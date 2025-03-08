@@ -3,4 +3,5 @@ module Main where
 import Cube
 
 main :: IO ()
-main = print solvedCube
+main = do
+    putStrLn $ showCube tPerm
