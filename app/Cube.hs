@@ -1,5 +1,7 @@
 module Cube where
 
+import Control.Monad.State
+
 data Color = White
            | Yellow
            | Green
