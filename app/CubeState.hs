@@ -110,9 +110,9 @@ instance Show CubeState where
               ++ showThirdC (dfr cube) ++ showSecondE (dr cube) ++ showSecondC (drb cube) ++ " "
               ++ showThirdC (drb cube) ++ showSecondE (db cube) ++ showSecondC (dbl cube)
 
-              ++ "\n   " ++ showFirstC (dlf cube) ++ showFirstE (df cube) ++ showFirstC (dfr cube)
-              ++ "\n   " ++ showFirstE (dl cube)  ++ show       (d cube)  ++ showFirstE (dr cube)
-              ++ "\n   " ++ showFirstC (dbl cube) ++ showFirstE (db cube) ++ showFirstC (drb cube)
+              ++ "\n    " ++ showFirstC (dlf cube) ++ showFirstE (df cube) ++ showFirstC (dfr cube)
+              ++ "\n    " ++ showFirstE (dl cube)  ++ show       (d cube)  ++ showFirstE (dr cube)
+              ++ "\n    " ++ showFirstC (dbl cube) ++ showFirstE (db cube) ++ showFirstC (drb cube)
 
 
 solvedCube :: CubeState
