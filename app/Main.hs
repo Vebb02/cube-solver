@@ -2,8 +2,10 @@
 module Main where
 
 import Cube
-import Text.Megaparsec
 import CubeParser
+import CubeState
+import Text.Megaparsec
+
 import qualified Data.Text as T
 
 
@@ -14,5 +16,6 @@ main = do
     case parsedResult of
         Left errorMessage -> print errorMessage
         Right cubeState -> do
+            print $ validateCubeState cubeState
             print cubeState
             putStrLn $ showCube tPerm cubeState
