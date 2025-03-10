@@ -112,4 +112,4 @@ tPerm = do
     move F Prime
 
 showCube :: Cube () -> CubeState -> String
-showCube c initialC = show $ execState c initialC
+showCube c initialC = show $ execState c initialC   
