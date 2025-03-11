@@ -1,6 +1,7 @@
 module CFOP.PLL where
 
 import CubeState
+import Cube
 
 data CornerPair = CornerPair (CubeState -> Corner) (CubeState -> Corner) 
 data PLLCategory = EdgesOnly | AdjecentCornerSwap | DiagonalCornerSwap
@@ -26,3 +27,94 @@ headlights (Corner _ c1 _) (Corner _ _ c2) =
     if c1 == c2
     then 1
     else 0
+
+pll :: Cube [Move]
+pll = undefined
+
+
+-- Edges only
+
+hPerm :: [Move]
+hPerm =
+    [ Move R Two
+    , Move U Two
+    , Move R Normal
+    , Move U Two
+    , Move R Two
+    , Move U Two
+    , Move R Two
+    , Move U Two
+    , Move R Normal
+    , Move U Two
+    , Move R Two
+    ]
+
+zPerm :: [Move]
+zPerm =
+    [ Move R Prime
+    , Move U Prime
+    , Move R Normal
+    , Move U Prime
+    , Move R Normal
+    , Move U Normal
+    , Move R Normal
+    , Move U Prime
+    , Move R Prime
+    , Move U Normal
+    , Move R Normal
+    , Move U Normal
+    , Move R Two
+    , Move U Prime
+    , Move R Prime
+    ]
+
+uaPerm :: [Move]
+uaPerm =
+    [ Move R Normal
+    , Move U Prime
+    , Move R Normal
+    , Move U Normal
+    , Move R Normal
+    , Move U Normal
+    , Move R Normal
+    , Move U Prime
+    , Move R Prime
+    , Move U Prime
+    , Move R Two
+    ]
+
+ubPerm :: [Move]
+ubPerm =
+    [ Move R Two
+    , Move U Normal
+    , Move R Normal
+    , Move U Normal
+    , Move R Prime
+    , Move U Prime
+    , Move R Prime
+    , Move U Prime
+    , Move R Prime
+    , Move U Normal
+    , Move R Prime
+    ]
+
+-- Adjacent corner swap
+tPerm :: [Move]
+tPerm =
+    [ Move R Normal
+    , Move U Normal
+    , Move R Prime
+    , Move U Prime
+    , Move R Prime
+    , Move F Normal
+    , Move R Two
+    , Move U Prime
+    , Move R Prime
+    , Move U Prime
+    , Move R Normal
+    , Move U Normal
+    , Move R Prime
+    , Move F Prime
+    ]
+
+-- Diagonal corner swap

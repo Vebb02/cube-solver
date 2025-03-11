@@ -99,22 +99,5 @@ sune = do
     move (Move U Two)
     move (Move R Prime)
 
-tPerm :: Cube ()
-tPerm = do
-    move (Move R Normal)
-    move (Move U Normal)
-    move (Move R Prime)
-    move (Move U Prime)
-    move (Move R Prime)
-    move (Move F Normal)
-    move (Move R Two)
-    move (Move U Prime)
-    move (Move R Prime)
-    move (Move U Prime)
-    move (Move R Normal)
-    move (Move U Normal)
-    move (Move R Prime)
-    move (Move F Prime)
-
 showCube :: Cube () -> CubeState -> String
 showCube c initialC = show $ execState c initialC   

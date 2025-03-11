@@ -3,9 +3,11 @@ module CFOP.CFOP where
 import Cube
 import CubeState
 import Control.Monad.State
+import CFOP.PLL
 
 solve :: Cube [Move]
 solve = do
+    pll
     auf
 
 auf :: Cube [Move]
