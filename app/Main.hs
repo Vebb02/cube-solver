@@ -3,28 +3,60 @@ module Main where
 
 import Cube ()
 import CubeParser ( parseCubeState )
-import CubeState ()
+import CubeState (CubeState)
 import CubeValidator ( validateCubeState )
-import Text.Megaparsec ( runParser )
+import CFOP ( auf )
 
+import Text.Megaparsec ( runParser, ParseErrorBundle )
 import qualified Data.Text as T
 
 import System.Directory (listDirectory)
+import Control.Monad.State (runState)
+import Data.Void (Void)
 
 main :: IO ()
 main = do
-    inputFiles <- listDirectory "input"
-    readCubeFiles inputFiles
+    -- validateTest
+    aufTest
 
-readCubeFiles :: [FilePath] -> IO ()
-readCubeFiles (file:files) = do
-    inputText <- readFile ("input" ++ "/" ++ file)
+
+aufTest :: IO ()
+aufTest = do
+    let dirPath = "input/auf"
+    inputFiles <- listDirectory dirPath
+    readCubeFiles dirPath inputFiles solveAuf
+
+solveAuf :: Either (ParseErrorBundle T.Text Void) CubeState -> FilePath -> IO()
+solveAuf parsedResult file = do
+    case parsedResult of
+        Left errorMessage -> print errorMessage
+        Right cubeState -> do
+            print file
+            print cubeState
+            let (result, newCubeState) = runState auf cubeState
+            print result
+            print newCubeState
+
+
+validateTest :: IO ()
+validateTest = do
+    let dirPath = "input/validate"
+    inputFiles <- listDirectory dirPath
+    readCubeFiles dirPath inputFiles validateCubes
+
+readCubeFiles :: String -> [FilePath] -> (Either (ParseErrorBundle T.Text Void) CubeState -> FilePath -> IO()) -> IO ()
+readCubeFiles dirPath (file:files) process = do
+    inputText <- readFile (dirPath ++ "/" ++ file)
     let parsedResult = runParser parseCubeState "" (T.pack inputText)
+    process parsedResult file
+    readCubeFiles dirPath files process
+readCubeFiles _ [] _ = return ()
+
+validateCubes :: Either (ParseErrorBundle T.Text Void) CubeState -> FilePath -> IO()
+validateCubes parsedResult file = do
     case parsedResult of
         Left errorMessage -> print errorMessage
         Right cubeState -> do
             putStrLn $ file ++ ": " ++ show (validateCubeState cubeState)
             -- print cubeState
             -- putStrLn $ showCube tPerm cubeState
-    readCubeFiles files
-readCubeFiles [] = return ()
