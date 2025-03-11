@@ -37,7 +37,7 @@ showSecondE edge = show $ secondE edge
 flipEdge :: Edge -> Edge
 flipEdge (Edge c1 c2) = Edge c2 c1
 
-data Corner = Corner 
+data Corner = Corner
     { firstC  :: Color
     , secondC :: Color
     , thirdC  :: Color
@@ -86,24 +86,24 @@ data CubeState = CubeState
     }
     deriving (Eq)
 
-instance Show CubeState where 
-    show cube = 
+instance Show CubeState where
+    show cube =
                    "    " ++ showFirstC (ulb cube) ++ showFirstE (ub cube) ++ showFirstC (ubr cube)
               ++ "\n    " ++ showFirstE (ul cube)  ++ show       (u cube)  ++ showFirstE (ur cube)
               ++ "\n    " ++ showFirstC (ufl cube) ++ showFirstE (uf cube) ++ showFirstC (urf cube)
-              
+
               ++ "\n"
               ++ showSecondC (ulb cube) ++ showSecondE (ul cube) ++ showThirdC (ufl cube) ++ " "
               ++ showSecondC (ufl cube) ++ showSecondE (uf cube) ++ showThirdC (urf cube) ++ " "
               ++ showSecondC (urf cube) ++ showSecondE (ur cube) ++ showThirdC (ubr cube) ++ " "
               ++ showSecondC (ubr cube) ++ showSecondE (ub cube) ++ showThirdC (ulb cube)
-              
+
               ++ "\n"
               ++ showSecondE (bl cube) ++ show (l cube) ++ showSecondE (fl cube) ++ " "
               ++ showFirstE  (fl cube) ++ show (f cube) ++ showFirstE  (fr cube) ++ " "
               ++ showSecondE (fr cube) ++ show (r cube) ++ showSecondE (br cube) ++ " "
               ++ showFirstE  (br cube) ++ show (b cube) ++ showFirstE  (bl cube)
-              
+
               ++ "\n"
               ++ showThirdC (dbl cube) ++ showSecondE (dl cube) ++ showSecondC (dlf cube) ++ " "
               ++ showThirdC (dlf cube) ++ showSecondE (df cube) ++ showSecondC (dfr cube) ++ " "
@@ -144,103 +144,3 @@ solvedCube = CubeState
     , dbl = Corner Yellow Blue Orange
     , drb = Corner Yellow Red Blue
     }
-
-
--- FIX: Corner and edge swap validation
-validateCubeState :: CubeState -> Bool
-validateCubeState cubeState = validatePieceQuantity cubeState
-                           && validateCenters cubeState 
-                           && validateEdgeOrientation cubeState
-                           && validateCornerRotation cubeState
-
-validateCornerRotation :: CubeState -> Bool
-validateCornerRotation cubeState = totalCornerSum cubeState `mod` 3 == 0
-
-totalCornerSum :: CubeState -> Int
-totalCornerSum cubeState = sum $ map cornerSum $ cubeCorners cubeState
-
-cubeCorners :: CubeState -> [Corner]
-cubeCorners cs = [ urf cs
-                 , ubr cs
-                 , ulb cs
-                 , ufl cs
-                 , dfr cs
-                 , dlf cs
-                 , dbl cs
-                 , drb cs
-                 ]
-
-cornerSum :: Corner -> Int
-cornerSum (Corner Yellow _ _) = 0
-cornerSum (Corner White _ _) = 0
-cornerSum (Corner _ Yellow  _) = 1
-cornerSum (Corner _ White _) = 1
-cornerSum (Corner _ _ Yellow) = 2
-cornerSum (Corner _ _ White) = 2
-cornerSum _ = undefined
-
-validateEdgeOrientation :: CubeState -> Bool
-validateEdgeOrientation cubeState = even $ totalEdgeSum cubeState
-
-totalEdgeSum :: CubeState -> Int
-totalEdgeSum cubeState = sum $ map edgeSum $ cubeEdges cubeState
-
-cubeEdges :: CubeState -> [Edge]
-cubeEdges cs = [ uf cs
-               , ur cs
-               , ub cs
-               , ul cs
-               , df cs
-               , dl cs
-               , db cs
-               , dr cs
-               , fr cs
-               , fl cs
-               , br cs
-               , bl cs
-               ]
-
-edgeSum :: Edge -> Int
-edgeSum (Edge White _) = 0
-edgeSum (Edge Yellow _) = 0
-edgeSum (Edge _ White) = 1
-edgeSum (Edge _ Yellow) = 1
-edgeSum (Edge Green _) = 0
-edgeSum (Edge Blue _) = 0
-edgeSum (Edge _ Green) = 1
-edgeSum (Edge _ Blue) = 1
-edgeSum _ = undefined
-
-validateCenters :: CubeState -> Bool
-validateCenters cubeState = 
-       f cubeState == Center Green
-    && b cubeState == Center Blue
-    && u cubeState == Center White
-    && d cubeState == Center Yellow
-    && r cubeState == Center Red
-    && l cubeState == Center Orange
-
-validatePieceQuantity :: CubeState -> Bool
-validatePieceQuantity cubeState = validateEdgeQuantity (cubeEdges cubeState) [] && validateCornerQuantity (cubeCorners cubeState) []
-
-validateEdgeQuantity :: [Edge] -> [Edge] -> Bool
-validateEdgeQuantity (x:xs) seen = edgeInList x (cubeEdges solvedCube) && not (edgeInList x seen) && validateEdgeQuantity xs (x:seen)
-validateEdgeQuantity [] _ = True
-
-edgeInList :: Edge -> [Edge] -> Bool
-edgeInList edge (x:xs) = edge `edgeEquivalent` x || edgeInList edge xs
-edgeInList _ [] = False
-
-edgeEquivalent :: Edge -> Edge -> Bool
-edgeEquivalent e1 e2 = e1 == e2 || e1 == flipEdge e2
-
-validateCornerQuantity :: [Corner] -> [Corner] -> Bool
-validateCornerQuantity (x:xs) seen = cornerInList x (cubeCorners solvedCube) && not (cornerInList x seen) && validateCornerQuantity xs (x:seen)
-validateCornerQuantity [] _ = True
-
-cornerInList :: Corner -> [Corner] -> Bool
-cornerInList corner (x:xs) = corner `cornerEquivalent` x || cornerInList corner xs
-cornerInList _ [] = False
-
-cornerEquivalent :: Corner -> Corner -> Bool
-cornerEquivalent c1 c2 = c1 == c2 || c1 == twistCorner c2 || c1 == twistCorner (twistCorner c2)
