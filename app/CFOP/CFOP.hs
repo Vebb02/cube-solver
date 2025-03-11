@@ -1,4 +1,4 @@
-module CFOP where
+module CFOP.CFOP where
 
 import Cube
 import CubeState

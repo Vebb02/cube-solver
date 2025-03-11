@@ -5,7 +5,8 @@ import Cube ()
 import CubeParser ( parseCubeState )
 import CubeState (CubeState)
 import CubeValidator ( validateCubeState )
-import CFOP ( auf )
+import CFOP.CFOP ( auf )
+import CFOP.PLL ( cornerSwapType )
 
 import Text.Megaparsec ( runParser, ParseErrorBundle )
 import qualified Data.Text as T
@@ -17,8 +18,24 @@ import Data.Void (Void)
 main :: IO ()
 main = do
     -- validateTest
-    aufTest
+    -- aufTest
+    pllTest
 
+
+pllTest :: IO ()
+pllTest = do
+    let dirPath = "input/pll"
+    inputFiles <- listDirectory dirPath
+    readCubeFiles dirPath inputFiles solvePll
+
+solvePll :: Either (ParseErrorBundle T.Text Void) CubeState -> FilePath -> IO()
+solvePll parsedResult file = do
+    case parsedResult of
+        Left errorMessage -> print errorMessage
+        Right cubeState -> do
+            print file
+            print cubeState
+            print $ cornerSwapType cubeState
 
 aufTest :: IO ()
 aufTest = do

@@ -65,7 +65,8 @@ executable cube-solver
                       CubeState,
                       CubeParser,
                       CubeValidator,
-                      CFOP
+                      CFOP.CFOP,
+                      CFOP.PLL
 
     -- LANGUAGE extensions used by modules in this package.
     -- other-extensions:
