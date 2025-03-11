@@ -75,5 +75,3 @@ validateCubes parsedResult file = do
         Left errorMessage -> print errorMessage
         Right cubeState -> do
             putStrLn $ file ++ ": " ++ show (validateCubeState cubeState)
-            -- print cubeState
-            -- putStrLn $ showCube tPerm cubeState
