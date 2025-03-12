@@ -20,6 +20,8 @@ data MoveFace = F
 data Move = Move MoveFace MoveDirection
     deriving (Eq)
 
+type Algorithm = [Move]
+
 instance Show Move where
     show (Move face Normal) = show face
     show (Move face Prime) = show face ++ "'"
@@ -98,7 +100,7 @@ move (Move x Two) = do
 showCube :: Cube () -> CubeState -> String
 showCube c initialC = show $ execState c initialC
 
-applyAlgorithm :: [Move] -> Cube [Move]
+applyAlgorithm :: Algorithm -> Cube Algorithm
 applyAlgorithm [] = return []
 applyAlgorithm (x:xs) = do
     move x
@@ -113,8 +115,13 @@ reverseMove (Move face Normal) = Move face Prime
 reverseMove (Move face Prime) = Move face Normal
 reverseMove (Move face Two) = Move face Two
 
-reverseMoveSeq :: [Move] -> [Move]
+reverseMoveSeq :: Algorithm -> Algorithm
 reverseMoveSeq moves = reverse $ map reverseMove moves
 
-aufMoves :: [Move]
-aufMoves = [Move U Normal, Move U Prime, Move U Two]
+aufMoves :: Algorithm
+aufMoves = [Move U Two, Move U Prime, Move U Normal]
+
+prependAuf :: [Algorithm] -> [Algorithm]
+prependAuf = prependMoves aufMoves where
+    prependMoves (x:xs) algorithms = prependMoves xs algorithms ++ map (x:) algorithms
+    prependMoves [] algorithms = algorithms
