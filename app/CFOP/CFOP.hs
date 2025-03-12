@@ -7,8 +7,9 @@ import CFOP.PLL
 
 solve :: Cube [Move]
 solve = do
-    pll
-    auf
+    pllMoves <- pll
+    aufMoves <- auf
+    return $ pllMoves ++ aufMoves
 
 auf :: Cube [Move]
 auf = do
