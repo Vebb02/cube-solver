@@ -1,8 +1,8 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Main where
 
-import CubeParser ( parseCubeState )
-import CubeState (CubeState)
+import CubeParser ( parseCubeState, parseScramble )
+import CubeState ( CubeState, solvedCube )
 import CubeValidator ( validateCubeState )
 import CFOP.CFOP ( auf )
 import CFOP.PLL
@@ -13,13 +13,34 @@ import qualified Data.Text as T
 import System.Directory ( listDirectory )
 import Control.Monad.State ( runState )
 import Data.Void (Void)
+import Cube ( applyAlgorithm )
 
 main :: IO ()
 main = do
+    parseScrambleTest
     -- validateTest
     -- aufTest
-    pllTest
+    -- pllTest
 
+parseScrambleTest :: IO ()
+parseScrambleTest = do
+    let dirPath = "input/scramble"
+    inputFiles <- listDirectory dirPath
+    readScrambles dirPath inputFiles
+
+readScrambles :: String -> [FilePath] -> IO ()
+readScrambles dirPath (file:files) = do
+    inputText <- readFile (dirPath ++ "/" ++ file)
+    let parsedResult = runParser parseScramble "" (T.pack inputText)
+    case parsedResult of
+        Left errorMessage -> print errorMessage
+        Right scramble -> do
+            print file
+            print scramble
+            let (_, cubeState) = runState (applyAlgorithm scramble) solvedCube
+            print cubeState
+    readScrambles dirPath files
+readScrambles _ [] = return ()
 
 pllTest :: IO ()
 pllTest = do
