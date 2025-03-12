@@ -67,6 +67,7 @@ executable cube-solver
                       CubeValidator,
                       CFOP.CFOP,
                       CFOP.PLL,
+                      CFOP.OLL,
                       Triggers
 
     -- LANGUAGE extensions used by modules in this package.

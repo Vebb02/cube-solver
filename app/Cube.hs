@@ -95,16 +95,6 @@ move (Move x Two) = do
     move (Move x Normal)
     move (Move x Normal)
 
-sune :: Cube ()
-sune = do
-    move (Move R Normal)
-    move (Move U Normal)
-    move (Move R Prime)
-    move (Move U Normal)
-    move (Move R Normal)
-    move (Move U Two)
-    move (Move R Prime)
-
 showCube :: Cube () -> CubeState -> String
 showCube c initialC = show $ execState c initialC
 
@@ -127,4 +117,4 @@ reverseMoveSeq :: [Move] -> [Move]
 reverseMoveSeq moves = reverse $ map reverseMove moves
 
 aufMoves :: [Move]
-aufMoves = [Move U Normal, Move U Two, Move U Prime]
+aufMoves = [Move U Normal, Move U Prime, Move U Two]

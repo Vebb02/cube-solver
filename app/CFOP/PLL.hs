@@ -5,7 +5,6 @@ import CubeState
 import Cube
 import Triggers
 
-data CornerPair = CornerPair (CubeState -> Corner) (CubeState -> Corner) 
 data PLLCategory = EdgesOnly | AdjecentCornerSwap | DiagonalCornerSwap
     deriving (Eq, Show)
 
