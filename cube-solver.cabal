@@ -68,7 +68,8 @@ executable cube-solver
                       CFOP.CFOP,
                       CFOP.PLL,
                       CFOP.OLL,
-                      Triggers
+                      Triggers,
+                      PDFCube
 
     -- LANGUAGE extensions used by modules in this package.
     -- other-extensions:
@@ -79,7 +80,8 @@ executable cube-solver
                       mtl,
                       text,
                       megaparsec,
-                      directory
+                      directory,
+                      HPDF
 
     -- Directories containing source files.
     hs-source-dirs:   app
