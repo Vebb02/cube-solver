@@ -29,10 +29,3 @@ tryAufMoves [] = do
     if cubeState == solvedCube
     then return []
     else undefined
-
-undoMove :: Move -> Cube ()
-undoMove (Move face Normal) = move (Move face Prime)
-undoMove (Move face Prime) = move (Move face Normal)
-undoMove (Move face Two) = move (Move face Two)
-
-

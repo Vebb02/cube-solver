@@ -114,3 +114,15 @@ applyAlgorithm (x:xs) = do
     move x
     result <- applyAlgorithm xs
     return (x : result)
+
+undoMove :: Move -> Cube ()
+undoMove x = move $ reverseMove x
+
+reverseMove :: Move -> Move
+reverseMove (Move face Normal) = Move face Prime
+reverseMove (Move face Prime) = Move face Normal
+reverseMove (Move face Two) = Move face Two
+
+reverseMoveSeq :: [Move] -> [Move]
+reverseMoveSeq [] = []
+reverseMoveSeq (x:xs) = reverseMoveSeq xs ++ [reverseMove x]

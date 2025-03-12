@@ -2,6 +2,7 @@ module CFOP.PLL where
 
 import CubeState
 import Cube
+import Triggers
 
 data CornerPair = CornerPair (CubeState -> Corner) (CubeState -> Corner) 
 data PLLCategory = EdgesOnly | AdjecentCornerSwap | DiagonalCornerSwap
@@ -139,11 +140,9 @@ jbPerm =
     , Move U Normal
     , Move R Prime
     , Move F Prime
-    , Move R Normal
-    , Move U Normal
-    , Move R Prime
-    , Move U Prime
-    , Move R Prime
+    ]
+    ++ sexy ++
+    [ Move R Prime
     , Move F Normal
     , Move R Two
     , Move U Prime
@@ -151,3 +150,18 @@ jbPerm =
     ]
 
 -- Diagonal corner swap
+
+yPerm :: [Move]
+yPerm =
+    [ Move F Normal
+    , Move R Normal
+    , Move U Prime
+    , Move R Prime
+    , Move U Prime
+    , Move R Normal
+    , Move U Normal
+    , Move R Prime
+    , Move F Prime
+    ]
+    ++ sexy
+    ++ sledgeHammer

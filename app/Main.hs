@@ -36,7 +36,7 @@ solvePll parsedResult file = do
             print file
             print cubeState
             print $ cornerSwapType cubeState
-            let (result, newCubeState) = runState (applyAlgorithm jaPerm) cubeState
+            let (result, newCubeState) = runState (applyAlgorithm jbPerm) cubeState
             print result
             print newCubeState
 
