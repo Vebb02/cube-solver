@@ -124,5 +124,7 @@ reverseMove (Move face Prime) = Move face Normal
 reverseMove (Move face Two) = Move face Two
 
 reverseMoveSeq :: [Move] -> [Move]
-reverseMoveSeq [] = []
-reverseMoveSeq (x:xs) = reverseMoveSeq xs ++ [reverseMove x]
+reverseMoveSeq moves = reverse $ map reverseMove moves
+
+aufMoves :: [Move]
+aufMoves = [Move U Normal, Move U Two, Move U Prime]
