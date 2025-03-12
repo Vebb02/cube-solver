@@ -1,7 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Main where
 
-import Cube (applyAlgorithm)
 import CubeParser ( parseCubeState )
 import CubeState (CubeState)
 import CubeValidator ( validateCubeState )
@@ -11,8 +10,8 @@ import CFOP.PLL
 import Text.Megaparsec ( runParser, ParseErrorBundle )
 import qualified Data.Text as T
 
-import System.Directory (listDirectory)
-import Control.Monad.State (runState)
+import System.Directory ( listDirectory )
+import Control.Monad.State ( runState )
 import Data.Void (Void)
 
 main :: IO ()
@@ -36,7 +35,7 @@ solvePll parsedResult file = do
             print file
             print cubeState
             print $ cornerSwapType cubeState
-            let (result, newCubeState) = runState (applyAlgorithm jbPerm) cubeState
+            let (result, newCubeState) = runState pll cubeState
             print result
             print newCubeState
 
