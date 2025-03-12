@@ -18,7 +18,13 @@ data MoveFace = F
     deriving (Eq, Show)
 
 data Move = Move MoveFace MoveDirection
-    deriving (Eq, Show)
+    deriving (Eq)
+
+instance Show Move where
+    show (Move face Normal) = show face
+    show (Move face Prime) = show face ++ "'"
+    show (Move face Two) = show face ++ "2"
+
 
 move :: Move -> Cube ()
 move (Move F Normal) = modify (\x -> x 
