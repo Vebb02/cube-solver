@@ -5,11 +5,18 @@ import Text.Megaparsec.Char
 import qualified Data.Text as T
 import Data.Void
 import CubeState
+import Cube
 
 type Parser = Parsec Void T.Text
 
-parseColor :: Parser Char
-parseColor = char 'W' <|> char 'Y' <|> char 'G' <|> char 'B' <|> char 'R' <|> char 'O'
+parseColor :: Parser Color
+parseColor =
+        White <$ char 'W'
+    <|> Yellow <$ char 'Y'
+    <|> Green <$ char 'G'
+    <|> Blue <$ char 'B'
+    <|> Red <$ char 'R'
+    <|> Orange <$ char 'O'
 
 parseCubeState :: Parser CubeState
 parseCubeState = do
@@ -17,19 +24,19 @@ parseCubeState = do
     u1 <- parseColor
     u2 <- parseColor
     u3 <- parseColor
-    
+
     _ <- newline
     space
     u4 <- parseColor
     u5 <- parseColor
     u6 <- parseColor
-    
+
     _ <- newline
     space
     u7 <- parseColor
     u8 <- parseColor
     u9 <- parseColor
-    
+
     _ <- newline
     l1 <- parseColor
     l2 <- parseColor
@@ -57,7 +64,7 @@ parseCubeState = do
     b4 <- parseColor
     b5 <- parseColor
     b6 <- parseColor
-    
+
     _ <- newline
     l7 <- parseColor
     l8 <- parseColor
@@ -71,7 +78,7 @@ parseCubeState = do
     b7 <- parseColor
     b8 <- parseColor
     b9 <- parseColor
-    
+
     _ <- newline
     space
     d1 <- parseColor
@@ -91,49 +98,61 @@ parseCubeState = do
     eof
 
     return CubeState
-        { f = Center $ charToColor f5
-        , r = Center $ charToColor r5
-        , u = Center $ charToColor u5
-        , b = Center $ charToColor b5
-        , l = Center $ charToColor l5
-        , d = Center $ charToColor d5
-        , uf = charsToEdge u8 f2
-        , ur = charsToEdge u6 r2
-        , ub = charsToEdge u2 b2
-        , ul = charsToEdge u4 l2
-        , df = charsToEdge d2 f8
-        , dl = charsToEdge d4 l8
-        , db = charsToEdge d8 b8
-        , dr = charsToEdge d6 r8
-        , fr = charsToEdge f6 r4
-        , fl = charsToEdge f4 l6
-        , br = charsToEdge b4 r6
-        , bl = charsToEdge b6 l4
-        , urf = charsToCorner u9 r1 f3
-        , ubr = charsToCorner u3 b1 r3
-        , ulb = charsToCorner u1 l1 b3
-        , ufl = charsToCorner u7 f1 l3
-        , dfr = charsToCorner d3 f9 r7
-        , dlf = charsToCorner d1 l9 f7
-        , dbl = charsToCorner d7 b9 l7
-        , drb = charsToCorner d9 r9 b7
+        { f = Center f5
+        , r = Center r5
+        , u = Center u5
+        , b = Center b5
+        , l = Center l5
+        , d = Center d5
+        , uf = Edge u8 f2
+        , ur = Edge u6 r2
+        , ub = Edge u2 b2
+        , ul = Edge u4 l2
+        , df = Edge d2 f8
+        , dl = Edge d4 l8
+        , db = Edge d8 b8
+        , dr = Edge d6 r8
+        , fr = Edge f6 r4
+        , fl = Edge f4 l6
+        , br = Edge b4 r6
+        , bl = Edge b6 l4
+        , urf = Corner u9 r1 f3
+        , ubr = Corner u3 b1 r3
+        , ulb = Corner u1 l1 b3
+        , ufl = Corner u7 f1 l3
+        , dfr = Corner d3 f9 r7
+        , dlf = Corner d1 l9 f7
+        , dbl = Corner d7 b9 l7
+        , drb = Corner d9 r9 b7
         }
 
-charsToEdge :: Char -> Char -> Edge
-charsToEdge c1 c2 = Edge (charToColor c1) (charToColor c2)
+parseScramble :: Parser Algorithm
+parseScramble = do
+    firstMove <- parseMove
+    restMoves <- many parseNextMove
+    eof
+    return (firstMove : restMoves)
 
-charsToCorner :: Char -> Char -> Char -> Corner
-charsToCorner c1 c2 c3 = Corner (charToColor c1) (charToColor c2) (charToColor c3)
+parseMove :: Parser Move
+parseMove = Move <$> parseFace <*> parseDirection
 
-charToColor :: Char -> Color
-charToColor 'W' = White
-charToColor 'Y' = Yellow
-charToColor 'G' = Green
-charToColor 'B' = Blue
-charToColor 'R' = Red
-charToColor 'O' = Orange
-charToColor _ = undefined
+parseNextMove :: Parser Move
+parseNextMove = space *> parseMove
 
+parseFace :: Parser MoveFace
+parseFace =
+        F <$ char 'F'
+    <|> R <$ char 'R'
+    <|> U <$ char 'U'
+    <|> B <$ char 'B'
+    <|> L <$ char 'L'
+    <|> D <$ char 'D'
+
+parseDirection :: Parser MoveDirection
+parseDirection =
+        Prime <$ char '\''
+    <|> Two   <$ char '2'
+    <|> return Normal
 
 runTest :: T.Text -> IO ()
 runTest = parseTest parseCubeState
