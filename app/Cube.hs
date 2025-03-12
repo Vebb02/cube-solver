@@ -100,4 +100,11 @@ sune = do
     move (Move R Prime)
 
 showCube :: Cube () -> CubeState -> String
-showCube c initialC = show $ execState c initialC   
+showCube c initialC = show $ execState c initialC
+
+applyAlgorithm :: [Move] -> Cube [Move]
+applyAlgorithm [] = return []
+applyAlgorithm (x:xs) = do
+    move x
+    result <- applyAlgorithm xs
+    return (x : result)

@@ -29,7 +29,8 @@ headlights (Corner _ c1 _) (Corner _ _ c2) =
     else 0
 
 pll :: Cube [Move]
-pll = undefined
+pll = do
+    undefined
 
 
 -- Edges only
@@ -115,6 +116,38 @@ tPerm =
     , Move U Normal
     , Move R Prime
     , Move F Prime
+    ]
+
+jaPerm :: [Move]
+jaPerm =
+    [ Move R Normal
+    , Move U Prime
+    , Move L Prime
+    , Move U Normal
+    , Move R Prime
+    , Move U Two
+    , Move L Normal
+    , Move U Prime
+    , Move L Prime
+    , Move U Two
+    , Move L Normal
+    ]
+
+jbPerm :: [Move]
+jbPerm =
+    [ Move R Normal
+    , Move U Normal
+    , Move R Prime
+    , Move F Prime
+    , Move R Normal
+    , Move U Normal
+    , Move R Prime
+    , Move U Prime
+    , Move R Prime
+    , Move F Normal
+    , Move R Two
+    , Move U Prime
+    , Move R Prime
     ]
 
 -- Diagonal corner swap
