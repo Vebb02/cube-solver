@@ -3,7 +3,7 @@ module Triggers where
 import Cube
 
 -- This is a totally legit speed cubing term, I promise
-sexy :: [Move]
+sexy :: Algorithm
 sexy =
     [ Move R Normal
     , Move U Normal
@@ -11,10 +11,10 @@ sexy =
     , Move U Prime
     ]
 
-reverseSexy :: [Move]
+reverseSexy :: Algorithm
 reverseSexy = reverseMoveSeq sexy
 
-sledgeHammer :: [Move]
+sledgeHammer :: Algorithm
 sledgeHammer =
     [ Move R Prime
     , Move F Normal
@@ -22,5 +22,5 @@ sledgeHammer =
     , Move F Prime
     ]
 
-hedgeSlammer :: [Move]
+hedgeSlammer :: Algorithm
 hedgeSlammer = reverseMoveSeq sledgeHammer

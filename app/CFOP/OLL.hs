@@ -3,28 +3,28 @@ module CFOP.OLL where
 import Cube
 import Triggers
 
-oll :: Cube [Move]
+oll :: Cube Algorithm
 oll = do
     edgeFlipMoves <- flipEdges
     cornerSolveMoves <- solveCorners
     return $ edgeFlipMoves ++ cornerSolveMoves
 
-flipEdges :: Cube [Move]
+flipEdges :: Cube Algorithm
 flipEdges = undefined
 
-solveCorners :: Cube [Move]
+solveCorners :: Cube Algorithm
 solveCorners = undefined
 
-dotFlip :: [Move]
+dotFlip :: Algorithm
 dotFlip = angleFlip ++ [Move U Normal] ++ lineFlip
 
-lineFlip :: [Move]
+lineFlip :: Algorithm
 lineFlip = [Move F Normal] ++ sexy ++ [Move F Prime]
 
-angleFlip :: [Move]
+angleFlip :: Algorithm
 angleFlip = reverseMoveSeq lineFlip
 
-sune :: [Move]
+sune :: Algorithm
 sune =
     [ Move R Normal
     , Move U Normal
@@ -35,10 +35,10 @@ sune =
     , Move R Prime
     ]
 
-antisune :: [Move]
+antisune :: Algorithm
 antisune = reverseMoveSeq sune
 
-hOll :: [Move]
+hOll :: Algorithm
 hOll =
     [ Move R Normal
     , Move U Normal
@@ -53,7 +53,7 @@ hOll =
     , Move R Prime
     ]
 
-lOll :: [Move]
+lOll :: Algorithm
 lOll = 
     [ Move F Normal
     , Move R Prime
@@ -65,7 +65,7 @@ lOll =
     , Move L Prime
     ]
 
-piOll :: [Move]
+piOll :: Algorithm
 piOll = 
     [ Move R Normal
     , Move U Two
@@ -78,10 +78,10 @@ piOll =
     , Move R Normal
     ]
 
-tOll :: [Move]
+tOll :: Algorithm
 tOll = reverseMoveSeq lOll
 
-uOll :: [Move]
+uOll :: Algorithm
 uOll = 
     [ Move R Two
     , Move D Normal

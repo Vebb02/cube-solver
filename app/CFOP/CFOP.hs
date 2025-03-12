@@ -5,17 +5,17 @@ import CubeState
 import Control.Monad.State
 import CFOP.PLL
 
-solve :: Cube [Move]
+solve :: Cube Algorithm
 solve = do
     pllMoves <- pll
     aufMove <- auf
     return $ pllMoves ++ aufMove
 
-auf :: Cube [Move]
+auf :: Cube Algorithm
 auf = do
     tryAufMoves aufMoves
 
-tryAufMoves :: [Move] -> Cube [Move]
+tryAufMoves :: Algorithm -> Cube Algorithm
 tryAufMoves (m:ms) = do
     move m
     cubeState <- get

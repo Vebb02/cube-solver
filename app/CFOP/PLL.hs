@@ -29,7 +29,7 @@ headlights (Corner _ c1 _) (Corner _ _ c2) =
     then 1
     else 0
 
-pll :: Cube [Move]
+pll :: Cube Algorithm
 pll = do
     cubeState <- get
     if isPllSolved cubeState
@@ -46,17 +46,12 @@ isPllSolved cubeState =
 equalPllSide :: Corner -> Edge -> Corner -> Bool
 equalPllSide (Corner _ c1 _) (Edge _ c2) (Corner _ _ c3) = c1 == c2 && c1 == c3
 
-solvePllByCategory :: PLLCategory -> Cube [Move]
+solvePllByCategory :: PLLCategory -> Cube Algorithm
 solvePllByCategory EdgesOnly = tryPllAlg (prependAuf [hPerm, zPerm, uaPerm, ubPerm])
 solvePllByCategory AdjecentCornerSwap = tryPllAlg (prependAuf [tPerm, jaPerm, jbPerm, fPerm, raPerm, rbPerm, aaPerm, abPerm, gaPerm, gbPerm, gcPerm, gdPerm])
 solvePllByCategory DiagonalCornerSwap = tryPllAlg (prependAuf [yPerm, vPerm, naPerm, nbPerm, ePerm])
 
-prependAuf :: [[Move]] -> [[Move]]
-prependAuf = prependMoves aufMoves where
-    prependMoves (x:xs) algorithms = prependMoves xs algorithms ++ map (x:) algorithms
-    prependMoves [] algorithms = algorithms
-
-tryPllAlg :: [[Move]] -> Cube [Move]
+tryPllAlg :: [Algorithm] -> Cube Algorithm
 tryPllAlg [] = undefined
 tryPllAlg (x:xs) = do
     _ <- applyAlgorithm x
@@ -69,7 +64,7 @@ tryPllAlg (x:xs) = do
 
 -- Edges only
 
-hPerm :: [Move]
+hPerm :: Algorithm
 hPerm =
     [ Move R Two
     , Move U Two
@@ -84,7 +79,7 @@ hPerm =
     , Move R Two
     ]
 
-zPerm :: [Move]
+zPerm :: Algorithm
 zPerm =
     [ Move R Prime
     , Move U Prime
@@ -103,7 +98,7 @@ zPerm =
     , Move R Prime
     ]
 
-uaPerm :: [Move]
+uaPerm :: Algorithm
 uaPerm =
     [ Move R Normal
     , Move U Prime
@@ -118,7 +113,7 @@ uaPerm =
     , Move R Two
     ]
 
-ubPerm :: [Move]
+ubPerm :: Algorithm
 ubPerm =
     [ Move R Two
     , Move U Normal
@@ -134,7 +129,7 @@ ubPerm =
     ]
 
 -- Adjacent corner swap
-tPerm :: [Move]
+tPerm :: Algorithm
 tPerm =
     sexy ++
     [ Move R Prime
@@ -149,7 +144,7 @@ tPerm =
     , Move F Prime
     ]
 
-jaPerm :: [Move]
+jaPerm :: Algorithm
 jaPerm =
     [ Move R Normal
     , Move U Prime
@@ -164,7 +159,7 @@ jaPerm =
     , Move L Normal
     ]
 
-jbPerm :: [Move]
+jbPerm :: Algorithm
 jbPerm =
     [ Move R Normal
     , Move U Normal
@@ -179,7 +174,7 @@ jbPerm =
     , Move R Prime
     ]
 
-fPerm :: [Move]
+fPerm :: Algorithm
 fPerm =
     [ Move R Prime
     , Move U Prime
@@ -199,7 +194,7 @@ fPerm =
     , Move R Normal
     ]
 
-aaPerm :: [Move]
+aaPerm :: Algorithm
 aaPerm =
     [ Move R Prime
     , Move F Normal
@@ -212,10 +207,10 @@ aaPerm =
     , Move R Two
     ]
 
-abPerm :: [Move]
+abPerm :: Algorithm
 abPerm = reverseMoveSeq aaPerm
 
-raPerm :: [Move]
+raPerm :: Algorithm
 raPerm =
     [ Move R Normal
     , Move U Normal
@@ -234,7 +229,7 @@ raPerm =
     , Move R Prime
     ]
 
-rbPerm :: [Move]
+rbPerm :: Algorithm
 rbPerm =
     [ Move R Two
     , Move F Normal
@@ -251,7 +246,7 @@ rbPerm =
     , Move R Normal
     ]
 
-gaPerm :: [Move]
+gaPerm :: Algorithm
 gaPerm =
     [ Move R Two
     , Move U Normal
@@ -270,18 +265,18 @@ gaPerm =
     , Move D Prime
     ]
 
-gbPerm :: [Move]
+gbPerm :: Algorithm
 gbPerm = reverseMoveSeq gaPerm
 
-gcPerm :: [Move]
+gcPerm :: Algorithm
 gcPerm = map reverseMove gaPerm 
 
-gdPerm :: [Move]
+gdPerm :: Algorithm
 gdPerm = reverseMoveSeq gcPerm
 
 -- Diagonal corner swap
 
-yPerm :: [Move]
+yPerm :: Algorithm
 yPerm =
     [ Move F Normal
     , Move R Normal
@@ -296,7 +291,7 @@ yPerm =
     ++ sexy
     ++ sledgeHammer
 
-vPerm :: [Move]
+vPerm :: Algorithm
 vPerm =
     [ Move R Normal
     , Move U Prime
@@ -316,7 +311,7 @@ vPerm =
     , Move R Two
     ]
 
-ePerm :: [Move]
+ePerm :: Algorithm
 ePerm =
     [ Move R Prime
     , Move U Prime
@@ -337,7 +332,7 @@ ePerm =
     , Move R Two 
     ]
 
-naPerm :: [Move]
+naPerm :: Algorithm
 naPerm =
     [ Move R Normal
     , Move U Normal
@@ -351,7 +346,7 @@ naPerm =
     , Move R Prime
     ]
 
-nbPerm :: [Move]
+nbPerm :: Algorithm
 nbPerm =
     [ Move R Prime
     , Move U Normal
