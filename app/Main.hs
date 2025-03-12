@@ -6,7 +6,7 @@ import CubeState ( CubeState, solvedCube )
 import CubeValidator ( validateCubeState )
 import CFOP.CFOP ( auf )
 import CFOP.PLL
-
+import PDFCube
 import Text.Megaparsec ( runParser, ParseErrorBundle )
 import qualified Data.Text as T
 
@@ -17,7 +17,8 @@ import Cube ( applyAlgorithm )
 
 main :: IO ()
 main = do
-    parseScrambleTest
+    runPDFTest
+    -- parseScrambleTest
     -- validateTest
     -- aufTest
     -- pllTest
