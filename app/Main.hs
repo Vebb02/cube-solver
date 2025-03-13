@@ -11,17 +11,26 @@ import Text.Megaparsec ( runParser, ParseErrorBundle )
 import qualified Data.Text as T
 
 import System.Directory ( listDirectory )
-import Control.Monad.State ( runState )
+import Control.Monad.State ( runState, evalState )
 import Data.Void (Void)
-import Cube ( applyAlgorithm )
+import Cube
 
 main :: IO ()
 main = do
-    runPDFTest
+    pdfTest
     -- parseScrambleTest
     -- validateTest
     -- aufTest
     -- pllTest
+
+pdfTest :: IO ()
+pdfTest = do
+    inputText <- readFile "input/pll/tPerm.in"
+    let parsedResult = runParser parseCubeState "" (T.pack inputText)
+    case parsedResult of
+        Left errorMessage -> print errorMessage
+        Right cubeState -> do
+            runPDFTest (evalState pll cubeState) cubeState
 
 parseScrambleTest :: IO ()
 parseScrambleTest = do

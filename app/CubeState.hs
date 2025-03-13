@@ -22,6 +22,9 @@ newtype Center = Center CubeColor
 instance Show Center where
     show (Center color) = show color
 
+centerColor :: Center -> CubeColor
+centerColor (Center c) = c
+
 data Edge = Edge
     { firstE  :: CubeColor
     , secondE :: CubeColor
