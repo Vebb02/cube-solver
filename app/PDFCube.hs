@@ -21,9 +21,11 @@ runPDFTest alg cubeState = do
             Right frontPageImage -> case eitherWarningImage of
                 Left errorMessage -> print errorMessage
                 Right warningImage -> do
-                    let font = PDFFont anyFont 50
                     let introductionPages = imagePage frontPageImage >> imagePage warningImage
-                    let instructions = evalState (createPdfCubeSolution alg 1 font) cubeState
+                    let font = PDFFont anyFont 50
+                    let size = 50
+                    let heightChange = 20
+                    let instructions = evalState (createPdfCubeSolution alg 1 font size heightChange) cubeState
                     let pdf = introductionPages >> instructions
                     runPdf "test.pdf" standardDocInfo rect pdf
 
@@ -34,118 +36,114 @@ imagePage frontPageImage = do
     image <- createPDFJpeg frontPageImage
     drawWithPage page (drawXObject image)
 
-
-leftTile :: [Point]
-leftTile = [300 :+ 300, 250 :+ 320, 250 :+ 370, 300 :+ 350, 300 :+ 300]
-
-rightTile :: [Point]
-rightTile = [300 :+ 300, 350 :+ 320, 350 :+ 370, 300 :+ 350, 300 :+ 300]
-
-topTile :: [Point]
-topTile = [300 :+ 450, 350 :+ 470, 300 :+ 490, 250 :+ 470, 300 :+ 450]
+cubeStart :: PDFFloat
+cubeStart = 300
 
 transformComplex :: PDFFloat -> PDFFloat -> Point -> Point
 transformComplex dx dy (x :+ y) = (x + dx) :+ (y + dy)
 
-drawCube :: CubeState -> Draw ()
-drawCube cubeState = do
-    drawLeftSide cubeState
-    drawRightSide cubeState
-    drawTop cubeState
+drawCube :: CubeState -> PDFFloat -> PDFFloat -> Draw ()
+drawCube cubeState size heightChange = do
+    drawLeftSide cubeState (-size) heightChange
+    drawRightSide cubeState size heightChange
+    drawTop cubeState size heightChange
 
-drawTop :: CubeState -> Draw ()
-drawTop cubeState = do
-    addTile (firstC $ urf cubeState) topTile 0 0
+drawTop :: CubeState -> PDFFloat -> PDFFloat -> Draw ()
+drawTop cubeState size heightChange = do
+    addTopTile (firstC $ urf cubeState) 0 0 size heightChange
 
-    addTile (firstE $ uf cubeState) topTile (-50) 20
-    addTile (firstE $ ur cubeState) topTile 50 20
+    addTopTile (firstE $ uf cubeState) (-1) 1 size heightChange
+    addTopTile (firstE $ ur cubeState) 1 1 size heightChange
 
-    addTile (firstC $ ufl cubeState) topTile (-100) 40
-    addTile (centerColor $ u cubeState) topTile 0 40
-    addTile (firstC $ ubr cubeState) topTile 100 40
+    addTopTile (firstC $ ufl cubeState) (-2) 2 size heightChange
+    addTopTile (centerColor $ u cubeState) 0 2 size heightChange
+    addTopTile (firstC $ ubr cubeState) 2 2 size heightChange
 
-    addTile (firstE $ ul cubeState) topTile (-50) 60
-    addTile (firstE $ ub cubeState) topTile 50 60
+    addTopTile (firstE $ ul cubeState) (-1) 3 size heightChange
+    addTopTile (firstE $ ub cubeState) 1 3 size heightChange
 
-    addTile (firstC $ ulb cubeState) topTile 0 80
+    addTopTile (firstC $ ulb cubeState) 0 4 size heightChange
     
+    addTopStroke [(0,0), (-1,1), (1,1), (-2,2), (0,2), (2,2), (-1,3), (1,3), (0,4)] size heightChange
 
-    addStroke topTile 0 0 
+drawRightSide :: CubeState -> PDFFloat -> PDFFloat -> Draw ()
+drawRightSide cubeState size heightChange = do
+    addSideTile (thirdC $ dfr cubeState) 0 0 size heightChange
+    addSideTile (secondE $ dr cubeState) 1 0 size heightChange
+    addSideTile (secondC $ drb cubeState) 2 0 size heightChange
 
-    addStroke topTile (-50) 20
-    addStroke topTile 50 20
+    addSideTile (secondE $ fr cubeState) 0 1 size heightChange
+    addSideTile (centerColor $ r cubeState) 1 1 size heightChange
+    addSideTile (secondE $ br cubeState) 2 1 size heightChange
 
-    addStroke topTile (-100) 40
-    addStroke topTile 0 40
-    addStroke topTile 100 40
-
-    addStroke topTile (-50) 60
-    addStroke topTile 50 60
-
-    addStroke topTile 0 80
-
-drawRightSide :: CubeState -> Draw ()
-drawRightSide cubeState = do
-    addTile (thirdC $ dfr cubeState) rightTile 0 0 
-    addTile (secondE $ dr cubeState) rightTile 50 20
-    addTile (secondC $ drb cubeState) rightTile (50 * 2) (20*2)
-
-    addTile (secondE $ fr cubeState) rightTile 0 50
-    addTile (centerColor $ r cubeState) rightTile 50 (50+20)
-    addTile (secondE $ br cubeState) rightTile (50 * 2) (50+20*2)
-
-    addTile (secondC $ urf cubeState) rightTile 0 (50*2)
-    addTile (secondE $ ur cubeState) rightTile 50 (50*2+20)
-    addTile (thirdC $ ubr cubeState) rightTile (50 * 2) (50*2+20*2)
+    addSideTile (secondC $ urf cubeState) 0 2 size heightChange
+    addSideTile (secondE $ ur cubeState) 1 2 size heightChange
+    addSideTile (thirdC $ ubr cubeState) 2 2 size heightChange
     
-    addStroke rightTile 0 0 
-    addStroke rightTile 50 20
-    addStroke rightTile (50 * 2) (20*2)
+    addSideStroke [(x,y) | x <- [0..2], y <- [0..2]] size heightChange
 
-    addStroke rightTile 0 50
-    addStroke rightTile 50 (50+20)
-    addStroke rightTile (50 * 2) (50+20*2)
+
+drawLeftSide :: CubeState -> PDFFloat -> PDFFloat -> Draw ()
+drawLeftSide cubeState size heightChange = do
+    addSideTile (secondC $ dfr cubeState) 0 0 size heightChange
+    addSideTile (secondE $ df cubeState) 1 0 size heightChange
+    addSideTile (thirdC $ dlf cubeState) 2 0 size heightChange
+
+    addSideTile (firstE $ fr cubeState) 0 1 size heightChange
+    addSideTile (centerColor $ f cubeState) 1 1 size heightChange
+    addSideTile (firstE $ fl cubeState) 2 1 size heightChange
+
+    addSideTile (thirdC $ urf cubeState) 0 2 size heightChange
+    addSideTile (secondE $ uf cubeState) 1 2 size heightChange
+    addSideTile (secondC $ ufl cubeState) 2 2 size heightChange
     
-    addStroke rightTile 0 (50*2)
-    addStroke rightTile 50 (50*2+20)
-    addStroke rightTile (50 * 2) (50*2+20*2)
+    addSideStroke [(x,y) | x <- [0..2], y <- [0..2]] size heightChange
 
-drawLeftSide :: CubeState -> Draw ()
-drawLeftSide cubeState = do
-    addTile (secondC $ dfr cubeState) leftTile 0 0 
-    addTile (secondE $ df cubeState) leftTile (-50) 20
-    addTile (thirdC $ dlf cubeState) leftTile (-(50 * 2)) (20*2)
-
-    addTile (firstE $ fr cubeState) leftTile 0 50
-    addTile (centerColor $ f cubeState) leftTile (-50) (50+20)
-    addTile (firstE $ fl cubeState) leftTile (-(50 * 2)) (50+20*2)
-
-    addTile (thirdC $ urf cubeState) leftTile 0 (50*2)
-    addTile (secondE $ uf cubeState) leftTile (-50) (50*2+20)
-    addTile (secondC $ ufl cubeState) leftTile (-(50 * 2)) (50*2+20*2)
-    
-    addStroke leftTile 0 0 
-    addStroke leftTile (-50) 20
-    addStroke leftTile (-(50 * 2)) (20*2)
-
-    addStroke leftTile 0 50
-    addStroke leftTile (-50) (50+20)
-    addStroke leftTile (-(50 * 2)) (50+20*2)
-    
-    addStroke leftTile 0 (50*2)
-    addStroke leftTile (-50) (50*2+20)
-    addStroke leftTile (-(50 * 2)) (50*2+20*2)
-addTile :: CubeColor -> [Point] -> PDFFloat -> PDFFloat -> Draw ()
-addTile color tile dx dy = do
+addTile :: CubeColor -> PDFFloat -> PDFFloat -> PDFFloat -> PDFFloat -> (PDFFloat -> PDFFloat -> PDFFloat -> PDFFloat -> [Point]) -> Draw ()
+addTile color x y size heightChange tileCalc = do
     fillColor $ cubeColorToPdfColor color
-    addPolygonToPath (fmap (transformComplex dx dy) tile)
+    addPolygonToPath (tileCalc x y size heightChange)
     fillPath
 
-addStroke :: [Point] -> PDFFloat -> PDFFloat -> Draw ()
-addStroke tile dx dy = do
+addStroke :: [(PDFFloat, PDFFloat)] -> PDFFloat -> PDFFloat -> (PDFFloat -> PDFFloat -> PDFFloat -> PDFFloat -> [Point]) -> Draw ()
+addStroke ((x, y):xys) size heightChange tileCalc = do
     fillColor black
-    addPolygonToPath (fmap (transformComplex dx dy) tile)
+    addPolygonToPath (tileCalc x y size heightChange)
     strokePath
+    addStroke xys size heightChange tileCalc
+addStroke [] _ _ _ = return ()
+
+calculatePolygonTileSide :: PDFFloat -> PDFFloat -> PDFFloat -> PDFFloat -> [Point]
+calculatePolygonTileSide x y size heightChange = let sizeY = abs size in
+    transformComplex cubeStart cubeStart <$> 
+    [ (size * x)     :+ (sizeY * y + heightChange * x)
+    , (size * (x+1)) :+ (sizeY * y + heightChange * (x+1))
+    , (size * (x+1)) :+ (sizeY * (y+1) + heightChange * (x+1))
+    , (size * x)     :+ (sizeY * (y+1) + heightChange * x)
+    , (size * x)     :+ (sizeY * y + heightChange * x)
+    ]
+
+addSideTile :: CubeColor -> PDFFloat -> PDFFloat -> PDFFloat -> PDFFloat -> Draw ()
+addSideTile color x y size heightChange = addTile color x y size heightChange calculatePolygonTileSide
+
+addSideStroke :: [(PDFFloat, PDFFloat)] -> PDFFloat -> PDFFloat -> Draw ()
+addSideStroke xys size heightChange = addStroke xys size heightChange calculatePolygonTileSide
+
+calculatePolygonTileTop :: PDFFloat -> PDFFloat -> PDFFloat -> PDFFloat -> [Point]
+calculatePolygonTileTop x y size heightChange =
+    transformComplex cubeStart (cubeStart + 3 * size) <$> 
+    [ (size * x)     :+ (heightChange * y)
+    , (size * (x+1)) :+ (heightChange * (y+1))
+    , (size * x)     :+ (heightChange * (y+2))
+    , (size * (x-1)) :+ (heightChange * (y+1))
+    , (size * x)     :+ (heightChange * y)
+    ]
+
+addTopTile :: CubeColor -> PDFFloat -> PDFFloat -> PDFFloat -> PDFFloat -> Draw ()
+addTopTile color x y size heightChange = addTile color x y size heightChange calculatePolygonTileTop
+
+addTopStroke :: [(PDFFloat, PDFFloat)] -> PDFFloat -> PDFFloat -> Draw ()
+addTopStroke xys size heightChange = addStroke xys size heightChange calculatePolygonTileTop
 
 rect :: PDFRect
 rect = PDFRect 0 0 600 800
@@ -164,13 +162,13 @@ cubeColorToPdfColor Blue = blue
 cubeColorToPdfColor Red = red
 cubeColorToPdfColor Orange = orange
 
-drawMove :: Move -> PDFFont -> Draw()
-drawMove m font = do
+drawMove :: Move -> PDFFont -> PDFFloat -> PDFFloat -> Draw()
+drawMove m font size heightChange = do
     setStrokeAlpha 0.75
     fillColor black
     setWidth 5
     setLineCap RoundCap
-    curve m
+    curve m size heightChange
     arrow m
     strokePath
     timesTwoMark m font
@@ -182,13 +180,31 @@ timesTwoMark (Move _ Two) font = drawText $ do
     displayText "x2"
 timesTwoMark _ _ = return ()
 
-curve :: Move -> Draw ()
-curve (Move F _) = addPolygonToPath [325 :+ 335, 325 :+ 460, 200 :+ 515]
-curve (Move R _) = addPolygonToPath [275 :+ 335, 275 :+ 460, 400 :+ 515]
-curve (Move U _) = addPolygonToPath [175 :+ 475, 300 :+ 425, 425 :+ 475]
-curve (Move B _) = addPolygonToPath [425 :+ 375, 425 :+ 500, 300 :+ 550]
-curve (Move L _) = addPolygonToPath [175 :+ 375, 175 :+ 500, 300 :+ 550]
-curve (Move D _) = addPolygonToPath [175 :+ 375, 300 :+ 325, 425 :+ 375]
+curve :: Move -> PDFFloat -> PDFFloat -> Draw ()
+curve (Move F _) size heightChange = addPolygonToPath [ (cubeStart + size/2) :+ (cubeStart + size/2 + heightChange/2)
+                                                      , (cubeStart + size/2) :+ (cubeStart + size*3 + heightChange/2)
+                                                      , (cubeStart - size*2) :+ (cubeStart + size*3 + heightChange*3)
+                                                      ]
+curve (Move R _) size heightChange = addPolygonToPath [ (cubeStart - size/2) :+ (cubeStart + size/2 + heightChange/2)
+                                                      , (cubeStart - size/2) :+ (cubeStart + size*3 + heightChange/2)
+                                                      , (cubeStart + size*2) :+ (cubeStart + size*3 + heightChange*3)
+                                                      ]
+curve (Move U _) size heightChange = addPolygonToPath [ (cubeStart - size*2.5) :+ (cubeStart + size*2.5 + heightChange*2.5)
+                                                      ,  cubeStart             :+ (cubeStart + size*2.5)
+                                                      , (cubeStart + size*2.5) :+ (cubeStart + size*2.5 + heightChange*2.5)
+                                                      ]
+curve (Move B _) size heightChange = addPolygonToPath [ (cubeStart + size*2.5) :+ (cubeStart + size/2 + heightChange*2.5)
+                                                      , (cubeStart + size*2.5) :+ (cubeStart + size*3 + heightChange*2.5)
+                                                      ,  cubeStart             :+ (cubeStart + size*3 + heightChange*5)
+                                                      ]
+curve (Move L _) size heightChange = addPolygonToPath [ (cubeStart - size*2.5) :+ (cubeStart + size/2 + heightChange*2.5)
+                                                      , (cubeStart - size*2.5) :+ (cubeStart + size*3 + heightChange*2.5)
+                                                      ,  cubeStart             :+ (cubeStart + size*3 + heightChange*5)
+                                                      ]
+curve (Move D _) size heightChange = addPolygonToPath [ (cubeStart - size*2.5) :+ (cubeStart + size*0.5 + heightChange*2.5)
+                                                      ,  cubeStart             :+ (cubeStart + size*0.5)
+                                                      , (cubeStart + size*2.5) :+ (cubeStart + size*0.5 + heightChange*2.5)
+                                                      ]
 
 arrow :: Move -> Draw ()
 arrow (Move m Two) = arrow (Move m Normal)
@@ -213,28 +229,28 @@ drawPageNumber pageNumber font = do
         textStart 50 700
         displayText (T.pack $ show pageNumber)
 
-drawCubePage :: CubeState -> Int -> PDFFont -> Draw ()
-drawCubePage cubeState pageNumber font = do
-    drawCube cubeState
+drawCubePage :: CubeState -> Int -> PDFFont -> PDFFloat -> PDFFloat -> Draw ()
+drawCubePage cubeState pageNumber font size heightChange = do
+    drawCube cubeState size heightChange
     drawPageNumber pageNumber font
 
-drawCubePageWithMove :: CubeState -> Move -> Int -> PDFFont -> Draw()
-drawCubePageWithMove cubeState m pageNumber font = do
-    drawCubePage cubeState pageNumber font
-    drawMove m font
+drawCubePageWithMove :: CubeState -> Move -> Int -> PDFFont -> PDFFloat -> PDFFloat -> Draw()
+drawCubePageWithMove cubeState m pageNumber font size heightChange = do
+    drawCubePage cubeState pageNumber font size heightChange
+    drawMove m font size heightChange
 
-createPdfCubeSolution :: Algorithm -> Int -> PDFFont -> Cube (PDF ())
-createPdfCubeSolution (m:ms) pageNumber font = do
+createPdfCubeSolution :: Algorithm -> Int -> PDFFont -> PDFFloat -> PDFFloat ->  Cube (PDF ())
+createPdfCubeSolution (m:ms) pageNumber font size heightChange = do
     cubeState <- get
     let pdf = do
             page <- addPage Nothing
-            drawWithPage page (drawCubePageWithMove cubeState m pageNumber font)
+            drawWithPage page (drawCubePageWithMove cubeState m pageNumber font size heightChange)
     move m
-    rest <- createPdfCubeSolution ms (pageNumber + 1) font
+    rest <- createPdfCubeSolution ms (pageNumber + 1) font size heightChange
     return (pdf >> rest) 
-createPdfCubeSolution [] pageNumber font = do
+createPdfCubeSolution [] pageNumber font size heightChange  = do
     cubeState <- get
     let pdf = do
             page <- addPage Nothing
-            drawWithPage page (drawCubePage cubeState pageNumber font)
+            drawWithPage page (drawCubePage cubeState pageNumber font size heightChange)
     return pdf
