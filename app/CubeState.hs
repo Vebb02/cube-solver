@@ -1,6 +1,6 @@
 module CubeState where
 
-data Color = White
+data CubeColor = White
            | Yellow
            | Green
            | Blue
@@ -8,7 +8,7 @@ data Color = White
            | Orange
     deriving (Eq)
 
-instance Show Color where
+instance Show CubeColor where
     show White = "W"
     show Yellow = "Y"
     show Green = "G"
@@ -16,15 +16,15 @@ instance Show Color where
     show Red = "R"
     show Orange = "O"
 
-newtype Center = Center Color
+newtype Center = Center CubeColor
     deriving (Eq)
 
 instance Show Center where
     show (Center color) = show color
 
 data Edge = Edge
-    { firstE  :: Color
-    , secondE :: Color
+    { firstE  :: CubeColor
+    , secondE :: CubeColor
     }
     deriving (Eq, Show)
 
@@ -38,9 +38,9 @@ flipEdge :: Edge -> Edge
 flipEdge (Edge c1 c2) = Edge c2 c1
 
 data Corner = Corner
-    { firstC  :: Color
-    , secondC :: Color
-    , thirdC  :: Color
+    { firstC  :: CubeColor
+    , secondC :: CubeColor
+    , thirdC  :: CubeColor
     }
     deriving (Eq, Show)
 

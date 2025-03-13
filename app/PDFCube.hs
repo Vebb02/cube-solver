@@ -3,6 +3,8 @@ module PDFCube where
 
 import Graphics.PDF.Colors
 import Graphics.PDF
+import CubeState
+import Cube
 
 runPDFTest :: IO ()
 runPDFTest = do
@@ -127,7 +129,6 @@ addStroke tile dx dy = do
     addPolygonToPath (fmap (transformComplex dx dy) tile)
     strokePath
 
-
 rect :: PDFRect
 rect = PDFRect 0 0 600 800
 
@@ -136,3 +137,11 @@ orange = Rgb 1 0.5 0
 
 yellow :: Color
 yellow = Rgb 1 1 0
+
+cubeColorToPdfColor :: CubeColor -> Color
+cubeColorToPdfColor White = white
+cubeColorToPdfColor Yellow = yellow
+cubeColorToPdfColor Green = green
+cubeColorToPdfColor Blue = blue
+cubeColorToPdfColor Red = red
+cubeColorToPdfColor Orange = orange
