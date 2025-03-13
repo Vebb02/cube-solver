@@ -6,11 +6,18 @@ import Graphics.PDF
 import CubeState
 import Cube
 import Control.Monad.State
+import qualified Data.Text as T
+
 
 runPDFTest :: Algorithm -> CubeState -> IO ()
 runPDFTest alg cubeState = do
-    let pdf = evalState (createPdfCubeSolution alg) cubeState
-    runPdf "test.pdf" standardDocInfo rect pdf
+    eitherFont <- mkStdFont Helvetica_Bold
+    case eitherFont of
+        Left errorMessage -> print errorMessage
+        Right anyFont -> do
+            let font = PDFFont anyFont 50
+            let pdf = evalState (createPdfCubeSolution alg 1 font) cubeState
+            runPdf "test.pdf" standardDocInfo rect pdf
 
 
 leftTile :: [Point]
@@ -142,32 +149,77 @@ cubeColorToPdfColor Blue = blue
 cubeColorToPdfColor Red = red
 cubeColorToPdfColor Orange = orange
 
+drawMove :: Move -> PDFFont -> Draw()
+drawMove m font = do
+    setStrokeAlpha 0.75
+    fillColor black
+    setWidth 5
+    setLineCap RoundCap
+    curve m
+    arrow m
+    strokePath
+    timesTwoMark m font
 
-drawCubePage :: CubeState -> Draw ()
-drawCubePage cubeState = do
+timesTwoMark :: Move -> PDFFont -> Draw ()
+timesTwoMark (Move _ Two) font = drawText $ do
+    setFont font
+    textStart 450 250
+    displayText "x2"
+timesTwoMark _ _ = return ()
+
+curve :: Move -> Draw ()
+curve (Move F _) = addPolygonToPath [325 :+ 335, 325 :+ 460, 200 :+ 515]
+curve (Move R _) = addPolygonToPath [275 :+ 335, 275 :+ 460, 400 :+ 515]
+curve (Move U _) = addPolygonToPath [175 :+ 475, 300 :+ 425, 425 :+ 475]
+curve (Move B _) = addPolygonToPath [425 :+ 375, 425 :+ 500, 300 :+ 550]
+curve (Move L _) = addPolygonToPath [175 :+ 375, 175 :+ 500, 300 :+ 550]
+curve (Move D _) = addPolygonToPath [175 :+ 375, 300 :+ 325, 425 :+ 375]
+
+arrow :: Move -> Draw ()
+arrow (Move m Two) = arrow (Move m Normal)
+arrow (Move F Normal) = addPolygonToPath [315 :+ 345, 325 :+ 335, 335 :+ 345]
+arrow (Move F Prime) = addPolygonToPath [210 :+ 500, 200 :+ 515, 215 :+ 520]
+arrow (Move R Normal) = addPolygonToPath [390 :+ 500, 400 :+ 515, 385 :+ 520]
+arrow (Move R Prime) = addPolygonToPath [285 :+ 345, 275 :+ 335, 265 :+ 345]
+arrow (Move U Normal) = addPolygonToPath [185 :+ 460, 175 :+ 475, 190 :+ 480]
+arrow (Move U Prime) = addPolygonToPath [415 :+ 460, 425 :+ 475, 410 :+ 480]
+arrow (Move B Normal) = addPolygonToPath [310 :+ 538, 300 :+ 550, 315 :+ 552]
+arrow (Move B Prime) = addPolygonToPath [415 :+ 385, 425 :+ 375, 435 :+ 385]
+arrow (Move L Normal) = addPolygonToPath [185 :+ 385, 175 :+ 375, 165 :+ 385]
+arrow (Move L Prime) = addPolygonToPath [290 :+ 538, 300 :+ 550, 285 :+ 552]
+arrow (Move D Normal) = addPolygonToPath [415 :+ 360, 425 :+ 375, 410 :+ 380]
+arrow (Move D Prime) = addPolygonToPath [185 :+ 360, 175 :+ 375, 190 :+ 380]
+
+
+drawPageNumber :: Int -> PDFFont -> Draw ()
+drawPageNumber pageNumber font = do
+    drawText $ do
+        setFont font
+        textStart 50 700
+        displayText (T.pack $ show pageNumber)
+
+drawCubePage :: CubeState -> Int -> PDFFont -> Draw ()
+drawCubePage cubeState pageNumber font = do
     drawCube cubeState
+    drawPageNumber pageNumber font
 
-drawMove :: Move -> Draw()
-drawMove m = do
-    undefined
+drawCubePageWithMove :: CubeState -> Move -> Int -> PDFFont -> Draw()
+drawCubePageWithMove cubeState m pageNumber font = do
+    drawCubePage cubeState pageNumber font
+    drawMove m font
 
-drawCubePageWithMove :: CubeState -> Move -> Draw()
-drawCubePageWithMove cubeState m = do
-    drawCubePage cubeState
-    -- drawMove m
-
-createPdfCubeSolution :: Algorithm -> Cube (PDF ())
-createPdfCubeSolution (m:ms) = do
+createPdfCubeSolution :: Algorithm -> Int -> PDFFont -> Cube (PDF ())
+createPdfCubeSolution (m:ms) pageNumber font = do
     cubeState <- get
     let pdf = do
             page <- addPage Nothing
-            drawWithPage page (drawCubePageWithMove cubeState m)
+            drawWithPage page (drawCubePageWithMove cubeState m pageNumber font)
     move m
-    rest <- createPdfCubeSolution ms
+    rest <- createPdfCubeSolution ms (pageNumber + 1) font
     return (pdf >> rest) 
-createPdfCubeSolution [] = do
+createPdfCubeSolution [] pageNumber font = do
     cubeState <- get
     let pdf = do
             page <- addPage Nothing
-            drawWithPage page (drawCubePage cubeState)
+            drawWithPage page (drawCubePage cubeState pageNumber font)
     return pdf
