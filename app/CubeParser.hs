@@ -9,7 +9,7 @@ import Cube
 
 type Parser = Parsec Void T.Text
 
-parseColor :: Parser Color
+parseColor :: Parser CubeColor
 parseColor =
         White <$ char 'W'
     <|> Yellow <$ char 'Y'
