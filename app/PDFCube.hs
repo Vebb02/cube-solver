@@ -12,12 +12,27 @@ import qualified Data.Text as T
 runPDFTest :: Algorithm -> CubeState -> IO ()
 runPDFTest alg cubeState = do
     eitherFont <- mkStdFont Helvetica_Bold
+    eitherFrontPageImage <- readJpegFile "images/front-page.jpeg"
+    eitherWarningImage <- readJpegFile "images/warning-page.jpeg"
     case eitherFont of
         Left errorMessage -> print errorMessage
-        Right anyFont -> do
-            let font = PDFFont anyFont 50
-            let pdf = evalState (createPdfCubeSolution alg 1 font) cubeState
-            runPdf "test.pdf" standardDocInfo rect pdf
+        Right anyFont -> case eitherFrontPageImage of
+            Left errorMessage -> print errorMessage
+            Right frontPageImage -> case eitherWarningImage of
+                Left errorMessage -> print errorMessage
+                Right warningImage -> do
+                    let font = PDFFont anyFont 50
+                    let introductionPages = imagePage frontPageImage >> imagePage warningImage
+                    let instructions = evalState (createPdfCubeSolution alg 1 font) cubeState
+                    let pdf = introductionPages >> instructions
+                    runPdf "test.pdf" standardDocInfo rect pdf
+
+
+imagePage :: JpegFile -> PDF ()
+imagePage frontPageImage = do
+    page <- addPage Nothing
+    image <- createPDFJpeg frontPageImage
+    drawWithPage page (drawXObject image)
 
 
 leftTile :: [Point]
