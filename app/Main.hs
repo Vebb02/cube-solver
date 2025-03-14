@@ -4,14 +4,14 @@ module Main where
 import CubeParser ( parseCubeState, parseScramble )
 import CubeState ( CubeState, solvedCube )
 import CubeValidator ( validateCubeState )
-import CFOP.CFOP ( auf )
+import CFOP.CFOP ( auf, solve )
 import CFOP.PLL
 import PDFCube
 import Text.Megaparsec ( runParser, ParseErrorBundle )
 import qualified Data.Text as T
 
 import System.Directory ( listDirectory )
-import Control.Monad.State ( runState, evalState )
+import Control.Monad.State
 import Data.Void (Void)
 import Cube
 
@@ -25,13 +25,13 @@ main = do
 
 pdfTest :: IO ()
 pdfTest = do
-    inputText <- readFile "input/pll/tPerm.in"
+    inputText <- readFile "input/oll/dot.in"
     let parsedResult = runParser parseCubeState "" (T.pack inputText)
     case parsedResult of
         Left errorMessage -> print errorMessage
         Right cubeState -> do
-            -- runPDFTest (evalState pll cubeState) cubeState
-            runPDFTest [Move F Normal, Move F Prime, Move R Normal, Move R Prime, Move U Normal, Move U Prime, Move B Normal, Move B Prime, Move L Normal, Move L Prime, Move D Normal, Move D Prime] cubeState
+            runPDFTest (evalState solve cubeState) cubeState
+            -- runPDFTest [Move F Normal, Move F Prime, Move R Normal, Move R Prime, Move U Normal, Move U Prime, Move B Normal, Move B Prime, Move L Normal, Move L Prime, Move D Normal, Move D Prime] cubeState
 
 parseScrambleTest :: IO ()
 parseScrambleTest = do

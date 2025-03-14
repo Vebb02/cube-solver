@@ -122,6 +122,22 @@ aufMoves :: Algorithm
 aufMoves = [Move U Two, Move U Prime, Move U Normal]
 
 prependAuf :: [Algorithm] -> [Algorithm]
-prependAuf = prependMoves aufMoves where
-    prependMoves (x:xs) algorithms = prependMoves xs algorithms ++ map (x:) algorithms
-    prependMoves [] algorithms = algorithms
+prependAuf = prependMoves aufMoves
+
+prependMoves :: [Move] -> [Algorithm] -> [Algorithm]
+prependMoves (x:xs) algorithms = prependMoves xs algorithms ++ map (x:) algorithms
+prependMoves [] algorithms = algorithms
+
+tryAlg :: [Algorithm] -> (CubeState -> Bool) -> Cube Algorithm
+tryAlg [] _ = undefined
+tryAlg (x:xs) stateCondition = do
+    _ <- applyAlgorithm x
+    cubeState <- get
+    if stateCondition cubeState
+    then return x
+    else do
+        _ <- applyAlgorithm (reverseMoveSeq x)
+        tryAlg xs stateCondition
+
+cubeSolved :: CubeState -> Bool
+cubeSolved cubeState = cubeState == solvedCube

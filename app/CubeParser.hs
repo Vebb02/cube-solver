@@ -6,6 +6,7 @@ import qualified Data.Text as T
 import Data.Void
 import CubeState
 import Cube
+import CubeValidator
 
 type Parser = Parsec Void T.Text
 
@@ -97,8 +98,8 @@ parseCubeState = do
     _ <- newline
     eof
 
-    return CubeState
-        { f = Center f5
+    let cubeState = CubeState { 
+          f = Center f5
         , r = Center r5
         , u = Center u5
         , b = Center b5
@@ -125,6 +126,9 @@ parseCubeState = do
         , dbl = Corner d7 b9 l7
         , drb = Corner d9 r9 b7
         }
+    if validateCubeState cubeState
+        then return cubeState
+        else error "Cube is not in a valid state"
 
 parseScramble :: Parser Algorithm
 parseScramble = do
