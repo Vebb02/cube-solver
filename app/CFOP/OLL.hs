@@ -2,18 +2,47 @@ module CFOP.OLL where
 
 import Cube
 import Triggers
+import CubeState
+import CubeValidator
+import Control.Monad.State
 
 oll :: Cube Algorithm
 oll = do
-    edgeFlipMoves <- flipEdges
+    cubeState <- get
+    edgeFlipMoves <- flipEdges (edgeState cubeState)
     cornerSolveMoves <- solveCorners
     return $ edgeFlipMoves ++ cornerSolveMoves
 
-flipEdges :: Cube Algorithm
-flipEdges = undefined
+data EdgeState = Dot | Line | Angle | EdgesOriented
+    deriving (Eq, Show)
+
+edgeState :: CubeState -> EdgeState
+edgeState cubeState = case totalEdgeSum cubeState of
+    0 -> EdgesOriented
+    2 -> if firstE (uf cubeState) == firstE (ub cubeState) 
+         || firstE (ul cubeState) == firstE (ur cubeState) 
+        then Line else Angle 
+    4 -> Dot
+    _ -> undefined
+
+edgesOriented :: CubeState -> Bool
+edgesOriented cubeState = edgeState cubeState == EdgesOriented
+
+tryEdgeFlipAlg :: [Algorithm] -> Cube Algorithm
+tryEdgeFlipAlg algs = tryAlg algs edgesOriented
+
+flipEdges :: EdgeState -> Cube Algorithm
+flipEdges EdgesOriented = return []
+flipEdges Line = tryEdgeFlipAlg (prependMoves [Move U Normal] [lineFlip])
+flipEdges Angle = tryEdgeFlipAlg (prependAuf [angleFlip])
+flipEdges Dot = applyAlgorithm dotFlip
+
+cornersOriented :: CubeState -> Bool
+cornersOriented cubeState = totalCornerSum cubeState == 0
 
 solveCorners :: Cube Algorithm
-solveCorners = undefined
+solveCorners = do 
+    tryAlg (prependAuf [[], sune, antisune, hOll, lOll, piOll, tOll, uOll]) cornersOriented
 
 dotFlip :: Algorithm
 dotFlip = angleFlip ++ [Move U Normal] ++ lineFlip

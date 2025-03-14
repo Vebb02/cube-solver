@@ -52,15 +52,7 @@ solvePllByCategory AdjecentCornerSwap = tryPllAlg (prependAuf [tPerm, jaPerm, jb
 solvePllByCategory DiagonalCornerSwap = tryPllAlg (prependAuf [yPerm, vPerm, naPerm, nbPerm, ePerm])
 
 tryPllAlg :: [Algorithm] -> Cube Algorithm
-tryPllAlg [] = undefined
-tryPllAlg (x:xs) = do
-    _ <- applyAlgorithm x
-    cubeState <- get
-    if isPllSolved cubeState
-    then return x
-    else do
-        _ <- applyAlgorithm (reverseMoveSeq x)
-        tryPllAlg xs
+tryPllAlg algs = tryAlg algs isPllSolved
 
 -- Edges only
 
