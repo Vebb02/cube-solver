@@ -68,6 +68,7 @@ executable cube-solver
                       CFOP.CFOP,
                       CFOP.PLL,
                       CFOP.OLL,
+                      CFOP.F2L,
                       Triggers,
                       PDFCube
 
