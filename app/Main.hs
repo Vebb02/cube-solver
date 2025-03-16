@@ -26,12 +26,12 @@ main = do
 
 pdfTest :: IO ()
 pdfTest = do
-    inputText <- readFile "input/f2l/7.in"
+    inputText <- readFile "input/f2l/1.in"
     let parsedResult = runParser parseCubeState "" (T.pack inputText)
     case parsedResult of
         Left errorMessage -> print errorMessage
         Right cubeState -> do
-            runPDFTest (evalState f2l cubeState) cubeState
+            runPDFTest (evalState solve cubeState) cubeState
             -- runPDFTest [Move F Normal, Move F Prime, Move R Normal, Move R Prime, Move U Normal, Move U Prime, Move B Normal, Move B Prime, Move L Normal, Move L Prime, Move D Normal, Move D Prime] cubeState
 
 parseScrambleTest :: IO ()
