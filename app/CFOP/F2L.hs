@@ -131,14 +131,14 @@ putPairInSlot slot = do
     cubeState <- get
     let solvedEdge = fst $ f2lSlot solvedCube slot
     let edge = edgeInEdgeList (cubeEdges cubeState) solvedEdge
-    solveSlot slot (edgeOrientationMove slot edge) [([], cubeState)]
+    let sideMove = edgeOrientationMove slot edge
+    solveSlot slot sideMove (map (\(currAlg, currState) -> let (resultAlg, resultState) = runState (applyAlgorithm [reverseMove sideMove]) currState in (currAlg ++ resultAlg, resultState)) (branchWithU (runState (applyAlgorithm [sideMove]) cubeState)) ++ createNewStates sideMove [([], cubeState)])
 
 solveSlot :: F2LSlot -> Move -> [(Algorithm, CubeState)] -> Cube Algorithm
 solveSlot _ _ [] = undefined
 solveSlot slot sideMove states = do
-    let newStates = createNewStates sideMove states
-    case validAlgorithm slot newStates of
-        Nothing -> solveSlot slot sideMove newStates
+    case validAlgorithm slot states of
+        Nothing -> solveSlot slot sideMove (createNewStates sideMove states)
         Just (alg, _) -> do
             applyAlgorithm alg
 
