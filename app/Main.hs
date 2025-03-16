@@ -14,6 +14,7 @@ import System.Directory ( listDirectory )
 import Control.Monad.State
 import Data.Void (Void)
 import Cube
+import CFOP.F2L ( f2l )
 
 main :: IO ()
 main = do
@@ -25,12 +26,12 @@ main = do
 
 pdfTest :: IO ()
 pdfTest = do
-    inputText <- readFile "input/oll/dot.in"
+    inputText <- readFile "input/f2l/7.in"
     let parsedResult = runParser parseCubeState "" (T.pack inputText)
     case parsedResult of
         Left errorMessage -> print errorMessage
         Right cubeState -> do
-            runPDFTest (evalState solve cubeState) cubeState
+            runPDFTest (evalState f2l cubeState) cubeState
             -- runPDFTest [Move F Normal, Move F Prime, Move R Normal, Move R Prime, Move U Normal, Move U Prime, Move B Normal, Move B Prime, Move L Normal, Move L Prime, Move D Normal, Move D Prime] cubeState
 
 parseScrambleTest :: IO ()
