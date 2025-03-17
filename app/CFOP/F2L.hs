@@ -5,13 +5,14 @@ import CubeState
 import Control.Monad.State
 import CubeValidator
 import Data.Maybe
+import Data.List ( permutations )
 
 f2l :: Cube Algorithm
 f2l = do
     cubeState <- get
     if f2lSolved cubeState
         then return []
-        else solveF2l [BL, BR, FL, FR]
+        else applyAlgorithm (fst $ bestPossibleF2L cubeState (permutations [BL, BR, FL, FR]))
 
 type F2LPair = (Edge, Corner)
 
@@ -38,6 +39,12 @@ f2lSlot cubeState BR = (br cubeState, drb cubeState)
 
 f2lSolved :: CubeState -> Bool
 f2lSolved cubeState = all (\slot -> f2lSlot cubeState slot == f2lSlot solvedCube slot) allPairs
+
+bestPossibleF2L :: CubeState -> [[F2LSlot]] -> (Algorithm, Int)
+bestPossibleF2L cubeState (x:xs) = do
+    let (alg, _) = runState (solveF2l x) cubeState
+    (\(alg1, moveCount1) (alg2, moveCount2) -> if moveCount1 < moveCount2 then (alg1, moveCount1) else (alg2, moveCount2)) (alg, length alg) (bestPossibleF2L cubeState xs)
+bestPossibleF2L _ [] = ([], 100000)
 
 solveF2l :: [F2LSlot] -> Cube Algorithm
 solveF2l (x:xs) = do
