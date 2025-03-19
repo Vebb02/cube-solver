@@ -4,6 +4,9 @@ import Control.Monad.State
 import CubeState
 import Cube
 import Triggers
+import CFOP.Cross
+import CFOP.F2L
+import CFOP.OLL
 
 data PLLCategory = EdgesOnly | AdjecentCornerSwap | DiagonalCornerSwap
     deriving (Eq, Show)
@@ -32,10 +35,11 @@ headlights (Corner _ c1 _) (Corner _ _ c2) =
 pll :: Cube Algorithm
 pll = do
     cubeState <- get
-    if isPllSolved cubeState
-    then return []
-    else solvePllByCategory (cornerSwapType cubeState)
-
+    if all (\validator -> validator cubeState) [crossSolved, f2lSolved, ollSolved] then
+        if isPllSolved cubeState
+            then return []
+            else solvePllByCategory (cornerSwapType cubeState)
+        else error "Cross, F2L and OLL must solved before PLL"
 isPllSolved :: CubeState -> Bool
 isPllSolved cubeState =
        equalPllSide (ufl cubeState) (uf cubeState) (urf cubeState)
