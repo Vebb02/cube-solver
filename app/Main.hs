@@ -15,6 +15,7 @@ import Control.Monad.State
 import Data.Void (Void)
 import Cube
 import CFOP.F2L ( f2l )
+import CFOP.Cross
 
 main :: IO ()
 main = do
