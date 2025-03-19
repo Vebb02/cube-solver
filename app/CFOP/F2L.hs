@@ -6,13 +6,16 @@ import Control.Monad.State
 import CubeValidator
 import Data.Maybe
 import Data.List ( permutations )
+import CFOP.Cross
 
 f2l :: Cube Algorithm
 f2l = do
     cubeState <- get
-    if f2lSolved cubeState
-        then return []
-        else applyAlgorithm (fst $ bestPossibleF2L cubeState (permutations [BL, BR, FL, FR]))
+    if crossSolved cubeState then
+        if f2lSolved cubeState
+            then return []
+            else applyAlgorithm (fst $ bestPossibleF2L cubeState (permutations [BL, BR, FL, FR]))
+        else error "Cross needs to be solved before F2L"
 
 type F2LPair = (Edge, Corner)
 

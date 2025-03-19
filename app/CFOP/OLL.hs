@@ -5,13 +5,19 @@ import Triggers
 import CubeState
 import CubeValidator
 import Control.Monad.State
+import CFOP.Cross
+import CFOP.F2L
+
 
 oll :: Cube Algorithm
 oll = do
     cubeState <- get
-    edgeFlipMoves <- flipEdges (edgeState cubeState)
-    cornerSolveMoves <- solveCorners
-    return $ edgeFlipMoves ++ cornerSolveMoves
+    if crossSolved cubeState && f2lSolved cubeState 
+        then do
+            edgeFlipMoves <- flipEdges (edgeState cubeState)
+            cornerSolveMoves <- solveCorners
+            return $ edgeFlipMoves ++ cornerSolveMoves
+        else error "Cross and F2L must be solved before OLL"
 
 data EdgeState = Dot | Line | Angle | EdgesOriented
     deriving (Eq, Show)
@@ -24,6 +30,9 @@ edgeState cubeState = case totalEdgeSum cubeState of
         then Line else Angle 
     4 -> Dot
     _ -> undefined
+
+ollSolved :: CubeState -> Bool
+ollSolved cubeState = edgesOriented cubeState && cornersOriented cubeState
 
 edgesOriented :: CubeState -> Bool
 edgesOriented cubeState = edgeState cubeState == EdgesOriented
