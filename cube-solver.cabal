@@ -71,7 +71,8 @@ executable cube-solver
                       CFOP.F2L,
                       CFOP.Cross,
                       Triggers,
-                      PDFCube
+                      PDFCube,
+                      Test
 
     -- LANGUAGE extensions used by modules in this package.
     -- other-extensions:
