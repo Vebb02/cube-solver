@@ -27,6 +27,29 @@ solveCrossPiece x = tryAlg [] (`crossPieceSolved` x)
 data CrossEdge = FEdge | REdge | BEdge | LEdge
     deriving (Eq, Show)
 
+data CrossEdgeCase = SolvedEdge | WrongPermutation | MidEdge | TopEdge | TopEdgeFlipped | BottomEdgeFlipped
+    deriving (Eq, Show)
+
+crossEdgeCase :: CubeState -> (CubeState -> Edge) -> CrossEdgeCase
+crossEdgeCase cubeState getEdge = let edge = getEdge solvedCube in
+    if any (\getTopEdge -> edge == getTopEdge cubeState) topLayerEdges
+        then TopEdge
+        else if any (\getTopEdge -> edge == flipEdge (getTopEdge cubeState)) topLayerEdges
+            then TopEdgeFlipped
+            else if any 
+                    (\getMidEdge -> edge == getMidEdge cubeState ||
+                                    edge == flipEdge (getMidEdge cubeState)) 
+                    midLayerEdges
+                then MidEdge
+                else if any (\getCrossEdge -> edge == flipEdge (getCrossEdge cubeState)) crossEdges
+                    then BottomEdgeFlipped
+                    else if any (\getCrossEdge -> edge == getCrossEdge cubeState) (optimalCrossEdges cubeState)
+                        then SolvedEdge
+                        else WrongPermutation
+
+optimalCrossEdges :: CubeState -> [CubeState -> Edge]
+optimalCrossEdges = undefined
+
 crossEdgeIndex :: CrossEdge -> Int
 crossEdgeIndex FEdge = 0
 crossEdgeIndex REdge = 1
@@ -42,11 +65,11 @@ moveTargetToDestination Nothing _ = return []
 moveTargetToDestination (Just target) destination = applyAlgorithm (dMoveBetween target destination)
 
 dMoveBetween :: CrossEdge -> CrossEdge -> Algorithm
-dMoveBetween from to = 
+dMoveBetween from to =
     let moveCount = (crossEdgeIndex to - crossEdgeIndex from)
         absMove = if moveCount < 0 then moveCount + 4 else moveCount
     in
-    case absMove of 
+    case absMove of
         0  -> []
         1  -> [Move D Normal]
         2  -> [Move D Two]
@@ -55,6 +78,12 @@ dMoveBetween from to =
 
 crossEdges :: [CubeState -> Edge]
 crossEdges = [df, dr, db, dl]
+
+topLayerEdges :: [CubeState -> Edge]
+topLayerEdges = [uf, ur, ub, ul]
+
+midLayerEdges :: [CubeState -> Edge]
+midLayerEdges = [fr, fl, br, bl]
 
 crossSolved :: CubeState -> Bool
 crossSolved cubeState = all (crossPieceSolved cubeState) crossEdges
