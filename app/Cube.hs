@@ -9,6 +9,18 @@ type Cube a = State CubeState a
 data MoveDirection = Normal | Prime | Two
     deriving (Eq, Show)
 
+combineMoveDirection :: MoveDirection -> MoveDirection -> Maybe MoveDirection
+combineMoveDirection Normal Prime = Nothing
+combineMoveDirection Prime Normal = Nothing
+combineMoveDirection Two Two = Nothing
+combineMoveDirection Normal Normal = Just Two
+combineMoveDirection Prime Prime = Just Two
+combineMoveDirection Normal Two = Just Prime
+combineMoveDirection Two Normal = Just Prime
+combineMoveDirection Prime Two = Just Normal
+combineMoveDirection Two Prime = Just Normal
+
+
 data MoveFace = F
           | R
           | U
@@ -141,3 +153,17 @@ tryAlg (x:xs) stateCondition = do
 
 cubeSolved :: CubeState -> Bool
 cubeSolved cubeState = cubeState == solvedCube
+
+removeCancellingMoves :: Algorithm -> Algorithm -> Algorithm
+removeCancellingMoves [] seen = reverse seen
+removeCancellingMoves (x:xs) (y:ys) = removeCancellingMoves xs (combineMoves x y ++ ys)
+removeCancellingMoves (x:xs) [] = removeCancellingMoves xs [x]
+
+combineMoves :: Move -> Move -> Algorithm
+combineMoves m0@(Move face0 dir0) m1@(Move face1 dir1) = 
+    if face0 /= face1 
+        then [m0, m1]
+        else let newDir = dir0 `combineMoveDirection` dir1 in
+            case newDir of
+                Nothing -> []
+                Just dir -> [Move face0 dir]
