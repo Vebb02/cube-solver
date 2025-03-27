@@ -11,7 +11,7 @@ solve = do
     ollMoves <- oll
     pllMoves <- pll
     aufMove <- auf
-    return $ f2lMoves ++ ollMoves ++ pllMoves ++ aufMove
+    return $ removeCancellingMoves (f2lMoves ++ ollMoves ++ pllMoves ++ aufMove) []
 
 auf :: Cube Algorithm
 auf = do
