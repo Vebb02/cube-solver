@@ -4,23 +4,114 @@ import Cube
 import CubeState
 import Control.Monad.State
 import Data.List ( permutations )
+import CubeValidator
 
 cross :: Cube Algorithm
 cross = do
     cubeState <- get
     if crossSolved cubeState
         then return []
-        else solveCross crossEdges
+        else applyAlgorithm (fst $ bestPossibleCross cubeState (permutations crossEdges))
+
+bestPossibleCross :: CubeState -> [[CubeState -> Edge]] -> (Algorithm, Int)
+bestPossibleCross cubeState (x:xs) = do
+    let (alg, _) = runState (solveCross x) cubeState
+    (\(alg1, moveCount1) (alg2, moveCount2) -> if moveCount1 < moveCount2 then (alg1, moveCount1) else (alg2, moveCount2)) (alg, length alg) (bestPossibleCross cubeState xs)
+bestPossibleCross _ [] = ([], 100000)
 
 solveCross :: [CubeState -> Edge] -> Cube Algorithm
 solveCross (x:xs) = do
     moves <- solveCrossPiece x
     rest <- solveCross xs
     return $ moves ++ rest
-solveCross [] = return []
+solveCross [] = tryAlg [[], [Move D Normal], [Move D Prime], [Move D Two]] crossSolved
 
 solveCrossPiece :: (CubeState -> Edge) -> Cube Algorithm
-solveCrossPiece x = tryAlg [] (`crossPieceSolved` x)
+solveCrossPiece x = do
+    cubeState <- get
+    let edgeCase = crossEdgeCase cubeState x
+    let x1 = findEdgeOnCube cubeState (x solvedCube)
+    solveCrossPieceByCase edgeCase x1
+
+findEdgeOnCube :: CubeState -> Edge -> (CubeState -> Edge)
+findEdgeOnCube cubeState edge = searchForEdge getCubeEdges where
+    searchForEdge [] = error "Could not find edge"
+    searchForEdge (x:xs) = 
+        if x cubeState == edge || x cubeState == flipEdge edge 
+        then x 
+        else searchForEdge xs
+
+solveCrossPieceByCase :: CrossEdgeCase -> (CubeState -> Edge) -> Cube Algorithm
+solveCrossPieceByCase SolvedEdge _ = return []
+solveCrossPieceByCase WrongPermutation x = do
+    cubeState <- get
+    let m = topBottomMoveFace x
+    moveOutOfLayer <- applyAlgorithm [Move m Normal]
+    moveBottomLayer <- moveTargetToDestination (targetEdge cubeState $ x cubeState) (moveFaceCrossEdge m)
+    moveBackToLayer <- applyAlgorithm [Move m Prime]
+    return $ moveOutOfLayer ++ moveBottomLayer ++ moveBackToLayer
+solveCrossPieceByCase MidEdge x = do
+    cubeState <- get
+    let (Move m dir) = midMove cubeState x
+    moveBottomLayer <- moveTargetToDestination (targetEdge cubeState $ x cubeState) (moveFaceCrossEdge m)
+    moveToBottomLayer <- applyAlgorithm [Move m dir]
+    return $ moveBottomLayer ++ moveToBottomLayer
+solveCrossPieceByCase TopEdge x = do
+    cubeState <- get
+    let m = topBottomMoveFace x
+    moveBottomLayer <- moveTargetToDestination (targetEdge cubeState $ x cubeState) (moveFaceCrossEdge m)
+    moveToBottomLayer <- applyAlgorithm [Move m Two]
+    return $ moveBottomLayer ++ moveToBottomLayer
+solveCrossPieceByCase TopEdgeFlipped x =  do
+    cubeState <- get
+    let m = topBottomMoveFace x
+    let m1 = leftMoveFace m
+    moveBottomLayer <- moveTargetToDestination (targetEdge cubeState $ x cubeState) (moveFaceCrossEdge m1)
+    insertPiece <- applyAlgorithm [Move m Prime, Move m1 Normal, Move m Normal]
+    return $ moveBottomLayer ++ insertPiece
+solveCrossPieceByCase BottomEdgeFlipped x = do
+    cubeState <- get
+    let m = topBottomMoveFace x
+    let m1 = leftMoveFace m
+    moveOutOfLayer <- applyAlgorithm [Move m Normal]
+    moveBottomLayer <- moveTargetToDestination (targetEdge cubeState $ x cubeState) (moveFaceCrossEdge m1)
+    moveBackToLayer <- applyAlgorithm [Move m1 Normal]
+    return $ moveOutOfLayer ++ moveBottomLayer ++ moveBackToLayer
+
+topBottomMoveFace :: (CubeState -> Edge) -> MoveFace
+topBottomMoveFace x = case secondE $ x solvedCube of
+    Green -> F
+    Red -> R
+    Blue -> B
+    Orange -> L
+    _ -> error "Color not defined"
+
+midMove :: CubeState -> (CubeState -> Edge) -> Move
+midMove cubeState x = let
+    solvedEdge = x solvedCube
+    unsolvedEdge = x cubeState in
+    case solvedEdge of
+        Edge Green Red -> if edgeSum unsolvedEdge == 0 then Move R Prime else Move F Normal
+        Edge Green Orange -> if edgeSum unsolvedEdge == 0 then Move L Normal else Move F Prime
+        Edge Blue Red -> if edgeSum unsolvedEdge == 0 then Move R Normal else Move B Prime
+        Edge Blue Orange -> if edgeSum unsolvedEdge == 0 then Move L Prime else Move B Normal
+        _ -> error $ show solvedEdge -- "Edge is not a valid mid edge"
+
+
+leftMoveFace :: MoveFace -> MoveFace
+leftMoveFace F = L
+leftMoveFace R = F
+leftMoveFace B = R
+leftMoveFace L = B
+leftMoveFace _ = error "Moveface does not have a face to the left"
+
+moveFaceCrossEdge :: MoveFace -> CrossEdge
+moveFaceCrossEdge F = FEdge
+moveFaceCrossEdge R = REdge
+moveFaceCrossEdge B = BEdge
+moveFaceCrossEdge L = LEdge
+moveFaceCrossEdge _ = error "Moveface is not assosiated with a cross edge"
+
 
 data CrossEdge = FEdge | REdge | BEdge | LEdge
     deriving (Eq, Show)
@@ -41,30 +132,31 @@ crossEdgeCase cubeState getEdge = let edge = getEdge solvedCube in
                 then MidEdge
                 else if any (\getCrossEdge -> edge == flipEdge (getCrossEdge cubeState)) crossEdges
                     then BottomEdgeFlipped
-                    else if edge `elem` optimalCrossEdges cubeState
+                    else if edge `elem` map fst (filter (uncurry (==)) $ optimalCrossEdges cubeState)
                         then SolvedEdge
                         else WrongPermutation
 
-optimalCrossEdges :: CubeState -> [Edge]
+optimalCrossEdges :: CubeState -> [(Edge, Edge)]
 optimalCrossEdges cubeState = do
     let currCrossEdges = map (\crossEdge -> crossEdge cubeState) crossEdges
     let solvedCrossEdges = map (\crossEdge -> crossEdge solvedCube) crossEdges
     let possibleSolvedCrossEdges = allRotations solvedCrossEdges
-    compareCrossEdgesWithPossibleSolvedCrossEdges currCrossEdges possibleSolvedCrossEdges
+    fst $ compareCrossEdgesWithPossibleSolvedCrossEdges currCrossEdges possibleSolvedCrossEdges
 
-compareCrossEdgesWithPossibleSolvedCrossEdges :: [Edge] -> [[Edge]] -> [Edge]
-compareCrossEdgesWithPossibleSolvedCrossEdges _ [] = []
+compareCrossEdgesWithPossibleSolvedCrossEdges :: [Edge] -> [[Edge]] -> ([(Edge, Edge)], Int)
+compareCrossEdgesWithPossibleSolvedCrossEdges _ [] = ([], -1)
 compareCrossEdgesWithPossibleSolvedCrossEdges edges (x:xs) =
-    let currentEdges = map fst $ filter (uncurry (==)) (zip edges x)
+    let currentEdges = zip edges x
+        solvedCount = length $ filter (uncurry (==)) currentEdges
         rest = compareCrossEdgesWithPossibleSolvedCrossEdges edges xs
     in
-    if length currentEdges > length rest
-        then currentEdges else rest
+    if solvedCount > snd rest
+        then (currentEdges, solvedCount) else rest
 
 allRotations :: [Edge] -> [[Edge]]
 allRotations edges = if null edges then [] else helperRotations (length edges-1) where
     helperRotations 0 = [edges]
-    helperRotations n = (drop n edges ++ take (length edges - n) edges) : helperRotations (n-1)
+    helperRotations n = (drop n edges ++ take n edges) : helperRotations (n-1)
 
 
 crossEdgeIndex :: CrossEdge -> Int
@@ -74,8 +166,20 @@ crossEdgeIndex BEdge = 2
 crossEdgeIndex LEdge = 3
 
 -- CrossEdge where edge is supposed to go
-targetEdge :: Edge -> Maybe CrossEdge
-targetEdge = undefined
+targetEdge :: CubeState -> Edge -> Maybe CrossEdge
+targetEdge cubeState edge =
+    let currentCrossEdges = optimalCrossEdges cubeState
+        flippedEdge = if edgeSum edge == 0 then edge else flipEdge edge
+    in
+        if not (any (uncurry (==)) currentCrossEdges)
+        then Nothing
+        else Just $ findEdge flippedEdge (map snd currentCrossEdges) (4 :: Int)
+    where
+        findEdge edge1 (x:xs) 4 = if edge1 == x then FEdge else findEdge edge1 xs 3
+        findEdge edge1 (x:xs) 3 = if edge1 == x then REdge else findEdge edge1 xs 2
+        findEdge edge1 (x:xs) 2 = if edge1 == x then BEdge else findEdge edge1 xs 1
+        findEdge edge1 (x:xs) 1 = if edge1 == x then LEdge else findEdge edge1 xs 0
+        findEdge _ _ _ = error "Edge is not in the possible target edges"
 
 moveTargetToDestination :: Maybe CrossEdge -> CrossEdge -> Cube Algorithm
 moveTargetToDestination Nothing _ = return []

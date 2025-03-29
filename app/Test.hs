@@ -18,7 +18,7 @@ import Cube
 
 pdfTest :: IO ()
 pdfTest = do
-    inputText <- readFile "input/f2l/1.in"
+    inputText <- readFile "input/cross/4.in"
     let parsedResult = runParser parseCubeState "" (T.pack inputText)
     case parsedResult of
         Left errorMessage -> print errorMessage
