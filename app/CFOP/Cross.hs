@@ -3,8 +3,6 @@ module CFOP.Cross where
 import Cube
 import CubeState
 import Control.Monad.State
-import CubeValidator
-import Data.Maybe
 import Data.List ( permutations )
 
 cross :: Cube Algorithm
@@ -36,19 +34,38 @@ crossEdgeCase cubeState getEdge = let edge = getEdge solvedCube in
         then TopEdge
         else if any (\getTopEdge -> edge == flipEdge (getTopEdge cubeState)) topLayerEdges
             then TopEdgeFlipped
-            else if any 
+            else if any
                     (\getMidEdge -> edge == getMidEdge cubeState ||
-                                    edge == flipEdge (getMidEdge cubeState)) 
+                                    edge == flipEdge (getMidEdge cubeState))
                     midLayerEdges
                 then MidEdge
                 else if any (\getCrossEdge -> edge == flipEdge (getCrossEdge cubeState)) crossEdges
                     then BottomEdgeFlipped
-                    else if any (\getCrossEdge -> edge == getCrossEdge cubeState) (optimalCrossEdges cubeState)
+                    else if edge `elem` optimalCrossEdges cubeState
                         then SolvedEdge
                         else WrongPermutation
 
-optimalCrossEdges :: CubeState -> [CubeState -> Edge]
-optimalCrossEdges = undefined
+optimalCrossEdges :: CubeState -> [Edge]
+optimalCrossEdges cubeState = do
+    let currCrossEdges = map (\crossEdge -> crossEdge cubeState) crossEdges
+    let solvedCrossEdges = map (\crossEdge -> crossEdge solvedCube) crossEdges
+    let possibleSolvedCrossEdges = allRotations solvedCrossEdges
+    compareCrossEdgesWithPossibleSolvedCrossEdges currCrossEdges possibleSolvedCrossEdges
+
+compareCrossEdgesWithPossibleSolvedCrossEdges :: [Edge] -> [[Edge]] -> [Edge]
+compareCrossEdgesWithPossibleSolvedCrossEdges _ [] = []
+compareCrossEdgesWithPossibleSolvedCrossEdges edges (x:xs) =
+    let currentEdges = map fst $ filter (uncurry (==)) (zip edges x)
+        rest = compareCrossEdgesWithPossibleSolvedCrossEdges edges xs
+    in
+    if length currentEdges > length rest
+        then currentEdges else rest
+
+allRotations :: [Edge] -> [[Edge]]
+allRotations edges = if null edges then [] else helperRotations (length edges-1) where
+    helperRotations 0 = [edges]
+    helperRotations n = (drop n edges ++ take (length edges - n) edges) : helperRotations (n-1)
+
 
 crossEdgeIndex :: CrossEdge -> Int
 crossEdgeIndex FEdge = 0
