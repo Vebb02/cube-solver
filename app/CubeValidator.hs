@@ -41,20 +41,23 @@ validateEdgeOrientation cubeState = even $ totalEdgeSum cubeState
 totalEdgeSum :: CubeState -> Int
 totalEdgeSum cubeState = sum $ map edgeSum $ cubeEdges cubeState
 
-cubeEdges :: CubeState -> [Edge]
-cubeEdges cs = [ uf cs
-               , ur cs
-               , ub cs
-               , ul cs
-               , df cs
-               , dl cs
-               , db cs
-               , dr cs
-               , fr cs
-               , fl cs
-               , br cs
-               , bl cs
+getCubeEdges :: [CubeState -> Edge]
+getCubeEdges = [ uf
+               , ur
+               , ub
+               , ul
+               , df
+               , dl
+               , db
+               , dr
+               , fr
+               , fl
+               , br
+               , bl
                ]
+
+cubeEdges :: CubeState -> [Edge]
+cubeEdges cs = map (\x -> x cs) getCubeEdges
 
 edgeSum :: Edge -> Int
 edgeSum (Edge White _) = 0
