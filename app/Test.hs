@@ -2,7 +2,7 @@
 module Test where
 
 import CubeParser ( parseCubeState, parseScramble )
-import CubeState ( CubeState, solvedCube )
+import CubeState
 import CubeValidator ( validateCubeState )
 import CFOP.CFOP ( auf, solve )
 import CFOP.PLL
@@ -102,3 +102,24 @@ validateCubes parsedResult file = do
         Left errorMessage -> print errorMessage
         Right cubeState -> do
             putStrLn $ file ++ ": " ++ show (validateCubeState cubeState)
+
+scramblesTest :: IO ()
+scramblesTest = do
+    inputText <- readFile "input/scrambles.in"
+    let unparsedScrambles = lines inputText
+    print $ solveScrambles unparsedScrambles
+
+solveScrambles :: [String] -> (Int, (Algorithm, Algorithm, Int), (Algorithm, Algorithm, Int)) 
+solveScrambles [] = (0, ([], [], 1000000), ([], [], 0))
+solveScrambles (x:xs) = do
+    case runParser parseScramble "" (T.pack x) of
+        Left errorMessage -> error $ show errorMessage
+        Right scramble -> do
+            let cubeState = execState (applyAlgorithm scramble) solvedCube
+            let (solution, _) = runState solve cubeState
+            -- print solution
+            let (moveCount, (minAlg, minScramble, minMoves), (maxAlg, maxScramble, maxMoves)) = solveScrambles xs
+            let totalMoveCount = moveCount + length solution
+            let shortest = if length solution < minMoves then (solution, scramble, length solution) else (minAlg, minScramble, minMoves)
+            let longest =  if length solution > maxMoves then (solution, scramble, length solution) else (maxAlg, maxScramble, maxMoves)
+            (totalMoveCount, shortest, longest)
