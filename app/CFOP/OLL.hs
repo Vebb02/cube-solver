@@ -125,6 +125,7 @@ uOll =
     , Move D Normal
     , Move R Prime
     , Move U Two
+    , Move R Normal
     , Move D Prime
     , Move R Prime
     , Move U Two
