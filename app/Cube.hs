@@ -141,7 +141,9 @@ prependMoves (x:xs) algorithms = prependMoves xs algorithms ++ map (x:) algorith
 prependMoves [] algorithms = algorithms
 
 tryAlg :: [Algorithm] -> (CubeState -> Bool) -> Cube Algorithm
-tryAlg [] _ = undefined
+tryAlg [] _ = do
+    cubeState <- get
+    error $ "\n" ++ show cubeState
 tryAlg (x:xs) stateCondition = do
     _ <- applyAlgorithm x
     cubeState <- get
