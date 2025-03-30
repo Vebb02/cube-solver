@@ -15,66 +15,66 @@ cross = do
 
 bestPossibleCross :: CubeState -> [[CubeState -> Edge]] -> (Algorithm, Int)
 bestPossibleCross cubeState (x:xs) = do
-    let (alg, _) = runState (solveCross x) cubeState
+    let (alg, _) = runState (solveCross x []) cubeState
     (\(alg1, moveCount1) (alg2, moveCount2) -> if moveCount1 < moveCount2 then (alg1, moveCount1) else (alg2, moveCount2)) (alg, length alg) (bestPossibleCross cubeState xs)
 bestPossibleCross _ [] = ([], 100000)
 
-solveCross :: [CubeState -> Edge] -> Cube Algorithm
-solveCross (x:xs) = do
-    moves <- solveCrossPiece x
-    rest <- solveCross xs
+solveCross :: [CubeState -> Edge] -> [CubeState -> Edge] -> Cube Algorithm
+solveCross (x:xs) solvedPieces = do
+    moves <- solveCrossPiece x solvedPieces
+    rest <- solveCross xs (x:solvedPieces)
     return $ moves ++ rest
-solveCross [] = tryAlg [[], [Move D Normal], [Move D Prime], [Move D Two]] crossSolved
+solveCross [] _ = tryAlg [[], [Move D Normal], [Move D Prime], [Move D Two]] crossSolved
 
-solveCrossPiece :: (CubeState -> Edge) -> Cube Algorithm
-solveCrossPiece x = do
+solveCrossPiece :: (CubeState -> Edge) -> [CubeState -> Edge] -> Cube Algorithm
+solveCrossPiece x solvedPieces = do
     cubeState <- get
-    let edgeCase = crossEdgeCase cubeState x
+    let edgeCase = crossEdgeCase cubeState x solvedPieces
     let x1 = findEdgeOnCube cubeState (x solvedCube)
-    solveCrossPieceByCase edgeCase x1
+    solveCrossPieceByCase edgeCase x1 solvedPieces
 
 findEdgeOnCube :: CubeState -> Edge -> (CubeState -> Edge)
 findEdgeOnCube cubeState edge = searchForEdge getCubeEdges where
     searchForEdge [] = error "Could not find edge"
-    searchForEdge (x:xs) = 
-        if x cubeState == edge || x cubeState == flipEdge edge 
-        then x 
+    searchForEdge (x:xs) =
+        if x cubeState == edge || x cubeState == flipEdge edge
+        then x
         else searchForEdge xs
 
-solveCrossPieceByCase :: CrossEdgeCase -> (CubeState -> Edge) -> Cube Algorithm
-solveCrossPieceByCase SolvedEdge _ = return []
-solveCrossPieceByCase WrongPermutation x = do
+solveCrossPieceByCase :: CrossEdgeCase -> (CubeState -> Edge) -> [CubeState -> Edge] -> Cube Algorithm
+solveCrossPieceByCase SolvedEdge _  _ = return []
+solveCrossPieceByCase WrongPermutation x solvedPieces = do
     cubeState <- get
     let m = topBottomMoveFace x
     moveOutOfLayer <- applyAlgorithm [Move m Normal]
-    moveBottomLayer <- moveTargetToDestination (targetEdge cubeState $ x cubeState) (moveFaceCrossEdge m)
+    moveBottomLayer <- moveTargetToDestination (targetEdge cubeState (x cubeState) solvedPieces) (moveFaceCrossEdge m)
     moveBackToLayer <- applyAlgorithm [Move m Prime]
     return $ moveOutOfLayer ++ moveBottomLayer ++ moveBackToLayer
-solveCrossPieceByCase MidEdge x = do
+solveCrossPieceByCase MidEdge x solvedPieces = do
     cubeState <- get
     let (Move m dir) = midMove cubeState x
-    moveBottomLayer <- moveTargetToDestination (targetEdge cubeState $ x cubeState) (moveFaceCrossEdge m)
+    moveBottomLayer <- moveTargetToDestination (targetEdge cubeState (x cubeState) solvedPieces) (moveFaceCrossEdge m)
     moveToBottomLayer <- applyAlgorithm [Move m dir]
     return $ moveBottomLayer ++ moveToBottomLayer
-solveCrossPieceByCase TopEdge x = do
+solveCrossPieceByCase TopEdge x solvedPieces = do
     cubeState <- get
     let m = topBottomMoveFace x
-    moveBottomLayer <- moveTargetToDestination (targetEdge cubeState $ x cubeState) (moveFaceCrossEdge m)
+    moveBottomLayer <- moveTargetToDestination (targetEdge cubeState (x cubeState) solvedPieces) (moveFaceCrossEdge m)
     moveToBottomLayer <- applyAlgorithm [Move m Two]
     return $ moveBottomLayer ++ moveToBottomLayer
-solveCrossPieceByCase TopEdgeFlipped x =  do
+solveCrossPieceByCase TopEdgeFlipped x solvedPieces =  do
     cubeState <- get
     let m = topBottomMoveFace x
     let m1 = leftMoveFace m
-    moveBottomLayer <- moveTargetToDestination (targetEdge cubeState $ x cubeState) (moveFaceCrossEdge m1)
+    moveBottomLayer <- moveTargetToDestination (targetEdge cubeState (x cubeState) solvedPieces) (moveFaceCrossEdge m1)
     insertPiece <- applyAlgorithm [Move m Prime, Move m1 Normal, Move m Normal]
     return $ moveBottomLayer ++ insertPiece
-solveCrossPieceByCase BottomEdgeFlipped x = do
+solveCrossPieceByCase BottomEdgeFlipped x solvedPieces = do
     cubeState <- get
     let m = topBottomMoveFace x
     let m1 = leftMoveFace m
     moveOutOfLayer <- applyAlgorithm [Move m Normal]
-    moveBottomLayer <- moveTargetToDestination (targetEdge cubeState $ x cubeState) (moveFaceCrossEdge m1)
+    moveBottomLayer <- moveTargetToDestination (targetEdge cubeState (x cubeState) solvedPieces) (moveFaceCrossEdge m1)
     moveBackToLayer <- applyAlgorithm [Move m1 Normal]
     return $ moveOutOfLayer ++ moveBottomLayer ++ moveBackToLayer
 
@@ -119,8 +119,8 @@ data CrossEdge = FEdge | REdge | BEdge | LEdge
 data CrossEdgeCase = SolvedEdge | WrongPermutation | MidEdge | TopEdge | TopEdgeFlipped | BottomEdgeFlipped
     deriving (Eq, Show)
 
-crossEdgeCase :: CubeState -> (CubeState -> Edge) -> CrossEdgeCase
-crossEdgeCase cubeState getEdge = let edge = getEdge solvedCube in
+crossEdgeCase :: CubeState -> (CubeState -> Edge) -> [CubeState -> Edge] -> CrossEdgeCase
+crossEdgeCase cubeState getEdge solvedPieces = let edge = getEdge solvedCube in
     if any (\getTopEdge -> edge == getTopEdge cubeState) topLayerEdges
         then TopEdge
         else if any (\getTopEdge -> edge == flipEdge (getTopEdge cubeState)) topLayerEdges
@@ -132,25 +132,28 @@ crossEdgeCase cubeState getEdge = let edge = getEdge solvedCube in
                 then MidEdge
                 else if any (\getCrossEdge -> edge == flipEdge (getCrossEdge cubeState)) crossEdges
                     then BottomEdgeFlipped
-                    else if edge `elem` map fst (filter (uncurry (==)) $ optimalCrossEdges cubeState)
+                    else if edge `elem` map fst (filter (uncurry (==)) $ optimalCrossEdges cubeState solvedPieces)
                         then SolvedEdge
                         else WrongPermutation
 
-optimalCrossEdges :: CubeState -> [(Edge, Edge)]
-optimalCrossEdges cubeState = do
+optimalCrossEdges :: CubeState -> [CubeState -> Edge] -> [(Edge, Edge)]
+optimalCrossEdges cubeState solvedPieces = do
     let currCrossEdges = map (\crossEdge -> crossEdge cubeState) crossEdges
     let solvedCrossEdges = map (\crossEdge -> crossEdge solvedCube) crossEdges
     let possibleSolvedCrossEdges = allRotations solvedCrossEdges
-    fst $ compareCrossEdgesWithPossibleSolvedCrossEdges currCrossEdges possibleSolvedCrossEdges
+    fst $ compareCrossEdgesWithPossibleSolvedCrossEdges currCrossEdges possibleSolvedCrossEdges solvedPieces
 
-compareCrossEdgesWithPossibleSolvedCrossEdges :: [Edge] -> [[Edge]] -> ([(Edge, Edge)], Int)
-compareCrossEdgesWithPossibleSolvedCrossEdges _ [] = ([], -1)
-compareCrossEdgesWithPossibleSolvedCrossEdges edges (x:xs) =
+compareCrossEdgesWithPossibleSolvedCrossEdges :: [Edge] -> [[Edge]] -> [CubeState -> Edge] ->  ([(Edge, Edge)], Int)
+compareCrossEdgesWithPossibleSolvedCrossEdges _ [] _ = ([], -1)
+compareCrossEdgesWithPossibleSolvedCrossEdges edges (x:xs) solvedPieces =
     let currentEdges = zip edges x
-        solvedCount = length $ filter (uncurry (==)) currentEdges
-        rest = compareCrossEdgesWithPossibleSolvedCrossEdges edges xs
+        equalEdges = map fst $ filter (uncurry (==)) currentEdges
+        solvedEdges = map (\x1 -> x1 solvedCube) solvedPieces
+        solvedPiecesIncluded = null solvedPieces || all (`elem` equalEdges) solvedEdges
+        solvedCount = length equalEdges
+        rest = compareCrossEdgesWithPossibleSolvedCrossEdges edges xs solvedPieces
     in
-    if solvedCount > snd rest
+    if solvedCount > snd rest && solvedPiecesIncluded
         then (currentEdges, solvedCount) else rest
 
 allRotations :: [Edge] -> [[Edge]]
@@ -166,9 +169,9 @@ crossEdgeIndex BEdge = 2
 crossEdgeIndex LEdge = 3
 
 -- CrossEdge where edge is supposed to go
-targetEdge :: CubeState -> Edge -> Maybe CrossEdge
-targetEdge cubeState edge =
-    let currentCrossEdges = optimalCrossEdges cubeState
+targetEdge :: CubeState -> Edge -> [CubeState -> Edge] -> Maybe CrossEdge
+targetEdge cubeState edge solvedPieces =
+    let currentCrossEdges = optimalCrossEdges cubeState solvedPieces
         flippedEdge = if edgeSum edge == 0 then edge else flipEdge edge
     in
         if not (any (uncurry (==)) currentCrossEdges)
