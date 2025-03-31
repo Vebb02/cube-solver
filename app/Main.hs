@@ -4,5 +4,5 @@ import Test
 
 main :: IO ()
 main = do
-    -- pdfTest
-    scramblesTest
+    pdfTest
+    -- scramblesTest
