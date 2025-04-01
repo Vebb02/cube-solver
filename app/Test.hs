@@ -23,8 +23,7 @@ pdfTest = do
     case parsedResult of
         Left errorMessage -> print errorMessage
         Right cubeState -> do
-            runPDFTest (evalState solve cubeState) cubeState
-            -- runPDFTest [Move F Normal, Move F Prime, Move R Normal, Move R Prime, Move U Normal, Move U Prime, Move B Normal, Move B Prime, Move L Normal, Move L Prime, Move D Normal, Move D Prime] cubeState
+            generatePDFSolution (evalState solve cubeState) cubeState
 
 parseScrambleTest :: IO ()
 parseScrambleTest = do
@@ -117,7 +116,6 @@ solveScrambles (x:xs) = do
         Right scramble -> do
             let cubeState = execState (applyAlgorithm scramble) solvedCube
             let (solution, _) = runState solve cubeState
-            -- print solution
             let (moveCount, (minAlg, minScramble, minMoves), (maxAlg, maxScramble, maxMoves)) = solveScrambles xs
             let totalMoveCount = moveCount + length solution
             let shortest = if length solution < minMoves then (solution, scramble, length solution) else (minAlg, minScramble, minMoves)

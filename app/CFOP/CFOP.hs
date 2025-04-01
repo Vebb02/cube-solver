@@ -1,10 +1,17 @@
 module CFOP.CFOP where
 
 import Cube
-import CFOP.Cross
-import CFOP.PLL
-import CFOP.OLL
-import CFOP.F2L
+    ( Algorithm
+    , Cube
+    , removeCancellingMoves
+    , tryAlg
+    , aufMoves
+    , cubeSolved 
+    )
+import CFOP.Cross ( cross )
+import CFOP.PLL ( pll )
+import CFOP.OLL ( oll )
+import CFOP.F2L ( f2l )
 
 solve :: Cube Algorithm
 solve = do
