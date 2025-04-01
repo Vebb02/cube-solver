@@ -5,9 +5,8 @@ import Triggers
 import CubeState
 import CubeValidator
 import Control.Monad.State
-import CFOP.Cross
-import CFOP.F2L
-
+import CFOP.Cross ( crossSolved )
+import CFOP.F2L ( f2lSolved )
 
 oll :: Cube Algorithm
 oll = do
@@ -29,7 +28,7 @@ edgeState cubeState = case totalEdgeSum cubeState of
          || firstE (ul cubeState) == firstE (ur cubeState) 
         then Line else Angle 
     4 -> Dot
-    _ -> undefined
+    _ -> error "Number of edges oriented is not valid for any OLL case"
 
 ollSolved :: CubeState -> Bool
 ollSolved cubeState = edgesOriented cubeState && cornersOriented cubeState
@@ -61,6 +60,8 @@ lineFlip = [Move F Normal] ++ sexy ++ [Move F Prime]
 
 angleFlip :: Algorithm
 angleFlip = reverseMoveSeq lineFlip
+
+-- Edges oriented algs
 
 sune :: Algorithm
 sune =

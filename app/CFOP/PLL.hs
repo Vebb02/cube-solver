@@ -4,25 +4,27 @@ import Control.Monad.State
 import CubeState
 import Cube
 import Triggers
-import CFOP.Cross
-import CFOP.F2L
-import CFOP.OLL
+import CFOP.Cross ( crossSolved )
+import CFOP.F2L ( f2lSolved )
+import CFOP.OLL ( ollSolved )
 
 data PLLCategory = EdgesOnly | AdjecentCornerSwap | DiagonalCornerSwap
     deriving (Eq, Show)
 
+facePairs :: [(CubeState -> Corner, CubeState -> Corner)]
+facePairs = [(ufl, urf), (urf, ubr), (ubr, ulb), (ulb, ufl)]
+
+sides :: [(CubeState -> Corner, CubeState -> Edge, CubeState -> Corner)]
+sides = zipWith (\(left, right) mid -> (left, mid, right)) facePairs [uf, ur, ub, ul]
+
 cornerSwapType :: CubeState -> PLLCategory
 cornerSwapType cubeState =
-    let headlightCount
-            = headlights (ufl cubeState) (urf cubeState)
-            + headlights (urf cubeState) (ubr cubeState)
-            + headlights (ubr cubeState) (ulb cubeState)
-            + headlights (ulb cubeState) (ufl cubeState)
+    let headlightCount = sum $ map (\(f1, f2) -> headlights (f1 cubeState) (f2 cubeState)) facePairs
     in case headlightCount of
         0 -> DiagonalCornerSwap
         1 -> AdjecentCornerSwap
         4 -> EdgesOnly
-        _ -> undefined
+        _ -> error "Headlights are not valid for any PLL case"
         
 
 -- Left corner is first paramter, right corner is second paramter
@@ -35,30 +37,38 @@ headlights (Corner _ c1 _) (Corner _ _ c2) =
 pll :: Cube Algorithm
 pll = do
     cubeState <- get
-    if all (\validator -> validator cubeState) [crossSolved, f2lSolved, ollSolved] then
-        if isPllSolved cubeState
-            then return []
-            else solvePllByCategory (cornerSwapType cubeState)
+    if all (\validator -> validator cubeState) [crossSolved, f2lSolved, ollSolved]
+        then
+            if isPllSolved cubeState
+                then return []
+                else solvePllByCategory (cornerSwapType cubeState)
         else error "Cross, F2L and OLL must solved before PLL"
+
 isPllSolved :: CubeState -> Bool
-isPllSolved cubeState =
-       equalPllSide (ufl cubeState) (uf cubeState) (urf cubeState)
-    && equalPllSide (urf cubeState) (ur cubeState) (ubr cubeState)
-    && equalPllSide (ubr cubeState) (ub cubeState) (ulb cubeState)
-    && equalPllSide (ulb cubeState) (ul cubeState) (ufl cubeState)
+isPllSolved cubeState = all 
+    (\(left, mid, right) -> 
+        equalPllSide 
+            (left cubeState) 
+            (mid cubeState) 
+            (right cubeState)
+    ) 
+    sides
 
 equalPllSide :: Corner -> Edge -> Corner -> Bool
 equalPllSide (Corner _ c1 _) (Edge _ c2) (Corner _ _ c3) = c1 == c2 && c1 == c3
 
 solvePllByCategory :: PLLCategory -> Cube Algorithm
-solvePllByCategory EdgesOnly = tryPllAlg (prependAuf [hPerm, zPerm, uaPerm, ubPerm])
-solvePllByCategory AdjecentCornerSwap = tryPllAlg (prependAuf [tPerm, jaPerm, jbPerm, fPerm, raPerm, rbPerm, aaPerm, abPerm, gaPerm, gbPerm, gcPerm, gdPerm])
-solvePllByCategory DiagonalCornerSwap = tryPllAlg (prependAuf [yPerm, vPerm, naPerm, nbPerm, ePerm])
+solvePllByCategory EdgesOnly = tryPllAlg (prependAuf edgesOnlyAlgs)
+solvePllByCategory AdjecentCornerSwap = tryPllAlg (prependAuf adjecentCornerSwapAlgs)
+solvePllByCategory DiagonalCornerSwap = tryPllAlg (prependAuf diagonalCornerSwapAlgs)
 
 tryPllAlg :: [Algorithm] -> Cube Algorithm
 tryPllAlg algs = tryAlg algs isPllSolved
 
 -- Edges only
+
+edgesOnlyAlgs :: [Algorithm]
+edgesOnlyAlgs = [hPerm, zPerm, uaPerm, ubPerm]
 
 hPerm :: Algorithm
 hPerm =
@@ -125,6 +135,23 @@ ubPerm =
     ]
 
 -- Adjacent corner swap
+
+adjecentCornerSwapAlgs :: [Algorithm]
+adjecentCornerSwapAlgs = 
+    [ tPerm
+    , jaPerm
+    , jbPerm
+    , fPerm
+    , raPerm
+    , rbPerm
+    , aaPerm
+    , abPerm
+    , gaPerm
+    , gbPerm
+    , gcPerm
+    , gdPerm
+    ]
+
 tPerm :: Algorithm
 tPerm =
     sexy ++
@@ -271,6 +298,9 @@ gdPerm :: Algorithm
 gdPerm = reverseMoveSeq gcPerm
 
 -- Diagonal corner swap
+
+diagonalCornerSwapAlgs :: [Algorithm]
+diagonalCornerSwapAlgs = [yPerm, vPerm, naPerm, nbPerm, ePerm]
 
 yPerm :: Algorithm
 yPerm =

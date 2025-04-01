@@ -2,7 +2,7 @@ module Triggers where
 
 import Cube
 
--- This is a totally legit speed cubing term, I promise
+-- This is a totally legit speedcubing term, I promise
 sexy :: Algorithm
 sexy =
     [ Move R Normal

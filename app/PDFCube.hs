@@ -9,8 +9,8 @@ import Control.Monad.State
 import qualified Data.Text as T
 
 
-runPDFTest :: Algorithm -> CubeState -> IO ()
-runPDFTest alg cubeState = do
+generatePDFSolution :: Algorithm -> CubeState -> IO ()
+generatePDFSolution alg cubeState = do
     eitherFont <- mkStdFont Helvetica_Bold
     eitherFrontPageImage <- readJpegFile "images/front-page.jpeg"
     eitherWarningImage <- readJpegFile "images/warning-page.jpeg"
@@ -27,7 +27,7 @@ runPDFTest alg cubeState = do
                     let heightChange = size / 5 * 2
                     let instructions = evalState (createPdfCubeSolution alg 1 font size heightChange) cubeState
                     let pdf = introductionPages >> instructions
-                    runPdf "test.pdf" standardDocInfo rect pdf
+                    runPdf "solution_manual.pdf" standardDocInfo rect pdf
 
 
 imagePage :: JpegFile -> PDF ()
