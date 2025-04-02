@@ -12,90 +12,32 @@ type Parser = Parsec Void T.Text
 
 parseColor :: Parser CubeColor
 parseColor =
-        White <$ char 'W'
+        White  <$ char 'W'
     <|> Yellow <$ char 'Y'
-    <|> Green <$ char 'G'
-    <|> Blue <$ char 'B'
-    <|> Red <$ char 'R'
+    <|> Green  <$ char 'G'
+    <|> Blue   <$ char 'B'
+    <|> Red    <$ char 'R'
     <|> Orange <$ char 'O'
+
+parseLine :: Int -> Parser [CubeColor]
+parseLine lineLength = do
+    space
+    colors <- count lineLength parseColor
+    _ <- newline
+    return colors
+
+parseFace :: Int -> Parser [CubeColor]
+parseFace lineLength = do
+    res <- count 3 (parseLine lineLength)
+    return $ concat res
 
 parseCubeState :: Parser CubeState
 parseCubeState = do
-    space
-    u1 <- parseColor
-    u2 <- parseColor
-    u3 <- parseColor
-
-    _ <- newline
-    space
-    u4 <- parseColor
-    u5 <- parseColor
-    u6 <- parseColor
-
-    _ <- newline
-    space
-    u7 <- parseColor
-    u8 <- parseColor
-    u9 <- parseColor
-
-    _ <- newline
-    l1 <- parseColor
-    l2 <- parseColor
-    l3 <- parseColor
-    f1 <- parseColor
-    f2 <- parseColor
-    f3 <- parseColor
-    r1 <- parseColor
-    r2 <- parseColor
-    r3 <- parseColor
-    b1 <- parseColor
-    b2 <- parseColor
-    b3 <- parseColor
-
-    _ <- newline
-    l4 <- parseColor
-    l5 <- parseColor
-    l6 <- parseColor
-    f4 <- parseColor
-    f5 <- parseColor
-    f6 <- parseColor
-    r4 <- parseColor
-    r5 <- parseColor
-    r6 <- parseColor
-    b4 <- parseColor
-    b5 <- parseColor
-    b6 <- parseColor
-
-    _ <- newline
-    l7 <- parseColor
-    l8 <- parseColor
-    l9 <- parseColor
-    f7 <- parseColor
-    f8 <- parseColor
-    f9 <- parseColor
-    r7 <- parseColor
-    r8 <- parseColor
-    r9 <- parseColor
-    b7 <- parseColor
-    b8 <- parseColor
-    b9 <- parseColor
-
-    _ <- newline
-    space
-    d1 <- parseColor
-    d2 <- parseColor
-    d3 <- parseColor
-    _ <- newline
-    space
-    d4 <- parseColor
-    d5 <- parseColor
-    d6 <- parseColor
-    _ <- newline
-    space
-    d7 <- parseColor
-    d8 <- parseColor
-    d9 <- parseColor
-    _ <- newline
+    [u1, u2, u3, u4, u5, u6, u7, u8, u9] <- parseFace 3
+    [l1 ,l2 ,l3 ,f1 ,f2 ,f3 ,r1 ,r2 ,r3 ,b1 ,b2 ,b3,
+     l4 ,l5 ,l6 ,f4 ,f5 ,f6 ,r4 ,r5 ,r6 ,b4 ,b5 ,b6,
+     l7 ,l8 ,l9 ,f7 ,f8 ,f9 ,r7 ,r8 ,r9 ,b7 ,b8 ,b9] <- parseFace 12
+    [d1, d2, d3, d4, d5, d6, d7, d8, d9] <- parseFace 3
     eof
 
     let cubeState = CubeState { 
@@ -138,13 +80,13 @@ parseScramble = do
     return (firstMove : restMoves)
 
 parseMove :: Parser Move
-parseMove = Move <$> parseFace <*> parseDirection
+parseMove = Move <$> parseTurningFace <*> parseDirection
 
 parseNextMove :: Parser Move
 parseNextMove = space *> parseMove
 
-parseFace :: Parser MoveFace
-parseFace =
+parseTurningFace :: Parser MoveFace
+parseTurningFace =
         F <$ char 'F'
     <|> R <$ char 'R'
     <|> U <$ char 'U'
@@ -157,6 +99,3 @@ parseDirection =
         Prime <$ char '\''
     <|> Two   <$ char '2'
     <|> return Normal
-
-runTest :: T.Text -> IO ()
-runTest = parseTest parseCubeState
