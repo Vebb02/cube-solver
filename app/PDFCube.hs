@@ -7,7 +7,18 @@ import CubeState
 import Cube
 import Control.Monad.State
 import qualified Data.Text as T
+import Text.Megaparsec ( runParser )
+import CubeParser ( parseCubeState )
+import CFOP.CFOP ( solve )
 
+generatePDF :: IO ()
+generatePDF = do
+    inputText <- readFile "scramble.in"
+    let parsedResult = runParser parseCubeState "" (T.pack inputText)
+    case parsedResult of
+        Left errorMessage -> print errorMessage
+        Right cubeState -> do
+            generatePDFSolution (evalState solve cubeState) cubeState
 
 generatePDFSolution :: Algorithm -> CubeState -> IO ()
 generatePDFSolution alg cubeState = do

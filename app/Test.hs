@@ -6,7 +6,6 @@ import CubeState
 import CubeValidator ( validateCubeState )
 import CFOP.CFOP ( auf, solve )
 import CFOP.PLL
-import PDFCube
 import Text.Megaparsec ( runParser, ParseErrorBundle )
 import qualified Data.Text as T
 
@@ -14,16 +13,6 @@ import System.Directory ( listDirectory )
 import Control.Monad.State
 import Data.Void (Void)
 import Cube
-
-
-pdfTest :: IO ()
-pdfTest = do
-    inputText <- readFile "scramble.in"
-    let parsedResult = runParser parseCubeState "" (T.pack inputText)
-    case parsedResult of
-        Left errorMessage -> print errorMessage
-        Right cubeState -> do
-            generatePDFSolution (evalState solve cubeState) cubeState
 
 parseScrambleTest :: IO ()
 parseScrambleTest = do
