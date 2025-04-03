@@ -184,82 +184,99 @@ timesTwoMark (Move _ Two) font = drawText $ do
 timesTwoMark _ _ = return ()
 
 curve :: Move -> PDFFloat -> PDFFloat -> Draw ()
-curve (Move F _) size heightChange = addPolygonToPath [ (cubeStart + size/2) :+ (cubeStart + size/2 + heightChange/2)
-                                                      , (cubeStart + size/2) :+ (cubeStart + size*3 + heightChange/2)
-                                                      , (cubeStart - size*2) :+ (cubeStart + size*3 + heightChange*3)
-                                                      ]
-curve (Move R _) size heightChange = addPolygonToPath [ (cubeStart - size/2) :+ (cubeStart + size/2 + heightChange/2)
-                                                      , (cubeStart - size/2) :+ (cubeStart + size*3 + heightChange/2)
-                                                      , (cubeStart + size*2) :+ (cubeStart + size*3 + heightChange*3)
-                                                      ]
-curve (Move U _) size heightChange = addPolygonToPath [ (cubeStart - size*2.5) :+ (cubeStart + size*2.5 + heightChange*2.5)
-                                                      ,  cubeStart             :+ (cubeStart + size*2.5)
-                                                      , (cubeStart + size*2.5) :+ (cubeStart + size*2.5 + heightChange*2.5)
-                                                      ]
-curve (Move B _) size heightChange = addPolygonToPath [ (cubeStart + size*2.5) :+ (cubeStart + size/2 + heightChange*2.5)
-                                                      , (cubeStart + size*2.5) :+ (cubeStart + size*3 + heightChange*2.5)
-                                                      ,  cubeStart             :+ (cubeStart + size*3 + heightChange*5)
-                                                      ]
-curve (Move L _) size heightChange = addPolygonToPath [ (cubeStart - size*2.5) :+ (cubeStart + size/2 + heightChange*2.5)
-                                                      , (cubeStart - size*2.5) :+ (cubeStart + size*3 + heightChange*2.5)
-                                                      ,  cubeStart             :+ (cubeStart + size*3 + heightChange*5)
-                                                      ]
-curve (Move D _) size heightChange = addPolygonToPath [ (cubeStart - size*2.5) :+ (cubeStart + size*0.5 + heightChange*2.5)
-                                                      ,  cubeStart             :+ (cubeStart + size*0.5)
-                                                      , (cubeStart + size*2.5) :+ (cubeStart + size*0.5 + heightChange*2.5)
-                                                      ]
+curve (Move F _) size heightChange =
+    addPolygonToPath [ (cubeStart + size/2) :+ (cubeStart + size/2 + heightChange/2)
+                     , (cubeStart + size/2) :+ (cubeStart + size*3 + heightChange/2)
+                     , (cubeStart - size*2) :+ (cubeStart + size*3 + heightChange*3)
+                     ]
+curve (Move R _) size heightChange =
+    addPolygonToPath [ (cubeStart - size/2) :+ (cubeStart + size/2 + heightChange/2)
+                     , (cubeStart - size/2) :+ (cubeStart + size*3 + heightChange/2)
+                     , (cubeStart + size*2) :+ (cubeStart + size*3 + heightChange*3)
+                     ]
+curve (Move U _) size heightChange =
+    addPolygonToPath [ (cubeStart - size*2.5) :+ (cubeStart + size*2.5 + heightChange*2.5)
+                     ,  cubeStart             :+ (cubeStart + size*2.5)
+                     , (cubeStart + size*2.5) :+ (cubeStart + size*2.5 + heightChange*2.5)
+                     ]
+curve (Move B _) size heightChange =
+    addPolygonToPath [ (cubeStart + size*2.5) :+ (cubeStart + size/2 + heightChange*2.5)
+                     , (cubeStart + size*2.5) :+ (cubeStart + size*3 + heightChange*2.5)
+                     ,  cubeStart             :+ (cubeStart + size*3 + heightChange*5)
+                     ]
+curve (Move L _) size heightChange =
+    addPolygonToPath [ (cubeStart - size*2.5) :+ (cubeStart + size/2 + heightChange*2.5)
+                     , (cubeStart - size*2.5) :+ (cubeStart + size*3 + heightChange*2.5)
+                     ,  cubeStart             :+ (cubeStart + size*3 + heightChange*5)
+                     ]
+curve (Move D _) size heightChange =
+    addPolygonToPath [ (cubeStart - size*2.5) :+ (cubeStart + size*0.5 + heightChange*2.5)
+                     ,  cubeStart             :+ (cubeStart + size*0.5)
+                     , (cubeStart + size*2.5) :+ (cubeStart + size*0.5 + heightChange*2.5)
+                     ]
 
 arrow :: Move -> PDFFloat -> PDFFloat -> Draw ()
 arrow (Move m Two) size heightChange = arrow (Move m Normal) size heightChange
-arrow (Move F Normal) size heightChange = addPolygonToPath [ (cubeStart + size/2 - size/5) :+ (cubeStart + size/2 + size/5 + heightChange/2)
-                                                           , (cubeStart + size/2)          :+ (cubeStart + size/2 + heightChange/2)
-                                                           , (cubeStart + size/2 + size/5) :+ (cubeStart + size/2 + size/5 + heightChange/2)
-                                                           ]
-arrow (Move F Prime)  size heightChange = addPolygonToPath [ (cubeStart - size*2 + size*0.35) :+ (cubeStart + size*3.04 + heightChange*3)
-                                                           , (cubeStart - size*2)             :+ (cubeStart + size*3 + heightChange*3)
-                                                           , (cubeStart - size*2 + size*0.1)  :+ (cubeStart + size*3 + heightChange*3 - size*0.22)
-                                                           ]
-arrow (Move R Normal) size heightChange = addPolygonToPath [ (cubeStart + size*2 - size*0.35) :+ (cubeStart + size*3.04 + heightChange*3)
-                                                           , (cubeStart + size*2)             :+ (cubeStart + size*3 + heightChange*3)
-                                                           , (cubeStart + size*2 - size*0.1)  :+ (cubeStart + size*3 + heightChange*3 - size*0.22)
-                                                           ]
-arrow (Move R Prime)  size heightChange = addPolygonToPath [ (cubeStart - size/2 - size/5) :+ (cubeStart + size/2 + size/5 + heightChange/2)
-                                                           , (cubeStart - size/2)          :+ (cubeStart + size/2 + heightChange/2)
-                                                           , (cubeStart - size/2 + size/5) :+ (cubeStart + size/2 + size/5 + heightChange/2)
-                                                           ]
-arrow (Move U Normal) size heightChange = addPolygonToPath [ (cubeStart - size*2.5 + size/4) :+ (cubeStart + size*2.5 + heightChange*2.5 + size/6)
-                                                           , (cubeStart - size*2.5)          :+ (cubeStart + size*2.5 + heightChange*2.5)
-                                                           , (cubeStart - size*2.5 + size/5) :+ (cubeStart + size*2.5 + heightChange*2.5 - size/3)
-                                                           ]
-arrow (Move U Prime)  size heightChange = addPolygonToPath [ (cubeStart + size*2.5 - size/4) :+ (cubeStart + size*2.5 + heightChange*2.5 + size/6)
-                                                           , (cubeStart + size*2.5)          :+ (cubeStart + size*2.5 + heightChange*2.5)
-                                                           , (cubeStart + size*2.5 - size/5) :+ (cubeStart + size*2.5 + heightChange*2.5 - size/3)
-                                                           ]
-arrow (Move B Normal) size heightChange = addPolygonToPath [ (cubeStart + size/7) :+ (cubeStart + size*3 + heightChange*5 - size/4)
-                                                           ,  cubeStart           :+ (cubeStart + size*3 + heightChange*5)
-                                                           , (cubeStart + size/3) :+ (cubeStart + size*3 + heightChange*5 + size/15)
-                                                           ]
-arrow (Move B Prime)  size heightChange = addPolygonToPath [ (cubeStart + size*2.5 - size/5) :+ (cubeStart + size/2 + size/5 + heightChange*2.5)
-                                                           , (cubeStart + size*2.5)          :+ (cubeStart + size/2 + heightChange*2.5)
-                                                           , (cubeStart + size*2.5 + size/5) :+ (cubeStart + size/2 + size/5 + heightChange*2.5)
-                                                           ]
-arrow (Move L Normal) size heightChange = addPolygonToPath [ (cubeStart - size*2.5 - size/5) :+ (cubeStart + size/2 + size/5 + heightChange*2.5)
-                                                           , (cubeStart - size*2.5)          :+ (cubeStart + size/2 + heightChange*2.5)
-                                                           , (cubeStart - size*2.5 + size/5) :+ (cubeStart + size/2 + size/5 + heightChange*2.5)
-                                                           ]
-arrow (Move L Prime)  size heightChange = addPolygonToPath [ (cubeStart - size/7) :+ (cubeStart + size*3 + heightChange*5 - size/4)
-                                                           ,  cubeStart           :+ (cubeStart + size*3 + heightChange*5)
-                                                           , (cubeStart - size/3) :+ (cubeStart + size*3 + heightChange*5 + size/15)
-                                                           ]
-arrow (Move D Normal) size heightChange = addPolygonToPath [ (cubeStart + size*2.5 - size/4) :+ (cubeStart + size/2 + heightChange*2.5 + size/6)
-                                                           , (cubeStart + size*2.5)          :+ (cubeStart + size/2 + heightChange*2.5)
-                                                           , (cubeStart + size*2.5 - size/5) :+ (cubeStart + size/2 + heightChange*2.5 - size/3)
-                                                           ]
-arrow (Move D Prime)  size heightChange = addPolygonToPath [ (cubeStart - size*2.5 + size/4) :+ (cubeStart + size/2 + heightChange*2.5 + size/6)
-                                                           , (cubeStart - size*2.5)          :+ (cubeStart + size/2 + heightChange*2.5)
-                                                           , (cubeStart - size*2.5 + size/5) :+ (cubeStart + size/2 + heightChange*2.5 - size/3)
-                                                           ]
-
+arrow (Move F Normal) size heightChange =
+    addPolygonToPath [ (cubeStart + size/2 - size/5) :+ (cubeStart + size/2 + size/5 + heightChange/2)
+                     , (cubeStart + size/2)          :+ (cubeStart + size/2 + heightChange/2)
+                     , (cubeStart + size/2 + size/5) :+ (cubeStart + size/2 + size/5 + heightChange/2)
+                     ]
+arrow (Move F Prime)  size heightChange =
+    addPolygonToPath [ (cubeStart - size*2 + size*0.35) :+ (cubeStart + size*3.04 + heightChange*3)
+                     , (cubeStart - size*2)             :+ (cubeStart + size*3 + heightChange*3)
+                     , (cubeStart - size*2 + size*0.1)  :+ (cubeStart + size*3 + heightChange*3 - size*0.22)
+                     ]
+arrow (Move R Normal) size heightChange =
+    addPolygonToPath [ (cubeStart + size*2 - size*0.35) :+ (cubeStart + size*3.04 + heightChange*3)
+                     , (cubeStart + size*2)             :+ (cubeStart + size*3 + heightChange*3)
+                     , (cubeStart + size*2 - size*0.1)  :+ (cubeStart + size*3 + heightChange*3 - size*0.22)
+                     ]
+arrow (Move R Prime)  size heightChange =
+    addPolygonToPath [ (cubeStart - size/2 - size/5) :+ (cubeStart + size/2 + size/5 + heightChange/2)
+                     , (cubeStart - size/2)          :+ (cubeStart + size/2 + heightChange/2)
+                     , (cubeStart - size/2 + size/5) :+ (cubeStart + size/2 + size/5 + heightChange/2)
+                     ]
+arrow (Move U Normal) size heightChange =
+    addPolygonToPath [ (cubeStart - size*2.5 + size/4) :+ (cubeStart + size*2.5 + heightChange*2.5 + size/6)
+                     , (cubeStart - size*2.5)          :+ (cubeStart + size*2.5 + heightChange*2.5)
+                     , (cubeStart - size*2.5 + size/5) :+ (cubeStart + size*2.5 + heightChange*2.5 - size/3)
+                     ]
+arrow (Move U Prime)  size heightChange =
+    addPolygonToPath [ (cubeStart + size*2.5 - size/4) :+ (cubeStart + size*2.5 + heightChange*2.5 + size/6)
+                     , (cubeStart + size*2.5)          :+ (cubeStart + size*2.5 + heightChange*2.5)
+                     , (cubeStart + size*2.5 - size/5) :+ (cubeStart + size*2.5 + heightChange*2.5 - size/3)
+                     ]
+arrow (Move B Normal) size heightChange =
+    addPolygonToPath [ (cubeStart + size/7) :+ (cubeStart + size*3 + heightChange*5 - size/4)
+                     ,  cubeStart           :+ (cubeStart + size*3 + heightChange*5)
+                     , (cubeStart + size/3) :+ (cubeStart + size*3 + heightChange*5 + size/15)
+                     ]
+arrow (Move B Prime)  size heightChange =
+    addPolygonToPath [ (cubeStart + size*2.5 - size/5) :+ (cubeStart + size/2 + size/5 + heightChange*2.5)
+                     , (cubeStart + size*2.5)          :+ (cubeStart + size/2 + heightChange*2.5)
+                     , (cubeStart + size*2.5 + size/5) :+ (cubeStart + size/2 + size/5 + heightChange*2.5)
+                     ]
+arrow (Move L Normal) size heightChange =
+    addPolygonToPath [ (cubeStart - size*2.5 - size/5) :+ (cubeStart + size/2 + size/5 + heightChange*2.5)
+                     , (cubeStart - size*2.5)          :+ (cubeStart + size/2 + heightChange*2.5)
+                     , (cubeStart - size*2.5 + size/5) :+ (cubeStart + size/2 + size/5 + heightChange*2.5)
+                     ]
+arrow (Move L Prime)  size heightChange =
+    addPolygonToPath [ (cubeStart - size/7) :+ (cubeStart + size*3 + heightChange*5 - size/4)
+                     ,  cubeStart           :+ (cubeStart + size*3 + heightChange*5)
+                     , (cubeStart - size/3) :+ (cubeStart + size*3 + heightChange*5 + size/15)
+                     ]
+arrow (Move D Normal) size heightChange =
+    addPolygonToPath [ (cubeStart + size*2.5 - size/4) :+ (cubeStart + size/2 + heightChange*2.5 + size/6)
+                     , (cubeStart + size*2.5)          :+ (cubeStart + size/2 + heightChange*2.5)
+                     , (cubeStart + size*2.5 - size/5) :+ (cubeStart + size/2 + heightChange*2.5 - size/3)
+                     ]
+arrow (Move D Prime)  size heightChange =
+    addPolygonToPath [ (cubeStart - size*2.5 + size/4) :+ (cubeStart + size/2 + heightChange*2.5 + size/6)
+                     , (cubeStart - size*2.5)          :+ (cubeStart + size/2 + heightChange*2.5)
+                     , (cubeStart - size*2.5 + size/5) :+ (cubeStart + size/2 + heightChange*2.5 - size/3)
+                     ]
 
 drawPageNumber :: Int -> PDFFont -> Draw ()
 drawPageNumber pageNumber font = do
@@ -286,7 +303,8 @@ createPdfCubeSolution (m:ms) pageNumber font size heightChange = do
             drawWithPage page (drawCubePageWithMove cubeState m pageNumber font size heightChange)
     move m
     rest <- createPdfCubeSolution ms (pageNumber + 1) font size heightChange
-    return (pdf >> rest) 
+    return (pdf >> rest)
+
 createPdfCubeSolution [] pageNumber font size heightChange  = do
     cubeState <- get
     let pdf = do
