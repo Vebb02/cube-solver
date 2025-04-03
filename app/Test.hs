@@ -1,15 +1,15 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Test where
 
-import CubeParser ( parseCubeState, parseScramble )
+import CubeParser (parseCubeState, parseScramble)
 import CubeState
-import CubeValidator ( validateCubeState )
-import CFOP.CFOP ( auf, solve )
+import CubeValidator (validateCubeState)
+import CFOP.CFOP (auf, solve)
 import CFOP.PLL
-import Text.Megaparsec ( runParser, ParseErrorBundle )
+import Text.Megaparsec (runParser, ParseErrorBundle)
 import qualified Data.Text as T
 
-import System.Directory ( listDirectory )
+import System.Directory (listDirectory)
 import Control.Monad.State
 import Data.Void (Void)
 import Cube
@@ -47,7 +47,6 @@ solvePll parsedResult file = do
         Right cubeState -> do
             print file
             print cubeState
-            print $ cornerSwapType cubeState
             let (result, newCubeState) = runState pll cubeState
             print result
             print newCubeState

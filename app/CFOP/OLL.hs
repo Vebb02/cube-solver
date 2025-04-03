@@ -1,12 +1,12 @@
-module CFOP.OLL where
+module CFOP.OLL (oll, ollSolved) where
 
 import Cube
 import Triggers
 import CubeState
 import CubeValidator
 import Control.Monad.State
-import CFOP.Cross ( crossSolved )
-import CFOP.F2L ( f2lSolved )
+import CFOP.Cross (crossSolved)
+import CFOP.F2L (f2lSolved)
 
 oll :: Cube Algorithm
 oll = do

@@ -1,4 +1,4 @@
-module CubeParser where
+module CubeParser (parseScramble, parse, parseCubeState) where
 
 import Text.Megaparsec
 import Text.Megaparsec.Char

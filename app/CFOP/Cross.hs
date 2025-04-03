@@ -1,9 +1,9 @@
-module CFOP.Cross where
+module CFOP.Cross (cross, crossSolved) where
 
 import Cube
 import CubeState
 import Control.Monad.State
-import Data.List ( permutations )
+import Data.List (permutations)
 import CubeValidator
 
 cross :: Cube Algorithm
@@ -11,20 +11,20 @@ cross = do
     cubeState <- get
     if crossSolved cubeState
         then return []
-        else applyAlgorithm (fst $ bestPossibleCross cubeState (permutations crossEdges))
+        else applyAlgorithm (bestPossibleCross cubeState)
 
-bestPossibleCross :: CubeState -> [[CubeState -> Edge]] -> (Algorithm, Int)
-bestPossibleCross cubeState (x:xs) = do
-    let (alg, _) = runState (solveCross x []) cubeState
-    (\(alg1, moveCount1) (alg2, moveCount2) -> if moveCount1 < moveCount2 then (alg1, moveCount1) else (alg2, moveCount2)) (alg, length alg) (bestPossibleCross cubeState xs)
-bestPossibleCross _ [] = ([], 100000)
+bestPossibleCross :: CubeState -> Algorithm
+bestPossibleCross cubeState = bestPossibleSolution cubeState solveCross (permutations crossEdges)
 
-solveCross :: [CubeState -> Edge] -> [CubeState -> Edge] -> Cube Algorithm
-solveCross (x:xs) solvedPieces = do
+solveCross :: [CubeState -> Edge] -> Cube Algorithm
+solveCross = flip solveCross' []
+
+solveCross' :: [CubeState -> Edge] -> [CubeState -> Edge] -> Cube Algorithm
+solveCross' (x:xs) solvedPieces = do
     moves <- solveCrossPiece x solvedPieces
-    rest <- solveCross xs (x:solvedPieces)
+    rest <- solveCross' xs (x:solvedPieces)
     return $ moves ++ rest
-solveCross [] _ = tryAlg [[], [Move D Normal], [Move D Prime], [Move D Two]] crossSolved
+solveCross' [] _ = tryAlg [[], [Move D Normal], [Move D Prime], [Move D Two]] crossSolved
 
 solveCrossPiece :: (CubeState -> Edge) -> [CubeState -> Edge] -> Cube Algorithm
 solveCrossPiece x solvedPieces = do
@@ -38,8 +38,8 @@ findEdgeOnCube cubeState edge = searchForEdge getCubeEdges where
     searchForEdge [] = error "Could not find edge"
     searchForEdge (x:xs) =
         if x cubeState == edge || x cubeState == flipEdge edge
-        then x
-        else searchForEdge xs
+            then x
+            else searchForEdge xs
 
 solveCrossPieceByCase :: CrossEdgeCase -> (CubeState -> Edge) -> [CubeState -> Edge] -> Cube Algorithm
 solveCrossPieceByCase SolvedEdge _  _ = return []
