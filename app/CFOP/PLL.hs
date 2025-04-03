@@ -1,12 +1,12 @@
-module CFOP.PLL where
+module CFOP.PLL (pll) where
 
 import Control.Monad.State
 import CubeState
 import Cube
 import Triggers
-import CFOP.Cross ( crossSolved )
-import CFOP.F2L ( f2lSolved )
-import CFOP.OLL ( ollSolved )
+import CFOP.Cross (crossSolved)
+import CFOP.F2L (f2lSolved)
+import CFOP.OLL (ollSolved)
 
 data PLLCategory = EdgesOnly | AdjecentCornerSwap | DiagonalCornerSwap
     deriving (Eq, Show)

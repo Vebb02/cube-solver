@@ -1,11 +1,12 @@
 module CubeState where
 
-data CubeColor = White
-           | Yellow
-           | Green
-           | Blue
-           | Red
-           | Orange
+data CubeColor = 
+      White
+    | Yellow
+    | Green
+    | Blue
+    | Red
+    | Orange
     deriving (Eq)
 
 instance Show CubeColor where
@@ -91,32 +92,31 @@ data CubeState = CubeState
 
 instance Show CubeState where
     show cube =
-                   "    " ++ showFirstC (ulb cube) ++ showFirstE (ub cube) ++ showFirstC (ubr cube)
-              ++ "\n    " ++ showFirstE (ul cube)  ++ show       (u cube)  ++ showFirstE (ur cube)
-              ++ "\n    " ++ showFirstC (ufl cube) ++ showFirstE (uf cube) ++ showFirstC (urf cube)
+            "    " ++ showFirstC (ulb cube) ++ showFirstE (ub cube) ++ showFirstC (ubr cube)
+        ++ "\n    " ++ showFirstE (ul cube)  ++ show       (u cube)  ++ showFirstE (ur cube)
+        ++ "\n    " ++ showFirstC (ufl cube) ++ showFirstE (uf cube) ++ showFirstC (urf cube)
 
-              ++ "\n"
-              ++ showSecondC (ulb cube) ++ showSecondE (ul cube) ++ showThirdC (ufl cube) ++ " "
-              ++ showSecondC (ufl cube) ++ showSecondE (uf cube) ++ showThirdC (urf cube) ++ " "
-              ++ showSecondC (urf cube) ++ showSecondE (ur cube) ++ showThirdC (ubr cube) ++ " "
-              ++ showSecondC (ubr cube) ++ showSecondE (ub cube) ++ showThirdC (ulb cube)
+        ++ "\n"
+        ++ showSecondC (ulb cube) ++ showSecondE (ul cube) ++ showThirdC (ufl cube) ++ " "
+        ++ showSecondC (ufl cube) ++ showSecondE (uf cube) ++ showThirdC (urf cube) ++ " "
+        ++ showSecondC (urf cube) ++ showSecondE (ur cube) ++ showThirdC (ubr cube) ++ " "
+        ++ showSecondC (ubr cube) ++ showSecondE (ub cube) ++ showThirdC (ulb cube)
 
-              ++ "\n"
-              ++ showSecondE (bl cube) ++ show (l cube) ++ showSecondE (fl cube) ++ " "
-              ++ showFirstE  (fl cube) ++ show (f cube) ++ showFirstE  (fr cube) ++ " "
-              ++ showSecondE (fr cube) ++ show (r cube) ++ showSecondE (br cube) ++ " "
-              ++ showFirstE  (br cube) ++ show (b cube) ++ showFirstE  (bl cube)
+        ++ "\n"
+        ++ showSecondE (bl cube) ++ show (l cube) ++ showSecondE (fl cube) ++ " "
+        ++ showFirstE  (fl cube) ++ show (f cube) ++ showFirstE  (fr cube) ++ " "
+        ++ showSecondE (fr cube) ++ show (r cube) ++ showSecondE (br cube) ++ " "
+        ++ showFirstE  (br cube) ++ show (b cube) ++ showFirstE  (bl cube)
 
-              ++ "\n"
-              ++ showThirdC (dbl cube) ++ showSecondE (dl cube) ++ showSecondC (dlf cube) ++ " "
-              ++ showThirdC (dlf cube) ++ showSecondE (df cube) ++ showSecondC (dfr cube) ++ " "
-              ++ showThirdC (dfr cube) ++ showSecondE (dr cube) ++ showSecondC (drb cube) ++ " "
-              ++ showThirdC (drb cube) ++ showSecondE (db cube) ++ showSecondC (dbl cube)
+        ++ "\n"
+        ++ showThirdC (dbl cube) ++ showSecondE (dl cube) ++ showSecondC (dlf cube) ++ " "
+        ++ showThirdC (dlf cube) ++ showSecondE (df cube) ++ showSecondC (dfr cube) ++ " "
+        ++ showThirdC (dfr cube) ++ showSecondE (dr cube) ++ showSecondC (drb cube) ++ " "
+        ++ showThirdC (drb cube) ++ showSecondE (db cube) ++ showSecondC (dbl cube)
 
-              ++ "\n    " ++ showFirstC (dlf cube) ++ showFirstE (df cube) ++ showFirstC (dfr cube)
-              ++ "\n    " ++ showFirstE (dl cube)  ++ show       (d cube)  ++ showFirstE (dr cube)
-              ++ "\n    " ++ showFirstC (dbl cube) ++ showFirstE (db cube) ++ showFirstC (drb cube)
-
+        ++ "\n    " ++ showFirstC (dlf cube) ++ showFirstE (df cube) ++ showFirstC (dfr cube)
+        ++ "\n    " ++ showFirstE (dl cube)  ++ show       (d cube)  ++ showFirstE (dr cube)
+        ++ "\n    " ++ showFirstC (dbl cube) ++ showFirstE (db cube) ++ showFirstC (drb cube)
 
 solvedCube :: CubeState
 solvedCube = CubeState
@@ -147,3 +147,40 @@ solvedCube = CubeState
     , dbl = Corner Yellow Blue Orange
     , drb = Corner Yellow Red Blue
     }
+
+cubeSolved :: CubeState -> Bool
+cubeSolved cubeState = cubeState == solvedCube
+
+getCubeCorners :: [CubeState -> Corner]
+getCubeCorners =
+    [ urf
+    , ubr
+    , ulb
+    , ufl
+    , dfr
+    , dlf
+    , dbl
+    , drb
+    ]
+
+cubeCorners :: CubeState -> [Corner]
+cubeCorners cubeState = map (\x -> x cubeState) getCubeCorners
+
+getCubeEdges :: [CubeState -> Edge]
+getCubeEdges =
+    [ uf
+    , ur
+    , ub
+    , ul
+    , df
+    , dl
+    , db
+    , dr
+    , fr
+    , fl
+    , br
+    , bl
+    ]
+
+cubeEdges :: CubeState -> [Edge]
+cubeEdges cubeState = map (\x -> x cubeState) getCubeEdges

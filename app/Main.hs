@@ -1,6 +1,6 @@
 module Main where
 
-import PDFCube ( generatePDF )
+import PDFCube (generatePDF)
 
 main :: IO ()
 main = do

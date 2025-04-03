@@ -3,6 +3,7 @@ module Cube where
 import CubeState
 
 import Control.Monad.State
+import Data.List (minimumBy)
 
 type Cube a = State CubeState a
 
@@ -159,9 +160,6 @@ tryAlg (x:xs) stateCondition = do
         _ <- applyAlgorithm (reverseMoveSeq x)
         tryAlg xs stateCondition
 
-cubeSolved :: CubeState -> Bool
-cubeSolved cubeState = cubeState == solvedCube
-
 removeCancellingMoves :: Algorithm -> Algorithm -> Algorithm
 removeCancellingMoves [] seen = reverse seen
 removeCancellingMoves (x:xs) (y:ys) = removeCancellingMoves xs (combineMoves x y ++ ys)
@@ -175,3 +173,8 @@ combineMoves m0@(Move face0 dir0) m1@(Move face1 dir1) =
             case newDir of
                 Nothing -> []
                 Just dir -> [Move face0 dir]
+
+bestPossibleSolution :: CubeState -> ([a] -> Cube Algorithm) -> [[a]] -> Algorithm
+bestPossibleSolution cubeState method orderings = 
+    minimumBy (\x y -> if length x < length y then LT else GT) 
+        $ map (\x -> evalState (method x) cubeState) orderings

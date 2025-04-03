@@ -6,12 +6,12 @@ import Cube
     , removeCancellingMoves
     , tryAlg
     , aufMoves
-    , cubeSolved 
     )
-import CFOP.Cross ( cross )
-import CFOP.PLL ( pll )
-import CFOP.OLL ( oll )
-import CFOP.F2L ( f2l )
+import CubeState (cubeSolved)
+import CFOP.Cross (cross)
+import CFOP.PLL (pll)
+import CFOP.OLL (oll)
+import CFOP.F2L (f2l)
 
 solve :: Cube Algorithm
 solve = do

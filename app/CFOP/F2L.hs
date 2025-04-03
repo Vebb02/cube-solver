@@ -1,11 +1,11 @@
-module CFOP.F2L where
+module CFOP.F2L (f2l, f2lSolved) where
 
 import Cube
 import CubeState
 import Control.Monad.State
 import CubeValidator
 import Data.Maybe
-import Data.List ( permutations )
+import Data.List (permutations)
 import CFOP.Cross
 
 f2l :: Cube Algorithm
@@ -14,7 +14,7 @@ f2l = do
     if crossSolved cubeState then
         if f2lSolved cubeState
             then return []
-            else applyAlgorithm (fst $ bestPossibleF2L cubeState (permutations [BL, BR, FL, FR]))
+            else applyAlgorithm (bestPossibleF2L cubeState)
         else error "Cross needs to be solved before F2L"
 
 type F2LPair = (Edge, Corner)
@@ -43,11 +43,8 @@ f2lSlot cubeState BR = (br cubeState, drb cubeState)
 f2lSolved :: CubeState -> Bool
 f2lSolved cubeState = all (\slot -> f2lSlot cubeState slot == f2lSlot solvedCube slot) allPairs
 
-bestPossibleF2L :: CubeState -> [[F2LSlot]] -> (Algorithm, Int)
-bestPossibleF2L cubeState (x:xs) = do
-    let (alg, _) = runState (solveF2l x) cubeState
-    (\(alg1, moveCount1) (alg2, moveCount2) -> if moveCount1 < moveCount2 then (alg1, moveCount1) else (alg2, moveCount2)) (alg, length alg) (bestPossibleF2L cubeState xs)
-bestPossibleF2L _ [] = ([], 100000)
+bestPossibleF2L :: CubeState -> Algorithm
+bestPossibleF2L cubeState = bestPossibleSolution cubeState solveF2l (permutations [BL, BR, FL, FR]) 
 
 solveF2l :: [F2LSlot] -> Cube Algorithm
 solveF2l (x:xs) = do
@@ -58,14 +55,13 @@ solveF2l [] = return []
 
 solveF2lPair :: F2LSlot -> Cube Algorithm
 solveF2lPair slot = do
-    -- orientEdgeAndCorner slot
     orientMoves <- orientEdgeAndCorner slot
     cubeState <- get
     if f2lSolved cubeState
-    then return orientMoves
-    else do
-        pairMoves <-  putPairInSlot slot
-        return $ orientMoves ++ pairMoves
+        then return orientMoves
+        else do
+            pairMoves <-  putPairInSlot slot
+            return $ orientMoves ++ pairMoves
 
 orientEdgeAndCorner :: F2LSlot -> Cube Algorithm
 orientEdgeAndCorner slot = do
@@ -86,7 +82,8 @@ fixOrientation slot (Just eSlot) Nothing = do
         else tryAlg (orientationMoves eSlot edge) (\cs-> isNothing (cornerSlot cs corner))
 fixOrientation slot Nothing (Just cSlot) = do
     let edge = fst $ f2lSlot solvedCube slot
-    if cSlot == slot then return []
+    if cSlot == slot
+        then return []
         else tryAlg (orientationMoves cSlot edge) (\cs-> isNothing (edgeSlot cs edge))
 fixOrientation slot (Just eSlot) (Just cSlot) = do
     cubeState <- get
@@ -128,13 +125,16 @@ cornerSlot cubeState corner = pieceSlot (zip allPairs allCorners) cubeState corn
 pieceSlot :: [(F2LSlot, CubeState -> a)] -> CubeState -> a -> (a -> a -> Bool) -> Maybe F2LSlot
 pieceSlot ((slot, getPiece):xs) cubeState piece equivalent =
     if getPiece cubeState `equivalent` piece
-    then Just slot
-    else pieceSlot xs cubeState piece equivalent
+        then Just slot
+        else pieceSlot xs cubeState piece equivalent
 pieceSlot [] _ _ _ = Nothing
 
 edgeInEdgeList :: [Edge] -> Edge -> Edge
-edgeInEdgeList (x:xs) edge = if edge `edgeEquivalent` x then x else edgeInEdgeList xs edge
-edgeInEdgeList [] _ = undefined
+edgeInEdgeList (x:xs) edge = 
+    if edge `edgeEquivalent` x
+        then x 
+        else edgeInEdgeList xs edge
+edgeInEdgeList [] _ = error "Could not find edge in list of edges"
 
 putPairInSlot :: F2LSlot -> Cube Algorithm
 putPairInSlot slot = do
@@ -142,33 +142,44 @@ putPairInSlot slot = do
     let solvedEdge = fst $ f2lSlot solvedCube slot
     let edge = edgeInEdgeList (cubeEdges cubeState) solvedEdge
     let sideMove = edgeOrientationMove slot edge
-    solveSlot slot sideMove (map (\(currAlg, currState) -> let (resultAlg, resultState) = runState (applyAlgorithm [reverseMove sideMove]) currState in (currAlg ++ resultAlg, resultState)) (branchWithU (runState (applyAlgorithm [sideMove]) cubeState)) ++ createNewStates sideMove [([], cubeState)])
+    solveSlot slot sideMove (map 
+        (\(currAlg, currState) -> 
+            let (resultAlg, resultState) = runState (applyAlgorithm [reverseMove sideMove]) currState 
+            in (currAlg ++ resultAlg, resultState))
+        (branchWithU (runState (applyAlgorithm [sideMove]) cubeState)) ++ createNewStates sideMove [([], cubeState)])
 
 solveSlot :: F2LSlot -> Move -> [(Algorithm, CubeState)] -> Cube Algorithm
-solveSlot _ _ [] = undefined
-solveSlot slot sideMove states = do
+solveSlot _ _ [] = error "The given states cannot be empty"
+solveSlot slot sideMove states =
     case validAlgorithm slot states of
         Nothing -> solveSlot slot sideMove (createNewStates sideMove states)
-        Just (alg, _) -> do
-            applyAlgorithm alg
+        Just (alg, _) -> applyAlgorithm alg
 
 createNewStates :: Move -> [(Algorithm, CubeState)] -> [(Algorithm, CubeState)]
-createNewStates sideMove (x:xs) = if length xs > 20000 then error $ "Length too long: " ++ show (length xs) else getStatesFromState sideMove x ++ createNewStates sideMove xs
+createNewStates sideMove (x:xs) = 
+    if length xs > 20000
+        then error $ "Too many states created: " ++ show (length xs) 
+        else getStatesFromState sideMove x ++ createNewStates sideMove xs
 createNewStates _ [] = []
 
 getStatesFromState :: Move -> (Algorithm, CubeState) -> [(Algorithm, CubeState)]
 getStatesFromState sideMove (alg, cubeState) = do
     let step1 = branchWithU (alg, cubeState)
-    let step2 = map (\(currAlg, currState) -> let (resultAlg, resultState) = runState (applyAlgorithm [sideMove]) currState in (currAlg ++ resultAlg, resultState)) step1
+    let step2 = map (\(currAlg, currState) -> 
+            let (resultAlg, resultState) = runState (applyAlgorithm [sideMove]) currState 
+            in (currAlg ++ resultAlg, resultState)) step1
     let step3 = foldr (\x acc -> branchWithU x ++ acc) [] step2
-    let step4 = map (\(currAlg, currState) -> let (resultAlg, resultState) = runState (applyAlgorithm [reverseMove sideMove]) currState in (currAlg ++ resultAlg, resultState)) step3
+    let step4 = map (\(currAlg, currState) -> 
+            let (resultAlg, resultState) = runState (applyAlgorithm [reverseMove sideMove]) currState 
+            in (currAlg ++ resultAlg, resultState)) step3
     step4
 
 branchWithU :: (Algorithm, CubeState) -> [(Algorithm, CubeState)]
 branchWithU = branchWithMoves [Move U Normal, Move U Prime, Move U Two]
 
 branchWithMoves :: [Move] -> (Algorithm, CubeState) -> [(Algorithm, CubeState)]
-branchWithMoves (x:xs) (alg, cubeState) = let (_, resultState) = runState (applyAlgorithm [x]) cubeState 
+branchWithMoves (x:xs) (alg, cubeState) = 
+    let (_, resultState) = runState (applyAlgorithm [x]) cubeState 
     in (alg ++ [x], resultState) : branchWithMoves xs (alg, cubeState)
 branchWithMoves [] _ = []
 
