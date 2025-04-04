@@ -151,36 +151,47 @@ solvedCube = CubeState
 cubeSolved :: CubeState -> Bool
 cubeSolved cubeState = cubeState == solvedCube
 
-getCubeCorners :: [CubeState -> Corner]
-getCubeCorners =
-    [ urf
-    , ubr
-    , ulb
-    , ufl
-    , dfr
-    , dlf
-    , dbl
-    , drb
-    ]
+class Piece a where
+    pieceEquivalent :: a -> a -> Bool
+    pieceInList :: a -> [a] -> Bool
+    pieceInList edge = any (pieceEquivalent edge)
+    getPieces :: [CubeState -> a]
+    pieces :: CubeState -> [a]
+    pieces cubeState = map (\x -> x cubeState) getPieces
+    findPieceOnCube :: CubeState -> a -> (CubeState -> a)
+    findPieceOnCube cubeState piece = searchForPiece getPieces where
+        searchForPiece [] = error "Could not find piece"
+        searchForPiece (x:xs) =
+            if x cubeState `pieceEquivalent` piece
+                then x
+                else searchForPiece xs
 
-cubeCorners :: CubeState -> [Corner]
-cubeCorners cubeState = map (\x -> x cubeState) getCubeCorners
+instance Piece Edge where
+    pieceEquivalent e1 e2 = e1 `elem` [e2, flipEdge e2]
+    getPieces =
+        [ uf
+        , ur
+        , ub
+        , ul
+        , df
+        , dl
+        , db
+        , dr
+        , fr
+        , fl
+        , br
+        , bl
+        ]
 
-getCubeEdges :: [CubeState -> Edge]
-getCubeEdges =
-    [ uf
-    , ur
-    , ub
-    , ul
-    , df
-    , dl
-    , db
-    , dr
-    , fr
-    , fl
-    , br
-    , bl
-    ]
-
-cubeEdges :: CubeState -> [Edge]
-cubeEdges cubeState = map (\x -> x cubeState) getCubeEdges
+instance Piece Corner where
+    pieceEquivalent c1 c2 = c1 `elem` [c2, twistCorner c2, twistCorner (twistCorner c2)]
+    getPieces =
+        [ urf
+        , ubr
+        , ulb
+        , ufl
+        , dfr
+        , dlf
+        , dbl
+        , drb
+        ]
