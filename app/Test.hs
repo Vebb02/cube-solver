@@ -4,7 +4,7 @@ module Test where
 import CubeParser (parseCubeState, parseScramble)
 import CubeState
 import CubeValidator (validateCubeState)
-import CFOP.CFOP (auf, solve)
+import CFOP.CFOP (auf, cfop)
 import CFOP.PLL
 import Text.Megaparsec (runParser, ParseErrorBundle)
 import qualified Data.Text as T
@@ -103,7 +103,7 @@ solveScrambles (x:xs) = do
         Left errorMessage -> error $ show errorMessage
         Right scramble -> do
             let cubeState = execState (applyAlgorithm scramble) solvedCube
-            let (solution, _) = runState solve cubeState
+            let (solution, _) = runState cfop cubeState
             let (moveCount, (minAlg, minScramble, minMoves), (maxAlg, maxScramble, maxMoves)) = solveScrambles xs
             let totalMoveCount = moveCount + length solution
             let shortest = if length solution < minMoves then (solution, scramble, length solution) else (minAlg, minScramble, minMoves)
