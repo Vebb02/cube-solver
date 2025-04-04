@@ -9,7 +9,7 @@ import Control.Monad.State
 import qualified Data.Text as T
 import Text.Megaparsec (runParser)
 import CubeParser (parseCubeState)
-import CFOP.CFOP (solve)
+import CFOP.CFOP (cfop)
 
 generatePDF :: IO ()
 generatePDF = do
@@ -18,7 +18,7 @@ generatePDF = do
     case parsedResult of
         Left errorMessage -> print errorMessage
         Right cubeState -> do
-            generatePDFSolution (evalState solve cubeState) cubeState
+            generatePDFSolution (evalState cfop cubeState) cubeState
 
 generatePDFSolution :: Algorithm -> CubeState -> IO ()
 generatePDFSolution alg cubeState = do
