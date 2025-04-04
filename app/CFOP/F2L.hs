@@ -75,7 +75,7 @@ fixOrientation _ Nothing Nothing = return []
 fixOrientation slot (Just eSlot) Nothing = do
     cubeState <- get
     let solvedEdge = fst $ f2lSlot solvedCube slot
-    let edge = edgeInEdgeList (cubeEdges cubeState) solvedEdge
+    let edge = edgeInEdgeList (pieces cubeState) solvedEdge
     let corner = snd $ f2lSlot solvedCube slot
     if eSlot == slot && edgeSum (fst $ f2lSlot cubeState slot) == 0
         then return []
@@ -88,7 +88,7 @@ fixOrientation slot Nothing (Just cSlot) = do
 fixOrientation slot (Just eSlot) (Just cSlot) = do
     cubeState <- get
     let solvedEdge = fst $ f2lSlot solvedCube slot
-    let edge = edgeInEdgeList (cubeEdges cubeState) solvedEdge
+    let edge = edgeInEdgeList (pieces cubeState) solvedEdge
     if eSlot == cSlot
         then applyAlgorithm [slotToMove eSlot, Move U Normal, reverseMove $ slotToMove eSlot]
         else if eSlot == slot && edgeSum edge == 0
@@ -117,21 +117,21 @@ slotToNonOrientedMove BL = Move B Prime
 slotToNonOrientedMove BR = Move B Normal
 
 edgeSlot :: CubeState -> Edge -> Maybe F2LSlot
-edgeSlot cubeState edge = pieceSlot (zip allPairs allEdges) cubeState edge edgeEquivalent
+edgeSlot = pieceSlot (zip allPairs allEdges)
 
 cornerSlot :: CubeState -> Corner -> Maybe F2LSlot
-cornerSlot cubeState corner = pieceSlot (zip allPairs allCorners) cubeState corner cornerEquivalent
+cornerSlot = pieceSlot (zip allPairs allCorners)
 
-pieceSlot :: [(F2LSlot, CubeState -> a)] -> CubeState -> a -> (a -> a -> Bool) -> Maybe F2LSlot
-pieceSlot ((slot, getPiece):xs) cubeState piece equivalent =
-    if getPiece cubeState `equivalent` piece
+pieceSlot :: (Piece a) => [(F2LSlot, CubeState -> a)] -> CubeState -> a -> Maybe F2LSlot
+pieceSlot ((slot, getPiece):xs) cubeState piece =
+    if getPiece cubeState `pieceEquivalent` piece
         then Just slot
-        else pieceSlot xs cubeState piece equivalent
-pieceSlot [] _ _ _ = Nothing
+        else pieceSlot xs cubeState piece
+pieceSlot [] _ _ = Nothing
 
 edgeInEdgeList :: [Edge] -> Edge -> Edge
 edgeInEdgeList (x:xs) edge = 
-    if edge `edgeEquivalent` x
+    if edge `pieceEquivalent` x
         then x 
         else edgeInEdgeList xs edge
 edgeInEdgeList [] _ = error "Could not find edge in list of edges"
@@ -140,7 +140,7 @@ putPairInSlot :: F2LSlot -> Cube Algorithm
 putPairInSlot slot = do
     cubeState <- get
     let solvedEdge = fst $ f2lSlot solvedCube slot
-    let edge = edgeInEdgeList (cubeEdges cubeState) solvedEdge
+    let edge = edgeInEdgeList (pieces cubeState) solvedEdge
     let sideMove = edgeOrientationMove slot edge
     solveSlot slot sideMove (map 
         (\(currAlg, currState) -> 

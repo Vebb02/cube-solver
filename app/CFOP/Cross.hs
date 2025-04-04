@@ -30,16 +30,8 @@ solveCrossPiece :: (CubeState -> Edge) -> [CubeState -> Edge] -> Cube Algorithm
 solveCrossPiece x solvedPieces = do
     cubeState <- get
     let edgeCase = crossEdgeCase cubeState x solvedPieces
-    let x1 = findEdgeOnCube cubeState (x solvedCube)
+    let x1 = findPieceOnCube cubeState (x solvedCube)
     solveCrossPieceByCase edgeCase x1 solvedPieces
-
-findEdgeOnCube :: CubeState -> Edge -> (CubeState -> Edge)
-findEdgeOnCube cubeState edge = searchForEdge getCubeEdges where
-    searchForEdge [] = error "Could not find edge"
-    searchForEdge (x:xs) =
-        if x cubeState == edge || x cubeState == flipEdge edge
-            then x
-            else searchForEdge xs
 
 solveCrossPieceByCase :: CrossEdgeCase -> (CubeState -> Edge) -> [CubeState -> Edge] -> Cube Algorithm
 solveCrossPieceByCase SolvedEdge _  _ = return []
