@@ -10,11 +10,13 @@ import CubeState
 
 validateCubeState :: CubeState -> Bool
 validateCubeState cubeState = 
-       validatePieceQuantity cubeState
-    && validateCenters cubeState
-    && validateEdgeOrientation cubeState
-    && validateCornerRotation cubeState
-    && validateEdgeAndCornerSwap cubeState
+    all (\validator -> validator cubeState)
+        [ validatePieceQuantity
+        , validateCenters
+        , validateEdgeOrientation
+        , validateCornerRotation
+        , validateEdgeAndCornerSwap
+        ]
 
 validateCornerRotation :: CubeState -> Bool
 validateCornerRotation cubeState = totalCornerSum cubeState `mod` 3 == 0
@@ -50,12 +52,8 @@ edgeSum _ = error "Invalid edge on cube"
 
 validateCenters :: CubeState -> Bool
 validateCenters cubeState =
-       f cubeState == Center Green
-    && b cubeState == Center Blue
-    && u cubeState == Center White
-    && d cubeState == Center Yellow
-    && r cubeState == Center Red
-    && l cubeState == Center Orange
+    all (\(center, color) -> center cubeState == Center color)
+        (zip [f, b, u, d, r, l] [Green, Blue, White, Yellow, Red, Orange])
 
 validatePieceQuantity :: CubeState -> Bool
 validatePieceQuantity cubeState = 
