@@ -1,5 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
-module Test where
+module TestOld where
 
 import CubeParser (parseCubeState, parseScramble)
 import CubeState
