@@ -13,7 +13,6 @@ globalThis.navigator = {
     })
 };
 
-var deviceList = [];
 // Callback invoked during Bluetooth scanning procedure on each new device found
 function onDeviceFound(device, selectFn) {
     selectFn();
@@ -36,7 +35,13 @@ async function customMacAddressProvider(device) {
 async function main() {
 
     var conn = await gan.connectGanCube(customMacAddressProvider);
-    // console.log(`Connected successfully`);
+
+    process.on('SIGINT', async () => {
+        if (conn) {
+            await conn.disconnect();
+        }
+        process.exit();
+    });
 
     conn.events$.subscribe((cubeEvent) => {
         if (cubeEvent.type == "MOVE") {
