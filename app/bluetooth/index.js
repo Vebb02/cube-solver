@@ -16,30 +16,9 @@ globalThis.navigator = {
 var deviceList = [];
 // Callback invoked during Bluetooth scanning procedure on each new device found
 function onDeviceFound(device, selectFn) {
-    deviceList.push({
-        device: device,
-        select: selectFn
-    });
-    console.log(`${deviceList.length}) ${device.name}`);
+    selectFn();
 }
 
-// Read user input from console
-const readline = require('readline').createInterface({
-    input: process.stdin,
-    output: process.stdout,
-    terminal: false
-});
-console.log(`=> Scanning for bluetooth devices, enter device number to connect:`);
-readline.on('line', (input) => {
-    var idx = parseInt(input) - 1;
-    if (deviceList[idx]) {
-        readline.close();
-        console.log(`Connecting to ${deviceList[idx].device.name}`);
-        deviceList[idx].select();
-    } else {
-        console.log(`Invalid device number entered!`);
-    }
-});
 
 // Retrieve cube device MAC address using implementation-specific fields containing advertising packet data from device
 async function customMacAddressProvider(device) {
@@ -57,11 +36,11 @@ async function customMacAddressProvider(device) {
 async function main() {
 
     var conn = await gan.connectGanCube(customMacAddressProvider);
-    console.log(`Connected successfully`);
+    // console.log(`Connected successfully`);
 
     conn.events$.subscribe((cubeEvent) => {
-        if (cubeEvent.type != "GYRO") {
-            console.log('GanCubeEvent', cubeEvent);
+        if (cubeEvent.type == "MOVE") {
+            console.log(cubeEvent.move);
         }
     });
 
@@ -74,4 +53,3 @@ async function main() {
 main();
 // Avoid Node.js process termination due to empty event loop queue
 setInterval(() => { }, 1 << 30);
-
