@@ -54,7 +54,8 @@ executable cube-solver
                       directory,
                       HPDF,
                       dbus,
-                      bytestring
+                      bytestring,
+                      crypton
 
     hs-source-dirs:   app
 
