@@ -1,9 +1,10 @@
 module Main where
 
 import PDFCube (generatePDF)
-import BluetoothCube (bluetooth)
+import BluetoothCube (bluetooth, decryptionTest)
 
 main :: IO ()
 main = do
-    bluetooth
+    decryptionTest
+    -- bluetooth
     generatePDF
