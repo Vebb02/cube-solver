@@ -1,0 +1,13 @@
+{
+  "name": "gan-node-sample",
+  "private": true,
+  "version": "1.0.0",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "gan-web-bluetooth": "^3.0.2",
+    "webbluetooth": "^3.2.1"
+  }
+}
