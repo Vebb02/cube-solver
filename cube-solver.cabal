@@ -41,7 +41,8 @@ executable cube-solver
                       CFOP.Cross,
                       Triggers,
                       PDFCube,
-                      TestOld
+                      TestOld,
+                      BluetoothCube
 
     -- LANGUAGE extensions used by modules in this package.
     -- other-extensions:
@@ -51,7 +52,9 @@ executable cube-solver
                       text,
                       megaparsec,
                       directory,
-                      HPDF
+                      HPDF,
+                      dbus,
+                      bytestring
 
     hs-source-dirs:   app
 
