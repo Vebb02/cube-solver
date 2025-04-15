@@ -60,7 +60,8 @@ executable cube-solver
                       servant,
                       servant-server,
                       wai,
-                      warp
+                      warp,
+                      bytestring
 
     hs-source-dirs:   app
 
