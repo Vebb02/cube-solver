@@ -8,7 +8,8 @@ import CubeParser (parseMove)
 import qualified Data.Text as T
 import Text.Megaparsec (runParser)
 import CubeState (CubeState, solvedCube)
-import Control.Monad.State (execState)
+import Control.Monad.State (execState, when)
+import Control.Concurrent (threadDelay)
 
 
 bluetooth :: IO ()
@@ -17,25 +18,51 @@ bluetooth = do
     let process = shell "cd app/bluetooth && npm start"
     (_, maybeHout, _, ph) <- createProcess process { std_out = CreatePipe }
     case maybeHout of
-        Just hout -> readLines 0 hout
+        Just hout -> bluetoothInteraction hout
         Nothing -> error "Could not get input handle"
     terminateProcess ph
     callCommand "rfkill block bluetooth"
     callCommand "rfkill unblock bluetooth"
     return ()
 
+bluetoothInteraction :: Handle -> IO ()
+bluetoothInteraction hout = do
+    readLines 5 hout
+    putStrLn "Cube is connected"
+    threadDelay 500000
+    putStrLn "Reset the cube to the solved state"
+    threadDelay 500000
+    countDown 3
+    flushOutput hout
+    putStrLn "Start scramblin!"
+    scrambleCube 0 hout solvedCube
 
 readLines :: Int -> Handle -> IO ()
-readLines 25 hout = scrambleCube 0 hout solvedCube
-readLines count hout = do
-    input <- hGetLine hout
-    putStrLn input
-    readLines (count + 1) hout
+readLines count hout
+    | count <= 0 = return ()
+    | otherwise = do
+        _ <- hGetLine hout
+        readLines (count - 1) hout
+
+countDown :: Int -> IO ()
+countDown count
+    | count <= 0 = putStrLn "0"
+    | otherwise = do
+        print count
+        threadDelay 1000000
+        countDown (count - 1)
+
+flushOutput :: Handle -> IO ()
+flushOutput hout = do
+    isMoreToRead <- hIsEOF hout
+    when isMoreToRead $ do
+        _ <- hGetLine hout
+        flushOutput hout
 
 scrambleCube :: Int -> Handle -> CubeState -> IO ()
 scrambleCube 100 _ _ = return ()
 scrambleCube count hout cubeState = do
-    m <- getNextMove hout
+    m <- parseNextMove hout
     let newCubeState = nextState m cubeState
     generatePDFFromCubeState newCubeState
     scrambleCube (count + 1) hout newCubeState
@@ -43,8 +70,8 @@ scrambleCube count hout cubeState = do
 nextState :: Move -> CubeState -> CubeState
 nextState m = execState (move m)
 
-getNextMove :: Handle -> IO Move
-getNextMove hout = do    
+parseNextMove :: Handle -> IO Move
+parseNextMove hout = do
     input <- hGetLine hout
     let eitherMove = runParser parseMove "" (T.pack input)
     case eitherMove of
