@@ -1,5 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
-module PDFCube (generatePDF, generatePDFFromCubeState) where
+module PDFCube (generatePDF, generatePDFFromSolution) where
 
 import Graphics.PDF.Colors hiding (blue)
 import Graphics.PDF hiding (blue)
@@ -11,8 +11,8 @@ import Text.Megaparsec (runParser)
 import CubeParser (parseCubeState)
 import CFOP.CFOP (cfop)
 
-generatePDFFromCubeState :: CubeState -> IO ()
-generatePDFFromCubeState cubeState = generatePDFSolution (evalState cfop cubeState) cubeState
+generatePDFFromSolution :: CubeState -> Algorithm -> IO ()
+generatePDFFromSolution cubeState solution = generatePDFSolution solution cubeState
 
 generatePDF :: IO ()
 generatePDF = do
