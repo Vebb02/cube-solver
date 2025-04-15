@@ -42,7 +42,8 @@ executable cube-solver
                       Triggers,
                       PDFCube,
                       TestOld,
-                      BluetoothCube
+                      BluetoothCube,
+                      CubeSolverServer
 
     -- LANGUAGE extensions used by modules in this package.
     -- other-extensions:
@@ -55,7 +56,11 @@ executable cube-solver
                       HPDF,
                       process,
                       time,
-                      options
+                      options,
+                      servant,
+                      servant-server,
+                      wai,
+                      warp
 
     hs-source-dirs:   app
 
