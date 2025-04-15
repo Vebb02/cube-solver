@@ -35,7 +35,7 @@ async function customMacAddressProvider(device) {
 async function main() {
 
     var conn = await gan.connectGanCube(customMacAddressProvider);
-
+    console.log("Connected!");
     conn.events$.subscribe((cubeEvent) => {
         if (cubeEvent.type == "MOVE") {
             console.log(cubeEvent.move);
