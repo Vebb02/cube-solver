@@ -36,13 +36,6 @@ async function main() {
 
     var conn = await gan.connectGanCube(customMacAddressProvider);
 
-    process.on('SIGINT', async () => {
-        if (conn) {
-            await conn.disconnect();
-        }
-        process.exit();
-    });
-
     conn.events$.subscribe((cubeEvent) => {
         if (cubeEvent.type == "MOVE") {
             console.log(cubeEvent.move);
@@ -54,6 +47,15 @@ async function main() {
     await conn.sendCubeCommand({ type: "REQUEST_BATTERY" });
 
 }
+
+process.stdout.on('error', async (err) => {
+    if (err.code === 'EPIPE') {
+        process.exit();
+    } else {
+        throw err;
+    }
+});
+
 
 main();
 // Avoid Node.js process termination due to empty event loop queue

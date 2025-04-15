@@ -4,6 +4,4 @@ import PDFCube (generatePDF)
 import BluetoothCube (bluetooth)
 
 main :: IO ()
-main = do
-    bluetooth
-    generatePDF
+main = if True then bluetooth else generatePDF
