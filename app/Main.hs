@@ -1,7 +1,18 @@
 module Main where
 
-import PDFCube (generatePDF)
 import BluetoothCube (bluetooth)
+import Options
+import PDFCube (generatePDF)
+
+newtype CubeSolverOptions = CubeSolverOptions
+    { bluetoothMode :: Bool }
+
+instance Options CubeSolverOptions where
+    defineOptions = CubeSolverOptions <$> simpleOption "bluetooth" False
+        "Whether to use bluetooth cube."
 
 main :: IO ()
-main = if True then bluetooth else generatePDF
+main = runCommand $ \opts _ ->
+    if bluetoothMode opts
+        then bluetooth
+        else generatePDF
