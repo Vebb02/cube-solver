@@ -12,7 +12,7 @@ import Control.Monad.State (execState, when, evalState)
 import Control.Concurrent (threadDelay)
 import CFOP.CFOP (cfop)
 import Data.List (minimumBy)
-
+import Data.Time (getCurrentTime, UTCTime, nominalDiffTimeToSeconds, diffUTCTime)
 
 bluetooth :: IO ()
 bluetooth = do
@@ -29,15 +29,20 @@ bluetooth = do
 
 bluetoothInteraction :: Handle -> IO ()
 bluetoothInteraction hout = do
+    putStrLn "Move top layer until cube is connected"
     readLines 5 hout
     putStrLn "Cube is connected"
     threadDelay 500000
-    putStrLn "Reset the cube to the solved state"
+    putStrLn "Reset the top layer so that the cube is solved"
     threadDelay 500000
     countDown 3
     flushOutput hout
     putStrLn "Start scramblin!"
-    cubeState <- scrambleCube 0 hout solvedCube
+    systemTimeNow <- getCurrentTime
+    cubeState <- scrambleCube systemTimeNow hout solvedCube
+    putStrLn "Start solvin!"
+    threadDelay 500000
+    callCommand "open solution_manual.pdf"
     solveCube hout cubeState (evalState cfop cubeState)
 
 readLines :: Int -> Handle -> IO ()
@@ -64,13 +69,19 @@ flushOutput hout = do
         _ <- hGetLine hout
         flushOutput hout
 
-scrambleCube :: Int -> Handle -> CubeState -> IO CubeState
-scrambleCube 30 _ cubeState = return cubeState
-scrambleCube count hout cubeState = do
-    m <- parseNextMove hout
-    print m
-    let newCubeState = nextState m cubeState
-    scrambleCube (count + 1) hout newCubeState
+scrambleCube :: UTCTime -> Handle -> CubeState -> IO CubeState
+scrambleCube startTime hout cubeState = do
+    systemTimeNow <- getCurrentTime
+    let secondsSinceLastMove = nominalDiffTimeToSeconds $ diffUTCTime systemTimeNow startTime
+    if secondsSinceLastMove >= 3
+        then return cubeState
+        else do
+            isReadyToRead <- hReady hout
+            if isReadyToRead then do
+                m <- parseNextMove hout
+                let newCubeState = nextState m cubeState
+                scrambleCube systemTimeNow hout newCubeState
+            else scrambleCube startTime hout cubeState
 
 solveCube :: Handle -> CubeState -> Algorithm -> IO ()
 solveCube _ cubeState [] = generatePDFFromSolution cubeState []

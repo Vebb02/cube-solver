@@ -53,7 +53,8 @@ executable cube-solver
                       megaparsec,
                       directory,
                       HPDF,
-                      process
+                      process,
+                      time
 
     hs-source-dirs:   app
 
