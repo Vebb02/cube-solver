@@ -54,7 +54,8 @@ executable cube-solver
                       directory,
                       HPDF,
                       process,
-                      time
+                      time,
+                      options
 
     hs-source-dirs:   app
 
