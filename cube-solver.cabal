@@ -15,7 +15,7 @@ license-file:       LICENSE
 author:             Vebjørn Øiestad
 maintainer:         vebjorn.oiestad@gmail.com
 
-build-type:         Simple
+build-type:         Custom
 
 extra-doc-files:    CHANGELOG.md
 
@@ -53,9 +53,7 @@ executable cube-solver
                       megaparsec,
                       directory,
                       HPDF,
-                      dbus,
-                      bytestring,
-                      crypton
+                      process
 
     hs-source-dirs:   app
 
@@ -64,6 +62,13 @@ executable cube-solver
 test-suite cube-solver-tests
     type:             detailed-0.9
     test-module:      CubeSolverTest
-    build-depends:    base ^>=4.17.2.1, Cabal >= 3.0
+    build-depends:    base ^>=4.17.2.1, 
+                      Cabal >= 3.0
     hs-source-dirs:   app
     default-language: Haskell2010
+
+
+custom-setup
+    setup-depends:    base ^>=4.17.2.1, 
+                      Cabal >= 3.0,
+                      process
