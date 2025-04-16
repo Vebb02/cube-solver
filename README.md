@@ -52,7 +52,13 @@ cabal run
 ```
 cabal run -- cube-solver --bluetooth
 ```
+### PDF API
+NOTE: Using the server flag overides the bluetooth flag.
+```
+cabal run -- cube-solver --server
+```
 ## Credit
 * ["Rubik's Cube: Why are some cases impossible to solve?" - by Dylan Wang AKA "JPerm" on YouTube](https://youtu.be/o-RxLzRe2YE?si=PNoy7rsajMeGU8o2)
 * [PLL: E perm and Z perm from SpeedCubeDB](https://speedcubedb.com/a/3x3/PLL)
 * [Names of OLL cases from jperm.net](https://jperm.net/algs/2look/oll)
+* [GAN Bluetooth with Node.js](https://github.com/afedotov/gan-node-sample)
