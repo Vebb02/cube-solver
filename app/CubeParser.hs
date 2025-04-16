@@ -70,7 +70,7 @@ parseCubeState = do
         }
     if validateCubeState cubeState
         then return cubeState
-        else error "Cube is not in a valid state"
+        else fail "Cube is not in a valid state"
 
 parseScramble :: Parser Algorithm
 parseScramble = do
