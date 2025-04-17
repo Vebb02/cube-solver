@@ -15,7 +15,8 @@ import Control.Monad.State (evalState, MonadIO (liftIO))
 import qualified Data.ByteString as BS
 import PDFCube (generatePDFFromSolution)
 
-type CubeSolverApi = "api" :> "cubesolver" :> QueryParam "cube" String :>  Get '[OctetStream] BS.ByteString
+type CubeSolverApi = "api" :> "cubesolver" :> "solve" :> QueryParam "cube" String :>  Get '[OctetStream] BS.ByteString
+                :<|> "api" :> "cubesolver" :> "validate" :> QueryParam "cube" String :>  Get '[PlainText] String
 
 solveCube :: Maybe String -> Handler BS.ByteString
 solveCube Nothing = return "No paramter given\n"
@@ -27,8 +28,16 @@ solveCube (Just unparsedCube) = do
             liftIO $ generatePDFFromSolution cubeState (evalState cfop cubeState)
             liftIO $ BS.readFile "solution_manual.pdf"
 
+validateCube :: Maybe String -> Handler String
+validateCube Nothing = return "false"
+validateCube (Just unparsedCube) = do
+    let parsedResult = runParser parseCubeState "" (T.pack unparsedCube)
+    case parsedResult of
+        Left _ -> return "false"
+        Right _ -> return "true"
+
 server :: Server CubeSolverApi
-server = solveCube
+server = solveCube :<|> validateCube
 
 api :: Proxy CubeSolverApi
 api = Proxy
