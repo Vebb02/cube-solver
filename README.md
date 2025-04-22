@@ -4,9 +4,9 @@
 
 ## Scramble input example file
 ### Notes 
-- The parser is case sensitive and will fail if the letters are not all upper case.
-- The file should always end with a single newline character.
-- The spacing for the white and yellow faces should be present.
+- The parser is not case sensitive and will accept both lower and upper case.
+- The file should always end with either the last color or white space.
+- The spacing for the white and yellow faces can be present and is recommended for manual input, but is not necessary.
 ### Face color to letter mapping
 | Color   | Letter |
 |---------|--------|
@@ -67,12 +67,12 @@ You can also use the [web UI](https://voiestad.no/cube-solver) to interact with 
 
 ### Example API call - Validate
 ```
-https://voiestad.no/api/cubesolver/validate?cube=%20YBR%0A%20RWR%0A%20OYB%0AGYGWBOWGWGWR%0AOOGOGRWRGYBW%0AGYOYWWBOBYBO%0A%20BGR%0A%20OYB%0A%20YRR%0A
+https://voiestad.no/api/cubesolver/validate?cube=YBRRWROYBGYGWBOWGWGWROOGOGRWRGYBWGYOYWWBOBYBOBGROYBYRR
 ```
 
 ### Example API call - Solve
 ```
-https://voiestad.no/api/cubesolver/solve?cube=%20YBR%0A%20RWR%0A%20OYB%0AGYGWBOWGWGWR%0AOOGOGRWRGYBW%0AGYOYWWBOBYBO%0A%20BGR%0A%20OYB%0A%20YRR%0A
+https://voiestad.no/api/cubesolver/solve?cube=YBRRWROYBGYGWBOWGWGWROOGOGRWRGYBWGYOYWWBOBYBOBGROYBYRR
 ```
 
 ## Credit

@@ -12,18 +12,18 @@ type Parser = Parsec Void T.Text
 
 parseColor :: Parser CubeColor
 parseColor =
-        White  <$ char 'W'
-    <|> Yellow <$ char 'Y'
-    <|> Green  <$ char 'G'
-    <|> Blue   <$ char 'B'
-    <|> Red    <$ char 'R'
-    <|> Orange <$ char 'O'
+        White  <$ char' 'W'
+    <|> Yellow <$ char' 'Y'
+    <|> Green  <$ char' 'G'
+    <|> Blue   <$ char' 'B'
+    <|> Red    <$ char' 'R'
+    <|> Orange <$ char' 'O'
 
 parseLine :: Int -> Parser [CubeColor]
 parseLine lineLength = do
-    space
+    space <|> return ()
     colors <- count lineLength parseColor
-    _ <- newline
+    space <|> return ()
     return colors
 
 parseFace :: Int -> Parser [CubeColor]
@@ -87,12 +87,12 @@ parseNextMove = space *> parseMove
 
 parseTurningFace :: Parser MoveFace
 parseTurningFace =
-        F <$ char 'F'
-    <|> R <$ char 'R'
-    <|> U <$ char 'U'
-    <|> B <$ char 'B'
-    <|> L <$ char 'L'
-    <|> D <$ char 'D'
+        F <$ char' 'F'
+    <|> R <$ char' 'R'
+    <|> U <$ char' 'U'
+    <|> B <$ char' 'B'
+    <|> L <$ char' 'L'
+    <|> D <$ char' 'D'
 
 parseDirection :: Parser MoveDirection
 parseDirection =
