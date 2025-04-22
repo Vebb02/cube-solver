@@ -22,6 +22,7 @@ generatePDF = do
         Left errorMessage -> print errorMessage
         Right cubeState -> do
             generatePDFSolution (evalState cfop cubeState) cubeState
+            putStrLn "PDF solution successfully generated!"
 
 generatePDFSolution :: Algorithm -> CubeState -> IO ()
 generatePDFSolution alg cubeState = do
