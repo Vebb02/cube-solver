@@ -116,9 +116,6 @@ move (Move x Two) = do
     move (Move x Normal)
     move (Move x Normal)
 
-showCube :: Cube () -> CubeState -> String
-showCube c initialC = show $ execState c initialC
-
 applyAlgorithm :: Algorithm -> Cube Algorithm
 applyAlgorithm [] = return []
 applyAlgorithm (x:xs) = do
