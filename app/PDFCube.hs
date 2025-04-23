@@ -1,5 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
-module PDFCube (generatePDF, generatePDFFromSolution) where
+module PDFCube (generatePDF, generatePDFSolution) where
 
 import Graphics.PDF.Colors hiding (blue)
 import Graphics.PDF hiding (blue)
@@ -10,9 +10,6 @@ import qualified Data.Text as T
 import Text.Megaparsec (runParser)
 import CubeParser (parseCubeState)
 import CFOP.CFOP (cfop)
-
-generatePDFFromSolution :: CubeState -> Algorithm -> IO ()
-generatePDFFromSolution cubeState solution = generatePDFSolution solution cubeState
 
 generatePDF :: IO ()
 generatePDF = do
@@ -26,24 +23,32 @@ generatePDF = do
 
 generatePDFSolution :: Algorithm -> CubeState -> IO ()
 generatePDFSolution alg cubeState = do
-    eitherFont <- mkStdFont Helvetica_Bold
+    eitherPdf <- generateDoc alg cubeState
+    case eitherPdf of
+        Left errorMessage -> error errorMessage
+        Right pdf -> runPdf "solution_manual.pdf" standardDocInfo rect pdf
+
+
+generateDoc :: Algorithm -> CubeState -> IO (Either String (PDF ()))
+generateDoc alg cubeState = do
+    eitherFont <- showLeft <$> mkStdFont Helvetica_Bold
     eitherFrontPageImage <- readJpegFile "images/front-page.jpeg"
     eitherWarningImage <- readJpegFile "images/warning-page.jpeg"
-    case eitherFont of
-        Left errorMessage -> print errorMessage
-        Right anyFont -> case eitherFrontPageImage of
-            Left errorMessage -> print errorMessage
-            Right frontPageImage -> case eitherWarningImage of
-                Left errorMessage -> print errorMessage
-                Right warningImage -> do
-                    let introductionPages = imagePage frontPageImage >> imagePage warningImage
-                    let font = PDFFont anyFont 50
-                    let size = 50
-                    let heightChange = size / 5 * 2
-                    let instructions = evalState (createPdfCubeSolution alg 1 font size heightChange) cubeState
-                    let pdf = introductionPages >> instructions
-                    runPdf "solution_manual.pdf" standardDocInfo rect pdf
+    return $ do
+        anyFont <- eitherFont
+        frontPageImage <- eitherFrontPageImage
+        warningImage <- eitherWarningImage
+        let introductionPages = imagePage frontPageImage >> imagePage warningImage
+        let font = PDFFont anyFont 50
+        let size = 50
+        let heightChange = size / 5 * 2
+        let instructions = evalState (createPdfCubeSolution alg 1 font size heightChange) cubeState
+        let pdf = introductionPages >> instructions
+        return pdf
 
+showLeft :: (Show a ) => Either a AnyFont -> Either String AnyFont
+showLeft (Right a) = Right a
+showLeft (Left a) = Left $ show a 
 
 imagePage :: JpegFile -> PDF ()
 imagePage frontPageImage = do

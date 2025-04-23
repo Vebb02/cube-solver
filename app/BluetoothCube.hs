@@ -1,6 +1,6 @@
 module BluetoothCube (bluetooth) where
 
-import PDFCube (generatePDFFromSolution)
+import PDFCube (generatePDFSolution)
 import System.IO
 import System.Process
 import Cube (move, Move, Algorithm, combineMoves, reverseMove)
@@ -84,9 +84,9 @@ scrambleCube startTime hout cubeState = do
             else scrambleCube startTime hout cubeState
 
 solveCube :: Handle -> CubeState -> Algorithm -> IO ()
-solveCube _ cubeState [] = generatePDFFromSolution cubeState []
+solveCube _ cubeState [] = generatePDFSolution [] cubeState
 solveCube hout cubeState solution@(x:xs) = do
-    generatePDFFromSolution cubeState solution
+    generatePDFSolution solution cubeState
     m <- parseNextMove hout
     let newCubeState = nextState m cubeState
     let currentSolution = combineMoves (reverseMove m) x ++ xs

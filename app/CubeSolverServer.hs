@@ -13,7 +13,7 @@ import qualified Data.Text as T
 import CFOP.CFOP (cfop)
 import Control.Monad.State (evalState, MonadIO (liftIO))
 import qualified Data.ByteString as BS
-import PDFCube (generatePDFFromSolution)
+import PDFCube (generatePDFSolution)
 
 type CubeSolverApi = "api" :> "cubesolver" :> "solve" :> QueryParam "cube" String :>  Get '[OctetStream] BS.ByteString
                 :<|> "api" :> "cubesolver" :> "validate" :> QueryParam "cube" String :>  Get '[PlainText] String
@@ -25,7 +25,7 @@ solveCube (Just unparsedCube) = do
     case parsedResult of
         Left _ -> return "Parsing failed\n"
         Right cubeState -> do
-            liftIO $ generatePDFFromSolution cubeState (evalState cfop cubeState)
+            liftIO $ generatePDFSolution (evalState cfop cubeState) cubeState 
             liftIO $ BS.readFile "solution_manual.pdf"
 
 validateCube :: Maybe String -> Handler String
