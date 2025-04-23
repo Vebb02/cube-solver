@@ -16,6 +16,11 @@ import Data.Time (getCurrentTime, UTCTime, nominalDiffTimeToSeconds, diffUTCTime
 
 bluetooth :: IO ()
 bluetooth = do
+    printAllWithDelay
+        [ "Make sure the cube is solved!"
+        , "Hold the cube so that the green side is facing towards you and the white side is on the top"
+        , "Continously move the top layer until cube is connected"
+        ] 8
     callCommand "rfkill unblock bluetooth"
     let process = shell "cd app/bluetooth && npm start"
     (_, maybeHout, _, ph) <- createProcess process { std_out = CreatePipe }
@@ -29,13 +34,12 @@ bluetooth = do
 
 bluetoothInteraction :: Handle -> IO ()
 bluetoothInteraction hout = do
-    putStrLn "Move top layer until cube is connected"
     readLines 5 hout
-    putStrLn "Cube is connected"
-    threadDelay 500000
-    putStrLn "Reset the top layer so that the cube is solved"
-    threadDelay 500000
-    countDown 3
+    printAllWithDelay 
+        [ "Cube is connected"
+        , "Reset the top layer so that the cube is solved"
+        ] 1
+    printAllWithDelay (map show ([10,9..1] :: [Integer])) 1
     flushOutput hout
     putStrLn "Start scramblin!"
     systemTimeNow <- getCurrentTime
@@ -45,6 +49,7 @@ bluetoothInteraction hout = do
     callCommand "open solution_manual.pdf"
     solveCube hout cubeState (evalState cfop cubeState)
 
+
 readLines :: Int -> Handle -> IO ()
 readLines count hout =
     if count <= 0
@@ -53,14 +58,13 @@ readLines count hout =
         _ <- hGetLine hout
         readLines (count - 1) hout
 
-countDown :: Int -> IO ()
-countDown count =
-    if count <= 0
-    then return ()
-    else do
-        print count
-        threadDelay 1000000
-        countDown (count - 1)
+printAllWithDelay :: [String] -> Int -> IO ()
+printAllWithDelay [] _ = return ()
+printAllWithDelay [x] _ = putStrLn x
+printAllWithDelay (x:xs) secondsDelay = do
+    putStrLn x
+    threadDelay $ 1000000 * secondsDelay
+    printAllWithDelay xs secondsDelay
 
 flushOutput :: Handle -> IO ()
 flushOutput hout = do
@@ -73,7 +77,7 @@ scrambleCube :: UTCTime -> Handle -> CubeState -> IO CubeState
 scrambleCube startTime hout cubeState = do
     systemTimeNow <- getCurrentTime
     let secondsSinceLastMove = nominalDiffTimeToSeconds $ diffUTCTime systemTimeNow startTime
-    if secondsSinceLastMove >= 3
+    if secondsSinceLastMove >= 5
         then return cubeState
         else do
             isReadyToRead <- hReady hout
