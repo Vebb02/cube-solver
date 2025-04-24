@@ -15,62 +15,16 @@ author:             Vebjørn Øiestad
 
 build-type:         Custom
 
-extra-doc-files:    CHANGELOG.md
-
 common warnings
     ghc-options: -Wall
 
-executable cube-solver
+library
     import:           warnings
 
-    main-is:          Main.hs
-
-    other-modules:    Cube,
-                      CubeState,
-                      CubeParser,
-                      CubeValidator,
-                      CFOP.CFOP,
-                      CFOP.PLL,
-                      CFOP.OLL,
-                      CFOP.F2L,
-                      CFOP.Cross,
-                      Triggers,
-                      PDFCube,
+    exposed-modules:  PDFCube,
+                      CubeSolverServer,
                       BluetoothCube,
-                      CubeSolverServer
-
-    -- LANGUAGE extensions used by modules in this package.
-    -- other-extensions:
-
-    build-depends:    base ^>=4.17.2.1,
-                      mtl,
-                      text,
-                      megaparsec,
-                      HPDF,
-                      process,
-                      time,
-                      options,
-                      servant,
-                      servant-server,
-                      wai,
-                      warp,
-                      bytestring
-
-    hs-source-dirs:   app
-
-    default-language: Haskell2010
-
-test-suite cube-solver-tests
-    type:             exitcode-stdio-1.0
-    main-is:          CubeSolverTest.hs
-    build-depends:    base ^>=4.17.2.1, 
-                      Cabal >= 3.0,
-                      QuickCheck,
-                      mtl,
-                      text,
-                      megaparsec
-
-    other-modules:    Cube,
+                      Cube,
                       CubeState,
                       CubeParser,
                       CubeValidator,
@@ -81,9 +35,48 @@ test-suite cube-solver-tests
                       CFOP.Cross,
                       Triggers
 
-    hs-source-dirs:   app
+    build-depends:    base ^>=4.17.2.1,
+                      mtl,
+                      text,
+                      megaparsec,
+                      HPDF,
+                      process,
+                      time,
+                      servant,
+                      servant-server,
+                      wai,
+                      warp,
+                      bytestring
+
+    hs-source-dirs:   src
+
     default-language: Haskell2010
 
+executable cube-solver
+    main-is:          Main.hs
+
+    build-depends:    base ^>=4.17.2.1,
+                      cube-solver,
+                      options
+
+    hs-source-dirs:   app
+
+    default-language: Haskell2010
+
+test-suite cube-solver-tests
+    type:             exitcode-stdio-1.0
+    
+    main-is:          CubeSolverTest.hs
+    
+    build-depends:    base ^>=4.17.2.1, 
+                      Cabal >= 3.0,
+                      cube-solver,
+                      QuickCheck,
+                      mtl
+    
+    hs-source-dirs:   test
+
+    default-language: Haskell2010
 
 custom-setup
     setup-depends:    base ^>=4.17.2.1, 

@@ -22,7 +22,7 @@ bluetooth = do
         , "Continously move the top layer until cube is connected"
         ] 8
     callCommand "rfkill unblock bluetooth"
-    let process = shell "cd app/bluetooth && npm start"
+    let process = shell "cd src/bluetooth && npm start"
     (_, maybeHout, _, ph) <- createProcess process { std_out = CreatePipe }
     case maybeHout of
         Just hout -> bluetoothInteraction hout
@@ -39,9 +39,8 @@ bluetoothInteraction hout = do
         [ "Cube is connected"
         , "Reset the top layer so that the cube is solved"
         ] 1
-    printAllWithDelay (map show ([10,9..1] :: [Integer])) 1
+    printAllWithDelay (map show ([10,9..1] :: [Integer]) ++ ["Start scramblin!"]) 1
     flushOutput hout
-    putStrLn "Start scramblin!"
     systemTimeNow <- getCurrentTime
     cubeState <- scrambleCube systemTimeNow hout solvedCube
     putStrLn "Start solvin!"
