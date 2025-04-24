@@ -1,4 +1,4 @@
-module CFOP.PLL (pll) where
+module CFOP.PLL (pll, pllSolved) where
 
 import Control.Monad.State
 import CubeState
@@ -39,13 +39,13 @@ pll = do
     cubeState <- get
     if all (\validator -> validator cubeState) [crossSolved, f2lSolved, ollSolved]
         then
-            if isPllSolved cubeState
+            if pllSolved cubeState
                 then return []
                 else solvePllByCategory (cornerSwapType cubeState)
         else error "Cross, F2L and OLL must solved before PLL"
 
-isPllSolved :: CubeState -> Bool
-isPllSolved cubeState = all 
+pllSolved :: CubeState -> Bool
+pllSolved cubeState = all 
     (\(left, mid, right) -> 
         equalPllSide 
             (left cubeState) 
@@ -63,7 +63,7 @@ solvePllByCategory AdjecentCornerSwap = tryPllAlg (prependAuf adjecentCornerSwap
 solvePllByCategory DiagonalCornerSwap = tryPllAlg (prependAuf diagonalCornerSwapAlgs)
 
 tryPllAlg :: [Algorithm] -> Cube Algorithm
-tryPllAlg algs = tryAlg algs isPllSolved
+tryPllAlg algs = tryAlg algs pllSolved
 
 -- Edges only
 

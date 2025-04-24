@@ -72,7 +72,9 @@ test-suite cube-solver-tests
                       Cabal >= 3.0,
                       cube-solver,
                       QuickCheck,
-                      mtl
+                      mtl,
+                      text,
+                      megaparsec
     
     hs-source-dirs:   test
 

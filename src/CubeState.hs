@@ -97,21 +97,21 @@ instance Show CubeState where
         ++ "\n    " ++ showFirstC (ufl cube) ++ showFirstE (uf cube) ++ showFirstC (urf cube)
 
         ++ "\n"
-        ++ showSecondC (ulb cube) ++ showSecondE (ul cube) ++ showThirdC (ufl cube) ++ " "
-        ++ showSecondC (ufl cube) ++ showSecondE (uf cube) ++ showThirdC (urf cube) ++ " "
-        ++ showSecondC (urf cube) ++ showSecondE (ur cube) ++ showThirdC (ubr cube) ++ " "
+        ++ showSecondC (ulb cube) ++ showSecondE (ul cube) ++ showThirdC (ufl cube)
+        ++ showSecondC (ufl cube) ++ showSecondE (uf cube) ++ showThirdC (urf cube)
+        ++ showSecondC (urf cube) ++ showSecondE (ur cube) ++ showThirdC (ubr cube)
         ++ showSecondC (ubr cube) ++ showSecondE (ub cube) ++ showThirdC (ulb cube)
 
         ++ "\n"
-        ++ showSecondE (bl cube) ++ show (l cube) ++ showSecondE (fl cube) ++ " "
-        ++ showFirstE  (fl cube) ++ show (f cube) ++ showFirstE  (fr cube) ++ " "
-        ++ showSecondE (fr cube) ++ show (r cube) ++ showSecondE (br cube) ++ " "
+        ++ showSecondE (bl cube) ++ show (l cube) ++ showSecondE (fl cube)
+        ++ showFirstE  (fl cube) ++ show (f cube) ++ showFirstE  (fr cube)
+        ++ showSecondE (fr cube) ++ show (r cube) ++ showSecondE (br cube)
         ++ showFirstE  (br cube) ++ show (b cube) ++ showFirstE  (bl cube)
 
         ++ "\n"
-        ++ showThirdC (dbl cube) ++ showSecondE (dl cube) ++ showSecondC (dlf cube) ++ " "
-        ++ showThirdC (dlf cube) ++ showSecondE (df cube) ++ showSecondC (dfr cube) ++ " "
-        ++ showThirdC (dfr cube) ++ showSecondE (dr cube) ++ showSecondC (drb cube) ++ " "
+        ++ showThirdC (dbl cube) ++ showSecondE (dl cube) ++ showSecondC (dlf cube)
+        ++ showThirdC (dlf cube) ++ showSecondE (df cube) ++ showSecondC (dfr cube)
+        ++ showThirdC (dfr cube) ++ showSecondE (dr cube) ++ showSecondC (drb cube)
         ++ showThirdC (drb cube) ++ showSecondE (db cube) ++ showSecondC (dbl cube)
 
         ++ "\n    " ++ showFirstC (dlf cube) ++ showFirstE (df cube) ++ showFirstC (dfr cube)

@@ -74,10 +74,9 @@ parseCubeState = do
 
 parseScramble :: Parser Algorithm
 parseScramble = do
-    firstMove <- parseMove
-    restMoves <- many parseNextMove
+    moves <- many parseNextMove
     eof
-    return (firstMove : restMoves)
+    return moves
 
 parseMove :: Parser Move
 parseMove = Move <$> parseTurningFace <*> parseDirection

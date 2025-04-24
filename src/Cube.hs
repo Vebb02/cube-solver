@@ -10,18 +10,24 @@ type Cube a = State CubeState a
 data MoveDirection = Normal | Prime | Two
     deriving (Eq, Show)
 
-data MoveFace = F
-          | R
-          | U
-          | B
-          | L
-          | D
+data MoveFace = 
+      F
+    | R
+    | U
+    | B
+    | L
+    | D
     deriving (Eq, Show)
 
 data Move = Move MoveFace MoveDirection
     deriving (Eq)
 
 type Algorithm = [Move]
+
+showAlg :: Algorithm -> String
+showAlg [] = ""
+showAlg [x] = show x
+showAlg (x:xs) = show x ++ " " ++ showAlg xs
 
 instance Show Move where
     show (Move face Normal) = show face
@@ -170,10 +176,9 @@ combineMoves :: Move -> Move -> Algorithm
 combineMoves m0@(Move face0 dir0) m1@(Move face1 dir1) = 
     if face0 /= face1 
         then [m0, m1]
-        else let newDir = dir0 `combineMoveDirection` dir1 in
-            case newDir of
-                Nothing -> []
-                Just dir -> [Move face0 dir]
+        else case dir0 `combineMoveDirection` dir1 of
+            Nothing -> []
+            Just dir -> [Move face0 dir]
 
 bestPossibleSolution :: CubeState -> ([a] -> Cube Algorithm) -> [[a]] -> Algorithm
 bestPossibleSolution cubeState method orderings = 
