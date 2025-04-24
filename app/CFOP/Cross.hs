@@ -181,16 +181,10 @@ moveTargetToDestination Nothing _ = return []
 moveTargetToDestination (Just target) destination = applyAlgorithm (dMoveBetween target destination)
 
 dMoveBetween :: CrossEdge -> CrossEdge -> Algorithm
-dMoveBetween from to =
-    let moveCount = (crossEdgeIndex to - crossEdgeIndex from)
-        absMove = if moveCount < 0 then moveCount + 4 else moveCount
-    in
-    case absMove of
-        0  -> []
-        1  -> [Move D Normal]
-        2  -> [Move D Two]
-        3  -> [Move D Prime]
-        _ -> error "Not valid move"
+dMoveBetween from to = 
+    case moveSumToMoveDirection (crossEdgeIndex to - crossEdgeIndex from) of
+        Nothing  -> []
+        Just dir  -> [Move D dir]
 
 crossEdges :: [CubeState -> Edge]
 crossEdges = [df, dr, db, dl]

@@ -10,18 +10,6 @@ type Cube a = State CubeState a
 data MoveDirection = Normal | Prime | Two
     deriving (Eq, Show)
 
-combineMoveDirection :: MoveDirection -> MoveDirection -> Maybe MoveDirection
-combineMoveDirection Normal Prime = Nothing
-combineMoveDirection Prime Normal = Nothing
-combineMoveDirection Two Two = Nothing
-combineMoveDirection Normal Normal = Just Two
-combineMoveDirection Prime Prime = Just Two
-combineMoveDirection Normal Two = Just Prime
-combineMoveDirection Two Normal = Just Prime
-combineMoveDirection Prime Two = Just Normal
-combineMoveDirection Two Prime = Just Normal
-
-
 data MoveFace = F
           | R
           | U
@@ -161,6 +149,22 @@ removeCancellingMoves :: Algorithm -> Algorithm -> Algorithm
 removeCancellingMoves [] seen = reverse seen
 removeCancellingMoves (x:xs) (y:ys) = removeCancellingMoves xs (combineMoves x y ++ ys)
 removeCancellingMoves (x:xs) [] = removeCancellingMoves xs [x]
+
+combineMoveDirection :: MoveDirection -> MoveDirection -> Maybe MoveDirection
+combineMoveDirection m1 m2 = moveSumToMoveDirection $ moveDirVal m1 + moveDirVal m2
+
+moveDirVal :: MoveDirection -> Int
+moveDirVal Normal = 1
+moveDirVal Prime = -1
+moveDirVal Two = 2
+
+moveSumToMoveDirection :: Int -> Maybe MoveDirection
+moveSumToMoveDirection moveSum = case (moveSum + 4) `mod` 4 of
+    0 -> Nothing
+    1 -> Just Normal
+    2 -> Just Two
+    3 -> Just Prime
+    x -> error $ "Invalid move sum " ++ " " ++ show x
 
 combineMoves :: Move -> Move -> Algorithm
 combineMoves m0@(Move face0 dir0) m1@(Move face1 dir1) = 

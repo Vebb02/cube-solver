@@ -19,7 +19,7 @@ type CubeSolverApi = "api" :> "cubesolver" :> "solve" :> QueryParam "cube" Strin
                 :<|> "api" :> "cubesolver" :> "validate" :> QueryParam "cube" String :>  Get '[PlainText] String
 
 solveCube :: Maybe String -> Handler BS.ByteString
-solveCube Nothing = return "No paramter given\n"
+solveCube Nothing = return "No parameter given\n"
 solveCube (Just unparsedCube) = do
     let parsedResult = runParser parseCubeState "" (T.pack unparsedCube)
     case parsedResult of
