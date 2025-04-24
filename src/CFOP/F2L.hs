@@ -3,7 +3,6 @@ module CFOP.F2L (f2l, f2lSolved) where
 import Cube
 import CubeState
 import Control.Monad.State
-import CubeValidator
 import Data.Maybe
 import Data.List (permutations)
 import CFOP.Cross
@@ -77,7 +76,7 @@ fixOrientation slot (Just eSlot) Nothing = do
     let solvedEdge = fst $ f2lSlot solvedCube slot
     let edge = edgeInEdgeList cubeState solvedEdge
     let corner = snd $ f2lSlot solvedCube slot
-    if eSlot == slot && edgeSum (fst $ f2lSlot cubeState slot) == 0
+    if eSlot == slot && pieceSum (fst $ f2lSlot cubeState slot) == 0
         then return []
         else tryAlg (orientationMoves eSlot edge) (\cs-> isNothing (cornerSlot cs corner))
 fixOrientation slot Nothing (Just cSlot) = do
@@ -91,7 +90,7 @@ fixOrientation slot (Just eSlot) (Just cSlot) = do
     let edge = edgeInEdgeList cubeState solvedEdge
     if eSlot == cSlot
         then applyAlgorithm [slotToMove eSlot, Move U Normal, reverseMove $ slotToMove eSlot]
-        else if eSlot == slot && edgeSum edge == 0
+        else if eSlot == slot && pieceSum edge == 0
             then applyAlgorithm [slotToMove cSlot, Move U Normal, reverseMove $ slotToMove cSlot]
             else do
             moves <- applyAlgorithm [edgeOrientationMove eSlot edge, Move U Normal, reverseMove $ edgeOrientationMove eSlot edge]
@@ -108,7 +107,7 @@ slotToMove BL = Move L Normal
 slotToMove BR = Move R Prime
 
 edgeOrientationMove :: F2LSlot -> Edge -> Move
-edgeOrientationMove slot edge = if edgeSum edge == 0 then slotToMove slot else slotToNonOrientedMove slot
+edgeOrientationMove slot edge = if pieceSum edge == 0 then slotToMove slot else slotToNonOrientedMove slot
 
 slotToNonOrientedMove :: F2LSlot -> Move
 slotToNonOrientedMove FL = Move F Normal

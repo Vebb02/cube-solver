@@ -1,10 +1,4 @@
-module CubeValidator 
-    ( validateCubeState
-    , edgeSum
-    , totalEdgeSum
-    , totalCornerSum
-    ) 
-    where
+module CubeValidator (validateCubeState) where
 
 import CubeState
 
@@ -19,36 +13,10 @@ validateCubeState cubeState =
         ]
 
 validateCornerRotation :: CubeState -> Bool
-validateCornerRotation cubeState = totalCornerSum cubeState `mod` 3 == 0
-
-totalCornerSum :: CubeState -> Int
-totalCornerSum cubeState = sum $ map cornerSum $ pieces cubeState
-
-cornerSum :: Corner -> Int
-cornerSum (Corner Yellow _ _) = 0
-cornerSum (Corner White _ _) = 0
-cornerSum (Corner _ Yellow  _) = 1
-cornerSum (Corner _ White _) = 1
-cornerSum (Corner _ _ Yellow) = 2
-cornerSum (Corner _ _ White) = 2
-cornerSum _ = error "Invalid corner on cube"
+validateCornerRotation cubeState = totalPieceSum (pieces cubeState :: [Corner]) `mod` 3 == 0
 
 validateEdgeOrientation :: CubeState -> Bool
-validateEdgeOrientation cubeState = even $ totalEdgeSum cubeState
-
-totalEdgeSum :: CubeState -> Int
-totalEdgeSum cubeState = sum $ map edgeSum $ pieces cubeState
-
-edgeSum :: Edge -> Int
-edgeSum (Edge White _) = 0
-edgeSum (Edge Yellow _) = 0
-edgeSum (Edge _ White) = 1
-edgeSum (Edge _ Yellow) = 1
-edgeSum (Edge Green _) = 0
-edgeSum (Edge Blue _) = 0
-edgeSum (Edge _ Green) = 1
-edgeSum (Edge _ Blue) = 1
-edgeSum _ = error "Invalid edge on cube"
+validateEdgeOrientation cubeState = even $ totalPieceSum (pieces cubeState :: [Edge])
 
 validateCenters :: CubeState -> Bool
 validateCenters cubeState =

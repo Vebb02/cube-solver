@@ -165,6 +165,9 @@ class Piece a where
             if x cubeState `pieceEquivalent` piece
                 then x
                 else searchForPiece xs
+    pieceSum :: a -> Int
+    totalPieceSum :: [a] -> Int
+    totalPieceSum = foldr ((+) . pieceSum) 0
 
 instance Piece Edge where
     pieceEquivalent e1 e2 = e1 `elem` [e2, flipEdge e2]
@@ -182,6 +185,15 @@ instance Piece Edge where
         , br
         , bl
         ]
+    pieceSum (Edge White _) = 0
+    pieceSum (Edge Yellow _) = 0
+    pieceSum (Edge _ White) = 1
+    pieceSum (Edge _ Yellow) = 1
+    pieceSum (Edge Green _) = 0
+    pieceSum (Edge Blue _) = 0
+    pieceSum (Edge _ Green) = 1
+    pieceSum (Edge _ Blue) = 1
+    pieceSum _ = error "Invalid edge on cube"
 
 instance Piece Corner where
     pieceEquivalent c1 c2 = c1 `elem` [c2, twistCorner c2, twistCorner (twistCorner c2)]
@@ -195,3 +207,10 @@ instance Piece Corner where
         , dbl
         , drb
         ]
+    pieceSum (Corner Yellow _ _) = 0
+    pieceSum (Corner White _ _) = 0
+    pieceSum (Corner _ Yellow  _) = 1
+    pieceSum (Corner _ White _) = 1
+    pieceSum (Corner _ _ Yellow) = 2
+    pieceSum (Corner _ _ White) = 2
+    pieceSum _ = error "Invalid corner on cube"

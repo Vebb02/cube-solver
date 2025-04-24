@@ -4,7 +4,6 @@ import Cube
 import CubeState
 import Control.Monad.State
 import Data.List (permutations)
-import CubeValidator
 
 cross :: Cube Algorithm
 cross = do
@@ -81,13 +80,14 @@ topBottomMoveFace x = case secondE $ x solvedCube of
 midMove :: CubeState -> (CubeState -> Edge) -> Move
 midMove cubeState x = let
     solvedEdge = x solvedCube
-    unsolvedEdge = x cubeState in
+    unsolvedEdge = x cubeState
+    edgeSum = pieceSum unsolvedEdge in
     case solvedEdge of
-        Edge Green Red -> if edgeSum unsolvedEdge == 0 then Move R Prime else Move F Normal
-        Edge Green Orange -> if edgeSum unsolvedEdge == 0 then Move L Normal else Move F Prime
-        Edge Blue Red -> if edgeSum unsolvedEdge == 0 then Move R Normal else Move B Prime
-        Edge Blue Orange -> if edgeSum unsolvedEdge == 0 then Move L Prime else Move B Normal
-        _ -> error $ show solvedEdge -- "Edge is not a valid mid edge"
+        Edge Green Red -> if edgeSum == 0 then Move R Prime else Move F Normal
+        Edge Green Orange -> if edgeSum == 0 then Move L Normal else Move F Prime
+        Edge Blue Red -> if edgeSum == 0 then Move R Normal else Move B Prime
+        Edge Blue Orange -> if edgeSum == 0 then Move L Prime else Move B Normal
+        _ -> error $ show solvedEdge
 
 
 leftMoveFace :: MoveFace -> MoveFace
@@ -153,18 +153,16 @@ allRotations edges = if null edges then [] else helperRotations (length edges-1)
     helperRotations 0 = [edges]
     helperRotations n = (drop n edges ++ take n edges) : helperRotations (n-1)
 
-
 crossEdgeIndex :: CrossEdge -> Int
 crossEdgeIndex FEdge = 0
 crossEdgeIndex REdge = 1
 crossEdgeIndex BEdge = 2
 crossEdgeIndex LEdge = 3
 
--- CrossEdge where edge is supposed to go
 targetEdge :: CubeState -> Edge -> [CubeState -> Edge] -> Maybe CrossEdge
 targetEdge cubeState edge solvedPieces =
     let currentCrossEdges = optimalCrossEdges cubeState solvedPieces
-        flippedEdge = if edgeSum edge == 0 then edge else flipEdge edge
+        flippedEdge = if pieceSum edge == 0 then edge else flipEdge edge
     in
         if not (any (uncurry (==)) currentCrossEdges)
         then Nothing

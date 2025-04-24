@@ -3,7 +3,6 @@ module CFOP.OLL (oll, ollSolved) where
 import Cube
 import Triggers
 import CubeState
-import CubeValidator
 import Control.Monad.State
 import CFOP.Cross (crossSolved)
 import CFOP.F2L (f2lSolved)
@@ -22,7 +21,7 @@ data EdgeState = Dot | Line | Angle | EdgesOriented
     deriving (Eq, Show)
 
 edgeState :: CubeState -> EdgeState
-edgeState cubeState = case totalEdgeSum cubeState of
+edgeState cubeState = case totalPieceSum (pieces cubeState :: [Edge]) of
     0 -> EdgesOriented
     2 -> if firstE (uf cubeState) == firstE (ub cubeState) 
          || firstE (ul cubeState) == firstE (ur cubeState) 
@@ -46,7 +45,7 @@ flipEdges Angle = tryEdgeFlipAlg (prependAuf [angleFlip])
 flipEdges Dot = applyAlgorithm dotFlip
 
 cornersOriented :: CubeState -> Bool
-cornersOriented cubeState = totalCornerSum cubeState == 0
+cornersOriented cubeState = totalPieceSum (pieces cubeState :: [Corner]) == 0
 
 solveCorners :: Cube Algorithm
 solveCorners = do 
