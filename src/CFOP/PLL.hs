@@ -76,66 +76,70 @@ edgesOnlyAlgs = [hPerm, zPerm, uaPerm, ubPerm]
 
 hPerm :: Algorithm
 hPerm =
-    [ Move R Two
-    , Move U Two
-    , Move R Normal
-    , Move U Two
-    , Move R Two
-    , Move U Two
-    , Move R Two
-    , Move U Two
-    , Move R Normal
-    , Move U Two
-    , Move R Two
+    map (uncurry Move)
+    [ (R, Two)
+    , (U, Two)
+    , (R, Normal)
+    , (U, Two)
+    , (R, Two)
+    , (U, Two)
+    , (R, Two)
+    , (U, Two)
+    , (R, Normal)
+    , (U, Two)
+    , (R, Two)
     ]
 
 zPerm :: Algorithm
 zPerm =
-    [ Move R Prime
-    , Move U Prime
-    , Move R Normal
-    , Move U Prime
-    , Move R Normal
-    , Move U Normal
-    , Move R Normal
-    , Move U Prime
-    , Move R Prime
-    , Move U Normal
-    , Move R Normal
-    , Move U Normal
-    , Move R Two
-    , Move U Prime
-    , Move R Prime
+    map (uncurry Move)
+    [ (R, Prime)
+    , (U, Prime)
+    , (R, Normal)
+    , (U, Prime)
+    , (R, Normal)
+    , (U, Normal)
+    , (R, Normal)
+    , (U, Prime)
+    , (R, Prime)
+    , (U, Normal)
+    , (R, Normal)
+    , (U, Normal)
+    , (R, Two)
+    , (U, Prime)
+    , (R, Prime)
     ]
 
 uaPerm :: Algorithm
 uaPerm =
-    [ Move R Normal
-    , Move U Prime
-    , Move R Normal
-    , Move U Normal
-    , Move R Normal
-    , Move U Normal
-    , Move R Normal
-    , Move U Prime
-    , Move R Prime
-    , Move U Prime
-    , Move R Two
+    map (uncurry Move)
+    [ (R, Normal)
+    , (U, Prime)
+    , (R, Normal)
+    , (U, Normal)
+    , (R, Normal)
+    , (U, Normal)
+    , (R, Normal)
+    , (U, Prime)
+    , (R, Prime)
+    , (U, Prime)
+    , (R, Two)
     ]
 
 ubPerm :: Algorithm
 ubPerm =
-    [ Move R Two
-    , Move U Normal
-    , Move R Normal
-    , Move U Normal
-    , Move R Prime
-    , Move U Prime
-    , Move R Prime
-    , Move U Prime
-    , Move R Prime
-    , Move U Normal
-    , Move R Prime
+    map (uncurry Move)
+    [ (R, Two)
+    , (U, Normal)
+    , (R, Normal)
+    , (U, Normal)
+    , (R, Prime)
+    , (U, Prime)
+    , (R, Prime)
+    , (U, Prime)
+    , (R, Prime)
+    , (U, Normal)
+    , (R, Prime)
     ]
 
 -- Adjacent corner swap
@@ -159,79 +163,86 @@ adjecentCornerSwapAlgs =
 tPerm :: Algorithm
 tPerm =
     sexy ++
-    [ Move R Prime
-    , Move F Normal
-    , Move R Two
-    , Move U Prime
-    , Move R Prime
-    , Move U Prime
-    , Move R Normal
-    , Move U Normal
-    , Move R Prime
-    , Move F Prime
+    map (uncurry Move)
+    [ (R, Prime)
+    , (F, Normal)
+    , (R, Two)
+    , (U, Prime)
+    , (R, Prime)
+    , (U, Prime)
+    , (R, Normal)
+    , (U, Normal)
+    , (R, Prime)
+    , (F, Prime)
     ]
 
 jaPerm :: Algorithm
 jaPerm =
-    [ Move R Normal
-    , Move U Prime
-    , Move L Prime
-    , Move U Normal
-    , Move R Prime
-    , Move U Two
-    , Move L Normal
-    , Move U Prime
-    , Move L Prime
-    , Move U Two
-    , Move L Normal
+    map (uncurry Move)
+    [ (R, Normal)
+    , (U, Prime)
+    , (L, Prime)
+    , (U, Normal)
+    , (R, Prime)
+    , (U, Two)
+    , (L, Normal)
+    , (U, Prime)
+    , (L, Prime)
+    , (U, Two)
+    , (L, Normal)
     ]
 
 jbPerm :: Algorithm
 jbPerm =
-    [ Move R Normal
-    , Move U Normal
-    , Move R Prime
-    , Move F Prime
+    map (uncurry Move)
+    [ (R, Normal)
+    , (U, Normal)
+    , (R, Prime)
+    , (F, Prime)
     ]
     ++ sexy ++
-    [ Move R Prime
-    , Move F Normal
-    , Move R Two
-    , Move U Prime
-    , Move R Prime
+    map (uncurry Move)
+    [ (R, Prime)
+    , (F, Normal)
+    , (R, Two)
+    , (U, Prime)
+    , (R, Prime)
     ]
 
 fPerm :: Algorithm
 fPerm =
-    [ Move R Prime
-    , Move U Prime
-    , Move F Prime
+    map (uncurry Move)
+    [ (R, Prime)
+    , (U, Prime)
+    , (F, Prime)
     ]
     ++ sexy ++
-    [ Move R Prime
-    , Move F Normal
-    , Move R Two
-    , Move U Prime
-    , Move R Prime
-    , Move U Prime
-    , Move R Normal
-    , Move U Normal
-    , Move R Prime
-    , Move U Normal
-    , Move R Normal
+    map (uncurry Move)
+    [ (R, Prime)
+    , (F, Normal)
+    , (R, Two)
+    , (U, Prime)
+    , (R, Prime)
+    , (U, Prime)
+    , (R, Normal)
+    , (U, Normal)
+    , (R, Prime)
+    , (U, Normal)
+    , (R, Normal)
     ]
 
 aaPerm :: Algorithm
 aaPerm =
-    [ Move R Prime
-    , Move F Normal
-    , Move R Prime
-    , Move B Two
-    , Move R Normal
-    , Move F Prime
-    , Move R Prime
-    , Move B Two
-    , Move R Two
+    map (uncurry Move)
+    [ (R, Prime)
+    , (F, Normal)
+    , (R, Prime)
+    , (B, Two)
+    , (R, Normal)
+    , (F, Prime)
+    , (R, Prime)
+    , (B, Two)
+    , (R, Two)
     ]
 
 abPerm :: Algorithm
@@ -239,57 +250,60 @@ abPerm = reverseMoveSeq aaPerm
 
 raPerm :: Algorithm
 raPerm =
-    [ Move R Normal
-    , Move U Normal
-    , Move R Prime
-    , Move F Prime
-    , Move R Normal
-    , Move U Two
-    , Move R Prime
-    , Move U Two
-    , Move R Prime
-    , Move F Normal
-    , Move R Normal
-    , Move U Normal
-    , Move R Normal
-    , Move U Two
-    , Move R Prime
+    map (uncurry Move)
+    [ (R, Normal)
+    , (U, Normal)
+    , (R, Prime)
+    , (F, Prime)
+    , (R, Normal)
+    , (U, Two)
+    , (R, Prime)
+    , (U, Two)
+    , (R, Prime)
+    , (F, Normal)
+    , (R, Normal)
+    , (U, Normal)
+    , (R, Normal)
+    , (U, Two)
+    , (R, Prime)
     ]
 
 rbPerm :: Algorithm
 rbPerm =
-    [ Move R Two
-    , Move F Normal
-    , Move R Normal
-    , Move U Normal
-    , Move R Normal
-    , Move U Prime
-    , Move R Prime
-    , Move F Prime
-    , Move R Normal
-    , Move U Two
-    , Move R Prime
-    , Move U Two
-    , Move R Normal
+    map (uncurry Move)
+    [ (R, Two)
+    , (F, Normal)
+    , (R, Normal)
+    , (U, Normal)
+    , (R, Normal)
+    , (U, Prime)
+    , (R, Prime)
+    , (F, Prime)
+    , (R, Normal)
+    , (U, Two)
+    , (R, Prime)
+    , (U, Two)
+    , (R, Normal)
     ]
 
 gaPerm :: Algorithm
 gaPerm =
-    [ Move R Two
-    , Move U Normal
-    , Move R Prime
-    , Move U Normal
-    , Move R Prime
-    , Move U Prime
-    , Move R Normal
-    , Move U Prime
-    , Move R Two
-    , Move U Prime
-    , Move D Normal
-    , Move R Prime
-    , Move U Normal
-    , Move R Normal
-    , Move D Prime
+    map (uncurry Move)
+    [ (R, Two)
+    , (U, Normal)
+    , (R, Prime)
+    , (U, Normal)
+    , (R, Prime)
+    , (U, Prime)
+    , (R, Normal)
+    , (U, Prime)
+    , (R, Two)
+    , (U, Prime)
+    , (D, Normal)
+    , (R, Prime)
+    , (U, Normal)
+    , (R, Normal)
+    , (D, Prime)
     ]
 
 gbPerm :: Algorithm
@@ -308,91 +322,97 @@ diagonalCornerSwapAlgs = [yPerm, vPerm, naPerm, nbPerm, ePerm]
 
 yPerm :: Algorithm
 yPerm =
-    [ Move F Normal
-    , Move R Normal
-    , Move U Prime
-    , Move R Prime
-    , Move U Prime
-    , Move R Normal
-    , Move U Normal
-    , Move R Prime
-    , Move F Prime
+    map (uncurry Move)
+    [ (F, Normal)
+    , (R, Normal)
+    , (U, Prime)
+    , (R, Prime)
+    , (U, Prime)
+    , (R, Normal)
+    , (U, Normal)
+    , (R, Prime)
+    , (F, Prime)
     ]
     ++ sexy
     ++ sledgeHammer
 
 vPerm :: Algorithm
 vPerm =
-    [ Move R Normal
-    , Move U Prime
-    , Move R Normal
-    , Move U Normal
-    , Move R Prime
-    , Move D Normal
-    , Move R Normal
-    , Move D Prime
-    , Move R Normal
-    , Move U Prime
-    , Move D Normal
-    , Move R Two
-    , Move U Normal
-    , Move R Two
-    , Move D Prime
-    , Move R Two
+    map (uncurry Move)
+    [ (R, Normal)
+    , (U, Prime)
+    , (R, Normal)
+    , (U, Normal)
+    , (R, Prime)
+    , (D, Normal)
+    , (R, Normal)
+    , (D, Prime)
+    , (R, Normal)
+    , (U, Prime)
+    , (D, Normal)
+    , (R, Two)
+    , (U, Normal)
+    , (R, Two)
+    , (D, Prime)
+    , (R, Two)
     ]
 
 ePerm :: Algorithm
 ePerm =
-    [ Move R Prime
-    , Move U Prime
-    , Move R Prime
-    , Move D Prime
-    , Move R Normal
-    , Move U Prime
-    , Move R Prime
-    , Move D Normal
-    , Move R Normal
-    , Move U Normal
-    , Move R Prime
-    , Move D Prime
-    , Move R Normal
-    , Move U Normal
-    , Move R Prime
-    , Move D Normal
-    , Move R Two 
+    map (uncurry Move)
+    [ (R, Prime)
+    , (U, Prime)
+    , (R, Prime)
+    , (D, Prime)
+    , (R, Normal)
+    , (U, Prime)
+    , (R, Prime)
+    , (D, Normal)
+    , (R, Normal)
+    , (U, Normal)
+    , (R, Prime)
+    , (D, Prime)
+    , (R, Normal)
+    , (U, Normal)
+    , (R, Prime)
+    , (D, Normal)
+    , (R, Two) 
     ]
 
 naPerm :: Algorithm
 naPerm =
-    [ Move R Normal
-    , Move U Normal
-    , Move R Prime
-    , Move U Normal
+    map (uncurry Move)
+    [ (R, Normal)
+    , (U, Normal)
+    , (R, Prime)
+    , (U, Normal)
     ]
     ++ jbPerm ++
-    [ Move U Two
-    , Move R Normal
-    , Move U Prime
-    , Move R Prime
+    map (uncurry Move)
+    [ (U, Two)
+    , (R, Normal)
+    , (U, Prime)
+    , (R, Prime)
     ]
 
 nbPerm :: Algorithm
 nbPerm =
-    [ Move R Prime
-    , Move U Normal
-    , Move R Normal
-    , Move U Prime
-    , Move R Prime
-    , Move F Prime
-    , Move U Prime
-    , Move F Normal
-    , Move R Normal
-    , Move U Normal
-    , Move R Prime
-    , Move F Normal
-    , Move R Prime
-    , Move F Prime
-    , Move R Normal
-    , Move U Prime
-    , Move R Normal
+    map (uncurry Move)
+    [ (R, Prime)
+    , (U, Normal)
+    , (R, Normal)
+    , (U, Prime)
+    , (R, Prime)
+    , (F, Prime)
+    , (U, Prime)
+    , (F, Normal)
+    , (R, Normal)
+    , (U, Normal)
+    , (R, Prime)
+    , (F, Normal)
+    , (R, Prime)
+    , (F, Prime)
+    , (R, Normal)
+    , (U, Prime)
+    , (R, Normal)
     ]

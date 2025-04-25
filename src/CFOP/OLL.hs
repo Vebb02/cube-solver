@@ -71,13 +71,14 @@ angleFlip = reverseMoveSeq lineFlip
 
 sune :: Algorithm
 sune =
-    [ Move R Normal
-    , Move U Normal
-    , Move R Prime
-    , Move U Normal
-    , Move R Normal
-    , Move U Two
-    , Move R Prime
+    map (uncurry Move)
+    [ (R, Normal)
+    , (U, Normal)
+    , (R, Prime)
+    , (U, Normal)
+    , (R, Normal)
+    , (U, Two)
+    , (R, Prime)
     ]
 
 antisune :: Algorithm
@@ -85,56 +86,60 @@ antisune = reverseMoveSeq sune
 
 hOll :: Algorithm
 hOll =
-    [ Move R Normal
-    , Move U Normal
-    , Move R Prime
-    , Move U Normal
-    , Move R Normal
-    , Move U Prime
-    , Move R Prime
-    , Move U Normal
-    , Move R Normal
-    , Move U Two
-    , Move R Prime
+    map (uncurry Move)
+    [ (R, Normal)
+    , (U, Normal)
+    , (R, Prime)
+    , (U, Normal)
+    , (R, Normal)
+    , (U, Prime)
+    , (R, Prime)
+    , (U, Normal)
+    , (R, Normal)
+    , (U, Two)
+    , (R, Prime)
     ]
 
 lOll :: Algorithm
 lOll = 
-    [ Move F Normal
-    , Move R Prime
-    , Move F Prime
-    , Move L Normal
-    , Move F Normal
-    , Move R Normal
-    , Move F Prime
-    , Move L Prime
+    map (uncurry Move)
+    [ (F, Normal)
+    , (R, Prime)
+    , (F, Prime)
+    , (L, Normal)
+    , (F, Normal)
+    , (R, Normal)
+    , (F, Prime)
+    , (L, Prime)
     ]
 
 piOll :: Algorithm
-piOll = 
-    [ Move R Normal
-    , Move U Two
-    , Move R Two
-    , Move U Prime
-    , Move R Two
-    , Move U Prime
-    , Move R Two
-    , Move U Two
-    , Move R Normal
+piOll =
+    map (uncurry Move)
+    [ (R, Normal)
+    , (U, Two)
+    , (R, Two)
+    , (U, Prime)
+    , (R, Two)
+    , (U, Prime)
+    , (R, Two)
+    , (U, Two)
+    , (R, Normal)
     ]
 
 tOll :: Algorithm
 tOll = reverseMoveSeq lOll
 
 uOll :: Algorithm
-uOll = 
-    [ Move R Two
-    , Move D Normal
-    , Move R Prime
-    , Move U Two
-    , Move R Normal
-    , Move D Prime
-    , Move R Prime
-    , Move U Two
-    , Move R Prime
+uOll =
+    map (uncurry Move)
+    [ (R, Two)
+    , (D, Normal)
+    , (R, Prime)
+    , (U, Two)
+    , (R, Normal)
+    , (D, Prime)
+    , (R, Prime)
+    , (U, Two)
+    , (R, Prime)
     ]
