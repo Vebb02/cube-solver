@@ -52,6 +52,10 @@ cabal run
 ```
 cabal run -- cube-solver --bluetooth
 ```
+#### On non-Linux systems
+```
+cabal run -- cube-solver --bluetooth --non-linux
+```
 ### PDF API
 NOTE: Using the server flag overides the bluetooth flag.
 ```

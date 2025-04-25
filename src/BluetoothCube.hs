@@ -14,26 +14,26 @@ import CFOP.CFOP (cfop)
 import Data.List (minimumBy)
 import Data.Time (getCurrentTime, UTCTime, nominalDiffTimeToSeconds, diffUTCTime)
 
-bluetooth :: IO ()
-bluetooth = do
+bluetooth :: Bool -> IO ()
+bluetooth onLinux = do
     printAllWithDelay
         [ "Make sure the cube is solved!"
         , "Hold the cube so that the green side is facing towards you and the white side is on the top"
         , "Continously move the top layer until cube is connected"
         ] 8
-    callCommand "rfkill unblock bluetooth"
+    when onLinux $ callCommand "rfkill unblock bluetooth"
     let process = shell "cd src/bluetooth && npm start"
     (_, maybeHout, _, ph) <- createProcess process { std_out = CreatePipe }
     case maybeHout of
-        Just hout -> bluetoothInteraction hout
+        Just hout -> bluetoothInteraction onLinux hout
         Nothing -> error "Could not get input handle"
     terminateProcess ph
-    callCommand "rfkill block bluetooth"
-    callCommand "rfkill unblock bluetooth"
+    when onLinux $ callCommand "rfkill block bluetooth"
+    when onLinux $ callCommand "rfkill unblock bluetooth"
     return ()
 
-bluetoothInteraction :: Handle -> IO ()
-bluetoothInteraction hout = do
+bluetoothInteraction :: Bool -> Handle -> IO ()
+bluetoothInteraction onLinux hout = do
     readLines 5 hout
     printAllWithDelay 
         [ "Cube is connected"
@@ -45,7 +45,7 @@ bluetoothInteraction hout = do
     cubeState <- scrambleCube systemTimeNow hout solvedCube
     putStrLn "Start solvin!"
     threadDelay 500000
-    callCommand "open solution_manual.pdf"
+    when onLinux $ callCommand "open solution_manual.pdf"
     solveCube hout cubeState (evalState cfop cubeState)
 
 
