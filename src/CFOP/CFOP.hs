@@ -5,7 +5,7 @@ import Cube
     , Cube
     , removeCancellingMoves
     , tryAlg
-    , aufMoves
+    , aufMoves, applyAlgorithm
     )
 import CubeState (cubeSolved)
 import CFOP.Cross (cross)
@@ -13,6 +13,7 @@ import CFOP.PLL (pll)
 import CFOP.OLL (oll)
 import CFOP.F2L (f2l)
 import Data.List (singleton)
+import Control.Monad.State
 
 cfop :: Cube Algorithm
 cfop = do
@@ -27,4 +28,7 @@ cfop = do
 
 auf :: Cube Algorithm
 auf = do
-    tryAlg ([] : map singleton aufMoves) cubeSolved
+    cubeState <- get
+    case tryAlg ([] : map singleton aufMoves) cubeState cubeSolved of
+        Left errorMessage -> error $ "Failed doing PLL: " ++ errorMessage 
+        Right alg -> applyAlgorithm alg 

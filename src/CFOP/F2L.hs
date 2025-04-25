@@ -78,12 +78,18 @@ fixOrientation slot (Just eSlot) Nothing = do
     let corner = snd $ f2lSlot solvedCube slot
     if eSlot == slot && pieceSum (fst $ f2lSlot cubeState slot) == 0
         then return []
-        else tryAlg (orientationMoves eSlot edge) (\cs-> isNothing (cornerSlot cs corner))
+        else case tryAlg (orientationMoves eSlot edge) cubeState (\cs-> isNothing (cornerSlot cs corner)) of
+            Left errorMessage -> error $ "Failed doing F2L: " ++ errorMessage 
+            Right alg -> applyAlgorithm alg
 fixOrientation slot Nothing (Just cSlot) = do
     let edge = fst $ f2lSlot solvedCube slot
     if cSlot == slot
         then return []
-        else tryAlg (orientationMoves cSlot edge) (\cs-> isNothing (edgeSlot cs edge))
+        else do
+            cubeState <- get
+            case tryAlg (orientationMoves cSlot edge) cubeState (\cs-> isNothing (edgeSlot cs edge)) of
+                Left errorMessage -> error $ "Failed doing F2L: " ++ errorMessage 
+                Right alg -> applyAlgorithm alg
 fixOrientation slot (Just eSlot) (Just cSlot) = do
     cubeState <- get
     let solvedEdge = fst $ f2lSlot solvedCube slot

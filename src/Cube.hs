@@ -141,18 +141,13 @@ prependAuf = prependMoves aufMoves
 prependMoves :: [Move] -> [Algorithm] -> [Algorithm]
 prependMoves moves algorithms = algorithms ++ foldr (\x acc -> map (x:) algorithms ++ acc) [] moves
 
-tryAlg :: [Algorithm] -> (CubeState -> Bool) -> Cube Algorithm
-tryAlg [] _ = do
-    cubeState <- get
-    error $ "\n" ++ show cubeState
-tryAlg (x:xs) stateCondition = do
-    _ <- applyAlgorithm x
-    cubeState <- get
-    if stateCondition cubeState
+tryAlg :: [Algorithm] -> CubeState -> (CubeState -> Bool) -> Either String Algorithm
+tryAlg [] cubeState _  = Left $ "Could not solve\n" ++ show cubeState
+tryAlg (x:xs) cubeState stateCondition = do
+    let newState = execState (applyAlgorithm x) cubeState
+    if stateCondition newState
     then return x
-    else do
-        _ <- applyAlgorithm (reverseMoveSeq x)
-        tryAlg xs stateCondition
+    else tryAlg xs cubeState stateCondition
 
 removeCancellingMoves :: Algorithm -> Algorithm -> Algorithm
 removeCancellingMoves [] seen = reverse seen

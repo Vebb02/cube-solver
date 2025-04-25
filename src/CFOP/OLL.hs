@@ -36,7 +36,11 @@ edgesOriented :: CubeState -> Bool
 edgesOriented cubeState = edgeState cubeState == EdgesOriented
 
 tryEdgeFlipAlg :: [Algorithm] -> Cube Algorithm
-tryEdgeFlipAlg algs = tryAlg algs edgesOriented
+tryEdgeFlipAlg algs = do
+    cubeState <- get
+    case tryAlg algs cubeState edgesOriented of
+        Left errorMessage -> error $ "Failed doing edge flip in OLL: " ++ errorMessage 
+        Right alg -> applyAlgorithm alg
 
 flipEdges :: EdgeState -> Cube Algorithm
 flipEdges EdgesOriented = return []
@@ -48,8 +52,11 @@ cornersOriented :: CubeState -> Bool
 cornersOriented cubeState = totalPieceSum (pieces cubeState :: [Corner]) == 0
 
 solveCorners :: Cube Algorithm
-solveCorners = do 
-    tryAlg (prependAuf [[], sune, antisune, hOll, lOll, piOll, tOll, uOll]) cornersOriented
+solveCorners = do
+    cubeState <- get
+    case tryAlg (prependAuf [[], sune, antisune, hOll, lOll, piOll, tOll, uOll]) cubeState cornersOriented of
+        Left errorMessage -> error $ "Failed solving corners of OLL: " ++ errorMessage 
+        Right alg -> applyAlgorithm alg
 
 dotFlip :: Algorithm
 dotFlip = angleFlip ++ [Move U Normal] ++ lineFlip

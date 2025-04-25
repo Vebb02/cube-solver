@@ -23,7 +23,11 @@ solveCross' (x:xs) solvedPieces = do
     moves <- solveCrossPiece x solvedPieces
     rest <- solveCross' xs (x:solvedPieces)
     return $ moves ++ rest
-solveCross' [] _ = tryAlg [[], [Move D Normal], [Move D Prime], [Move D Two]] crossSolved
+solveCross' [] _ = do
+    cubeState <- get
+    case tryAlg [[], [Move D Normal], [Move D Prime], [Move D Two]] cubeState crossSolved of
+        Left errorMessage -> error $ "Failed doing last move of cross: " ++ errorMessage 
+        Right alg -> applyAlgorithm alg
 
 solveCrossPiece :: (CubeState -> Edge) -> [CubeState -> Edge] -> Cube Algorithm
 solveCrossPiece x solvedPieces = do

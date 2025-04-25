@@ -30,7 +30,6 @@ bluetooth onLinux = do
     terminateProcess ph
     when onLinux $ callCommand "rfkill block bluetooth"
     when onLinux $ callCommand "rfkill unblock bluetooth"
-    return ()
 
 bluetoothInteraction :: Bool -> Handle -> IO ()
 bluetoothInteraction onLinux hout = do

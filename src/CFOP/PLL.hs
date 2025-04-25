@@ -63,7 +63,11 @@ solvePllByCategory AdjecentCornerSwap = tryPllAlg (prependAuf adjecentCornerSwap
 solvePllByCategory DiagonalCornerSwap = tryPllAlg (prependAuf diagonalCornerSwapAlgs)
 
 tryPllAlg :: [Algorithm] -> Cube Algorithm
-tryPllAlg algs = tryAlg algs pllSolved
+tryPllAlg algs = do
+    cubeState <- get
+    case tryAlg algs cubeState pllSolved of
+        Left errorMessage -> error $ "Failed solving PLL: " ++ errorMessage 
+        Right alg -> applyAlgorithm alg
 
 -- Edges only
 
