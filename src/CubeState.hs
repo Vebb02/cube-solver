@@ -92,9 +92,9 @@ data CubeState = CubeState
 
 instance Show CubeState where
     show cube =
-            "    " ++ showFirstC (ulb cube) ++ showFirstE (ub cube) ++ showFirstC (ubr cube)
-        ++ "\n    " ++ showFirstE (ul cube)  ++ show       (u cube)  ++ showFirstE (ur cube)
-        ++ "\n    " ++ showFirstC (ufl cube) ++ showFirstE (uf cube) ++ showFirstC (urf cube)
+             "   " ++ showFirstC (ulb cube) ++ showFirstE (ub cube) ++ showFirstC (ubr cube)
+        ++ "\n   " ++ showFirstE (ul cube)  ++ show       (u cube)  ++ showFirstE (ur cube)
+        ++ "\n   " ++ showFirstC (ufl cube) ++ showFirstE (uf cube) ++ showFirstC (urf cube)
 
         ++ "\n"
         ++ showSecondC (ulb cube) ++ showSecondE (ul cube) ++ showThirdC (ufl cube)
@@ -114,9 +114,9 @@ instance Show CubeState where
         ++ showThirdC (dfr cube) ++ showSecondE (dr cube) ++ showSecondC (drb cube)
         ++ showThirdC (drb cube) ++ showSecondE (db cube) ++ showSecondC (dbl cube)
 
-        ++ "\n    " ++ showFirstC (dlf cube) ++ showFirstE (df cube) ++ showFirstC (dfr cube)
-        ++ "\n    " ++ showFirstE (dl cube)  ++ show       (d cube)  ++ showFirstE (dr cube)
-        ++ "\n    " ++ showFirstC (dbl cube) ++ showFirstE (db cube) ++ showFirstC (drb cube)
+        ++ "\n   " ++ showFirstC (dlf cube) ++ showFirstE (df cube) ++ showFirstC (dfr cube)
+        ++ "\n   " ++ showFirstE (dl cube)  ++ show       (d cube)  ++ showFirstE (dr cube)
+        ++ "\n   " ++ showFirstC (dbl cube) ++ showFirstE (db cube) ++ showFirstC (drb cube)
 
 solvedCube :: CubeState
 solvedCube = CubeState
@@ -149,9 +149,10 @@ solvedCube = CubeState
     }
 
 cubeSolved :: CubeState -> Bool
-cubeSolved cubeState = cubeState == solvedCube
+cubeSolved = (solvedCube ==) 
 
 class Piece a where
+    pieceOrientations :: a -> [a]
     pieceEquivalent :: a -> a -> Bool
     pieceInList :: a -> [a] -> Bool
     pieceInList edge = any (pieceEquivalent edge)
@@ -170,7 +171,8 @@ class Piece a where
     totalPieceSum = foldr ((+) . pieceSum) 0
 
 instance Piece Edge where
-    pieceEquivalent e1 e2 = e1 `elem` [e2, flipEdge e2]
+    pieceOrientations e = [e, flipEdge e]
+    pieceEquivalent e1 e2 = e1 `elem` pieceOrientations e2
     getPieces =
         [ uf
         , ur
@@ -196,7 +198,8 @@ instance Piece Edge where
     pieceSum _ = error "Invalid edge on cube"
 
 instance Piece Corner where
-    pieceEquivalent c1 c2 = c1 `elem` [c2, twistCorner c2, twistCorner (twistCorner c2)]
+    pieceOrientations c = [c, twistCorner c, twistCorner $ twistCorner c]
+    pieceEquivalent c1 c2 = c1 `elem` pieceOrientations c2
     getPieces =
         [ urf
         , ubr

@@ -118,25 +118,28 @@ applyAlgorithm (x:xs) = do
     return (x : result)
 
 undoMove :: Move -> Cube ()
-undoMove x = move $ reverseMove x
+undoMove = move . reverseMove
 
 reverseMove :: Move -> Move
-reverseMove (Move face Normal) = Move face Prime
-reverseMove (Move face Prime) = Move face Normal
-reverseMove (Move face Two) = Move face Two
+reverseMove (Move face md) = Move face (reverseMoveDirection md)
+
+reverseMoveDirection :: MoveDirection -> MoveDirection
+reverseMoveDirection Normal = Prime
+reverseMoveDirection Prime = Normal
+reverseMoveDirection Two = Two
+
 
 reverseMoveSeq :: Algorithm -> Algorithm
-reverseMoveSeq moves = reverse $ map reverseMove moves
+reverseMoveSeq = reverse . map reverseMove
 
 aufMoves :: Algorithm
-aufMoves = [Move U Two, Move U Prime, Move U Normal]
+aufMoves = map (Move U) [Normal, Prime, Two]
 
 prependAuf :: [Algorithm] -> [Algorithm]
 prependAuf = prependMoves aufMoves
 
 prependMoves :: [Move] -> [Algorithm] -> [Algorithm]
-prependMoves (x:xs) algorithms = prependMoves xs algorithms ++ map (x:) algorithms
-prependMoves [] algorithms = algorithms
+prependMoves moves algorithms = algorithms ++ foldr (\x acc -> map (x:) algorithms ++ acc) [] moves
 
 tryAlg :: [Algorithm] -> (CubeState -> Bool) -> Cube Algorithm
 tryAlg [] _ = do
