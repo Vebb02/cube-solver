@@ -104,7 +104,7 @@ fixOrientation slot (Just eSlot) (Just cSlot) = do
             return $ moves ++ restMoves
 
 orientationMoves :: F2LSlot -> Edge -> [Algorithm]
-orientationMoves slot edge = let m = edgeOrientationMove slot edge in [[m, aufMove, reverseMove m] | aufMove <- reverseMoveSeq aufMoves]
+orientationMoves slot edge = let m = edgeOrientationMove slot edge in [[m, aufMove, reverseMove m] | aufMove <- aufMoves]
 
 slotToMove :: F2LSlot -> Move
 slotToMove FL = Move L Prime
