@@ -21,10 +21,8 @@ parseColor =
 
 parseLine :: Int -> Parser [CubeColor]
 parseLine lineLength = do
-    space <|> return ()
-    colors <- count lineLength parseColor
-    space <|> return ()
-    return colors
+    space
+    count lineLength parseColor
 
 parseFace :: Int -> Parser [CubeColor]
 parseFace lineLength = do
@@ -38,6 +36,7 @@ parseCubeState = do
      l4 ,l5 ,l6 ,f4 ,f5 ,f6 ,r4 ,r5 ,r6 ,b4 ,b5 ,b6,
      l7 ,l8 ,l9 ,f7 ,f8 ,f9 ,r7 ,r8 ,r9 ,b7 ,b8 ,b9] <- parseFace 12
     [d1, d2, d3, d4, d5, d6, d7, d8, d9] <- parseFace 3
+    space
     eof
 
     let cubeState = CubeState { 
