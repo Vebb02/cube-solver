@@ -185,7 +185,7 @@ cubeColorToPdfColor Blue = blue
 cubeColorToPdfColor Red = red
 cubeColorToPdfColor Orange = orange
 
-drawMove :: Move -> PDFFont -> PDFFloat -> PDFFloat -> Draw()
+drawMove :: Move -> PDFFont -> PDFFloat -> PDFFloat -> Draw ()
 drawMove m font size heightChange = do
     setStrokeAlpha 0.75
     fillColor black
@@ -310,7 +310,7 @@ drawCubePage cubeState pageNumber font size heightChange = do
     drawCube cubeState size heightChange
     drawPageNumber pageNumber font
 
-drawCubePageWithMove :: CubeState -> Move -> Int -> PDFFont -> PDFFloat -> PDFFloat -> Draw()
+drawCubePageWithMove :: CubeState -> Move -> Int -> PDFFont -> PDFFloat -> PDFFloat -> Draw ()
 drawCubePageWithMove cubeState m pageNumber font size heightChange = do
     drawCubePage cubeState pageNumber font size heightChange
     drawMove m font size heightChange
@@ -318,16 +318,14 @@ drawCubePageWithMove cubeState m pageNumber font size heightChange = do
 createPdfCubeSolution :: Algorithm -> Int -> PDFFont -> PDFFloat -> PDFFloat ->  Cube (PDF ())
 createPdfCubeSolution (m:ms) pageNumber font size heightChange = do
     cubeState <- get
-    let pdf = do
-            page <- addPage Nothing
-            drawWithPage page (drawCubePageWithMove cubeState m pageNumber font size heightChange)
     move m
     rest <- createPdfCubeSolution ms (pageNumber + 1) font size heightChange
-    return (pdf >> rest)
-
+    return $ do
+        page <- addPage Nothing
+        drawWithPage page (drawCubePageWithMove cubeState m pageNumber font size heightChange)
+        rest
 createPdfCubeSolution [] pageNumber font size heightChange  = do
     cubeState <- get
-    let pdf = do
-            page <- addPage Nothing
-            drawWithPage page (drawCubePage cubeState pageNumber font size heightChange)
-    return pdf
+    return $ do
+        page <- addPage Nothing
+        drawWithPage page (drawCubePage cubeState pageNumber font size heightChange)
