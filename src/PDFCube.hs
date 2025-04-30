@@ -51,9 +51,9 @@ showLeft (Right a) = Right a
 showLeft (Left a) = Left $ show a 
 
 imagePage :: JpegFile -> PDF ()
-imagePage frontPageImage = do
+imagePage imageFile = do
     page <- addPage Nothing
-    image <- createPDFJpeg frontPageImage
+    image <- createPDFJpeg imageFile
     drawWithPage page (drawXObject image)
 
 cubeStart :: PDFFloat
