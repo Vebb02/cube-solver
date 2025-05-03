@@ -4,9 +4,10 @@ name:               cube-solver
 
 version:            0.1.0.0
 
-synopsis:        Rubik's cube solver
+synopsis:           Rubik's cube solver
 
--- description:
+description:        Epic cube solver program in Haskell. 
+                    Generates a PDF solving manual from a Rubik's cube scramble.
 
 license:            BSD-3-Clause
 license-file:       LICENSE

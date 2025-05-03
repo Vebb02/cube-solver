@@ -1,4 +1,14 @@
 # Cube Solver
+The cube solver is a Haskell program that generates a PDF solving manual from a Rubik's cube scramble. There are currently three modes:
+- Standard mode: Solves the scramble from an input file and creates a PDF solution.
+- Server mode: Starts an API that takes a scramble and gives a PDF solution as response.
+- Bluetooth mode: Connects to a GAN bluetooth cube and gives live update in the PDF solution.
+
+## Compatibility
+- Linux: Fully compatible.
+- Windows: Full compatible. (Bluetooth mode: see [how to run](#on-non-linux-systems) section)
+- Mac: Standard and Server mode works. Bluetooth mode not yet supported.
+
 ## Before running
 - Create a `scramble.in` file in the project directory containing a scramble using the template below. The orientation of the cube should be green in the front and white on the top. NOTE: This will not work with cubes that do not follow the standard color scheme.
 
@@ -57,7 +67,7 @@ cabal run -- cube-solver --bluetooth
 cabal run -- cube-solver --bluetooth --non-linux
 ```
 ### PDF API
-NOTE: Using the server flag overides the bluetooth flag.
+NOTE: Using the server flag overrides the bluetooth flag.
 ```
 cabal run -- cube-solver --server
 ```
@@ -80,7 +90,7 @@ https://voiestad.no/api/cubesolver/solve?cube=YBRRWROYBGYGWBOWGWGWROOGOGRWRGYBWG
 ```
 
 ## Credit
-* ["Rubik's Cube: Why are some cases impossible to solve?" - by Dylan Wang AKA "JPerm" on YouTube](https://youtu.be/o-RxLzRe2YE?si=PNoy7rsajMeGU8o2)
-* [PLL: E perm and Z perm from SpeedCubeDB](https://speedcubedb.com/a/3x3/PLL)
-* [Names of OLL cases from jperm.net](https://jperm.net/algs/2look/oll)
-* [GAN Bluetooth with Node.js](https://github.com/afedotov/gan-node-sample)
+- ["Rubik's Cube: Why are some cases impossible to solve?" - by Dylan Wang AKA "JPerm" on YouTube](https://youtu.be/o-RxLzRe2YE?si=PNoy7rsajMeGU8o2)
+- [PLL: E perm and Z perm from SpeedCubeDB](https://speedcubedb.com/a/3x3/PLL)
+- [Names of OLL cases from jperm.net](https://jperm.net/algs/2look/oll)
+- [GAN Bluetooth with Node.js](https://github.com/afedotov/gan-node-sample)
