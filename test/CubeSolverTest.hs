@@ -116,12 +116,12 @@ instance Arbitrary Move where
 
 instance Arbitrary MoveFace where
     arbitrary = 
-        oneof [ return F
-              , return B
-              , return R
-              , return L
-              , return U
-              , return D
+        oneof [ return FFace
+              , return BFace
+              , return RFace
+              , return LFace
+              , return UFace
+              , return DFace
               ]
 
 instance Arbitrary MoveDirection where

@@ -82,12 +82,12 @@ parseMove = Move <$> parseTurningFace <*> parseDirection
 
 parseTurningFace :: Parser MoveFace
 parseTurningFace =
-        F <$ char' 'F'
-    <|> R <$ char' 'R'
-    <|> U <$ char' 'U'
-    <|> B <$ char' 'B'
-    <|> L <$ char' 'L'
-    <|> D <$ char' 'D'
+        FFace <$ char' 'F'
+    <|> RFace <$ char' 'R'
+    <|> UFace <$ char' 'U'
+    <|> BFace <$ char' 'B'
+    <|> LFace <$ char' 'L'
+    <|> DFace <$ char' 'D'
 
 parseDirection :: Parser MoveDirection
 parseDirection =

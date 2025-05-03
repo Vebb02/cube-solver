@@ -95,11 +95,11 @@ fixOrientation slot (Just eSlot) (Just cSlot) = do
     let solvedEdge = fst $ f2lSlot solvedCube slot
     let edge = edgeInEdgeList cubeState solvedEdge
     if eSlot == cSlot
-        then applyAlgorithm [slotToMove eSlot, Move U Normal, reverseMove $ slotToMove eSlot]
+        then applyAlgorithm [slotToMove eSlot, U, reverseMove $ slotToMove eSlot]
         else if eSlot == slot && pieceSum edge == 0
-            then applyAlgorithm [slotToMove cSlot, Move U Normal, reverseMove $ slotToMove cSlot]
+            then applyAlgorithm [slotToMove cSlot, U, reverseMove $ slotToMove cSlot]
             else do
-            moves <- applyAlgorithm [edgeOrientationMove eSlot edge, Move U Normal, reverseMove $ edgeOrientationMove eSlot edge]
+            moves <- applyAlgorithm [edgeOrientationMove eSlot edge, U, reverseMove $ edgeOrientationMove eSlot edge]
             restMoves <- fixOrientation slot Nothing (Just cSlot)
             return $ moves ++ restMoves
 
@@ -107,19 +107,19 @@ orientationMoves :: F2LSlot -> Edge -> [Algorithm]
 orientationMoves slot edge = let m = edgeOrientationMove slot edge in [[m, aufMove, reverseMove m] | aufMove <- aufMoves]
 
 slotToMove :: F2LSlot -> Move
-slotToMove FL = Move L Prime
-slotToMove FR = Move R Normal
-slotToMove BL = Move L Normal
-slotToMove BR = Move R Prime
+slotToMove FL = L'
+slotToMove FR = R
+slotToMove BL = L
+slotToMove BR = R'
 
 edgeOrientationMove :: F2LSlot -> Edge -> Move
 edgeOrientationMove slot edge = if pieceSum edge == 0 then slotToMove slot else slotToNonOrientedMove slot
 
 slotToNonOrientedMove :: F2LSlot -> Move
-slotToNonOrientedMove FL = Move F Normal
-slotToNonOrientedMove FR = Move F Prime
-slotToNonOrientedMove BL = Move B Prime
-slotToNonOrientedMove BR = Move B Normal
+slotToNonOrientedMove FL = F
+slotToNonOrientedMove FR = F'
+slotToNonOrientedMove BL = B'
+slotToNonOrientedMove BR = B
 
 edgeSlot :: CubeState -> Edge -> Maybe F2LSlot
 edgeSlot = pieceSlot (zip allPairs allEdges)
@@ -176,7 +176,7 @@ getStatesFromState sideMove (alg, cubeState) = do
     step4
 
 branchWithU :: (Algorithm, CubeState) -> [(Algorithm, CubeState)]
-branchWithU = branchWithMoves [Move U Normal, Move U Prime, Move U Two]
+branchWithU = branchWithMoves [U, U', U2]
 
 branchWithMoves :: [Move] -> (Algorithm, CubeState) -> [(Algorithm, CubeState)]
 branchWithMoves (x:xs) (alg, cubeState) = 

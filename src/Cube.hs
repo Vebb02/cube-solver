@@ -1,3 +1,4 @@
+{-# Language PatternSynonyms #-}
 module Cube where
 
 import CubeState
@@ -11,16 +12,66 @@ data MoveDirection = Normal | Prime | Two
     deriving (Eq, Show)
 
 data MoveFace = 
-      F
-    | R
-    | U
-    | B
-    | L
-    | D
-    deriving (Eq, Show)
+      FFace
+    | RFace
+    | UFace
+    | BFace
+    | LFace
+    | DFace
+    deriving (Eq)
+
+instance Show MoveFace where
+    show FFace = "F"
+    show RFace = "R"
+    show UFace = "U"
+    show BFace = "B"
+    show LFace = "L"
+    show DFace = "D"
 
 data Move = Move MoveFace MoveDirection
     deriving (Eq)
+
+pattern F :: Move
+pattern F = Move FFace Normal
+pattern F' :: Move
+pattern F' = Move FFace Prime
+pattern F2 :: Move
+pattern F2 = Move FFace Two
+
+pattern R :: Move
+pattern R = Move RFace Normal
+pattern R' :: Move
+pattern R' = Move RFace Prime
+pattern R2 :: Move
+pattern R2 = Move RFace Two
+
+pattern U :: Move
+pattern U = Move UFace Normal
+pattern U' :: Move
+pattern U' = Move UFace Prime
+pattern U2 :: Move
+pattern U2 = Move UFace Two
+
+pattern B :: Move
+pattern B = Move BFace Normal
+pattern B' :: Move
+pattern B' = Move BFace Prime
+pattern B2 :: Move
+pattern B2 = Move BFace Two
+
+pattern L :: Move
+pattern L = Move LFace Normal
+pattern L' :: Move
+pattern L' = Move LFace Prime
+pattern L2 :: Move
+pattern L2 = Move LFace Two
+
+pattern D :: Move
+pattern D = Move DFace Normal
+pattern D' :: Move
+pattern D' = Move DFace Prime
+pattern D2 :: Move
+pattern D2 = Move DFace Two
 
 type Algorithm = [Move]
 
@@ -36,7 +87,7 @@ instance Show Move where
 
 
 move :: Move -> Cube ()
-move (Move F Normal) = 
+move (Move FFace Normal) = 
     modify (\x -> x 
     { uf = flipEdge $ fl x
     , fr = flipEdge $ uf x
@@ -47,7 +98,7 @@ move (Move F Normal) =
     , dlf = twistCorner $ dfr x
     , ufl = twistCorner $ twistCorner $ dlf x
     })
-move (Move R Normal) = 
+move (Move RFace Normal) = 
     modify (\x -> x
     { ur = fr x
     , br = ur x
@@ -58,7 +109,7 @@ move (Move R Normal) =
     , dfr = twistCorner $ drb x
     , urf = twistCorner $ twistCorner $ dfr x
     })
-move (Move U Normal) = 
+move (Move UFace Normal) = 
     modify (\x -> x
     { uf = ur x
     , ur = ub x
@@ -69,7 +120,7 @@ move (Move U Normal) =
     , ulb = ufl x
     , ufl = urf x
     })
-move (Move B Normal) = 
+move (Move BFace Normal) = 
     modify (\x -> x
     { ub = flipEdge $ br x
     , br = flipEdge $ db x
@@ -80,7 +131,7 @@ move (Move B Normal) =
     , drb = twistCorner $ dbl x
     , ubr = twistCorner $ twistCorner $ drb x
     })
-move (Move L Normal) = 
+move (Move LFace Normal) = 
     modify (\x -> x 
     { ul = bl x
     , fl = ul x
@@ -91,7 +142,7 @@ move (Move L Normal) =
     , dbl = twistCorner $ dlf x
     , ulb = twistCorner $ twistCorner $ dbl x
     })
-move (Move D Normal) = 
+move (Move DFace Normal) = 
     modify (\x -> x 
     { df = dl x
     , dl = db x
@@ -133,7 +184,7 @@ reverseMoveSeq :: Algorithm -> Algorithm
 reverseMoveSeq = reverse . map reverseMove
 
 aufMoves :: Algorithm
-aufMoves = map (Move U) [Normal, Prime, Two]
+aufMoves = map (Move UFace) [Normal, Prime, Two]
 
 prependAuf :: [Algorithm] -> [Algorithm]
 prependAuf = prependMoves aufMoves

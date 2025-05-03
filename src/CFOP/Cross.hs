@@ -25,7 +25,7 @@ solveCross' (x:xs) solvedPieces = do
     return $ moves ++ rest
 solveCross' [] _ = do
     cubeState <- get
-    case tryAlg [[], [Move D Normal], [Move D Prime], [Move D Two]] cubeState crossSolved of
+    case tryAlg [[], [D], [D'], [D2]] cubeState crossSolved of
         Left errorMessage -> error $ "Failed doing last move of cross: " ++ errorMessage 
         Right alg -> applyAlgorithm alg
 
@@ -75,10 +75,10 @@ solveCrossPieceByCase BottomEdgeFlipped x solvedPieces = do
 
 topBottomMoveFace :: (CubeState -> Edge) -> MoveFace
 topBottomMoveFace x = case secondE $ x solvedCube of
-    Green -> F
-    Red -> R
-    Blue -> B
-    Orange -> L
+    Green -> FFace
+    Red -> RFace
+    Blue -> BFace
+    Orange -> LFace
     _ -> error "Color not defined"
 
 midMove :: CubeState -> (CubeState -> Edge) -> Move
@@ -87,25 +87,25 @@ midMove cubeState x = let
     unsolvedEdge = x cubeState
     edgeSum = pieceSum unsolvedEdge in
     case solvedEdge of
-        Edge Green Red -> if edgeSum == 0 then Move R Prime else Move F Normal
-        Edge Green Orange -> if edgeSum == 0 then Move L Normal else Move F Prime
-        Edge Blue Red -> if edgeSum == 0 then Move R Normal else Move B Prime
-        Edge Blue Orange -> if edgeSum == 0 then Move L Prime else Move B Normal
+        Edge Green Red -> if edgeSum == 0 then R' else F
+        Edge Green Orange -> if edgeSum == 0 then L else F'
+        Edge Blue Red -> if edgeSum == 0 then R else B'
+        Edge Blue Orange -> if edgeSum == 0 then L' else B
         _ -> error $ show solvedEdge
 
 
 leftMoveFace :: MoveFace -> MoveFace
-leftMoveFace F = L
-leftMoveFace R = F
-leftMoveFace B = R
-leftMoveFace L = B
+leftMoveFace FFace = LFace
+leftMoveFace RFace = FFace
+leftMoveFace BFace = RFace
+leftMoveFace LFace = BFace
 leftMoveFace _ = error "Moveface does not have a face to the left"
 
 moveFaceCrossEdge :: MoveFace -> CrossEdge
-moveFaceCrossEdge F = FEdge
-moveFaceCrossEdge R = REdge
-moveFaceCrossEdge B = BEdge
-moveFaceCrossEdge L = LEdge
+moveFaceCrossEdge FFace = FEdge
+moveFaceCrossEdge RFace = REdge
+moveFaceCrossEdge BFace = BEdge
+moveFaceCrossEdge LFace = LEdge
 moveFaceCrossEdge _ = error "Moveface is not assosiated with a cross edge"
 
 
@@ -186,7 +186,7 @@ dMoveBetween :: CrossEdge -> CrossEdge -> Algorithm
 dMoveBetween from to = 
     case moveSumToMoveDirection (crossEdgeIndex to - crossEdgeIndex from) of
         Nothing  -> []
-        Just dir  -> [Move D dir]
+        Just dir  -> [Move DFace dir]
 
 crossEdges :: [CubeState -> Edge]
 crossEdges = [df, dr, db, dl]

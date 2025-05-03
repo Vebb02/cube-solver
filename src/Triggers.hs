@@ -4,25 +4,13 @@ import Cube
 
 -- This is a totally legit speedcubing term, I promise
 sexy :: Algorithm
-sexy =
-    map (uncurry Move)
-    [ (R, Normal)
-    , (U, Normal)
-    , (R, Prime)
-    , (U, Prime)
-    ]
+sexy = [R, U, R', U']
 
 reverseSexy :: Algorithm
 reverseSexy = reverseMoveSeq sexy
 
 sledgeHammer :: Algorithm
-sledgeHammer =
-    map (uncurry Move)
-    [ (R, Prime)
-    , (F, Normal)
-    , (R, Normal)
-    , (F, Prime)
-    ]
+sledgeHammer = [R', F, R, F']
 
 hedgeSlammer :: Algorithm
 hedgeSlammer = reverseMoveSeq sledgeHammer

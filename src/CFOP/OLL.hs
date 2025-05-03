@@ -44,7 +44,7 @@ tryEdgeFlipAlg algs = do
 
 flipEdges :: EdgeState -> Cube Algorithm
 flipEdges EdgesOriented = return []
-flipEdges Line = tryEdgeFlipAlg (prependMoves [Move U Normal] [lineFlip])
+flipEdges Line = tryEdgeFlipAlg (prependMoves [U] [lineFlip])
 flipEdges Angle = tryEdgeFlipAlg (prependAuf [angleFlip])
 flipEdges Dot = applyAlgorithm dotFlip
 
@@ -59,10 +59,10 @@ solveCorners = do
         Right alg -> applyAlgorithm alg
 
 dotFlip :: Algorithm
-dotFlip = angleFlip ++ [Move U Normal] ++ lineFlip
+dotFlip = angleFlip ++ [U] ++ lineFlip
 
 lineFlip :: Algorithm
-lineFlip = [Move F Normal] ++ sexy ++ [Move F Prime]
+lineFlip = [F] ++ sexy ++ [F']
 
 angleFlip :: Algorithm
 angleFlip = reverseMoveSeq lineFlip
@@ -70,76 +70,22 @@ angleFlip = reverseMoveSeq lineFlip
 -- Edges oriented algs
 
 sune :: Algorithm
-sune =
-    map (uncurry Move)
-    [ (R, Normal)
-    , (U, Normal)
-    , (R, Prime)
-    , (U, Normal)
-    , (R, Normal)
-    , (U, Two)
-    , (R, Prime)
-    ]
+sune = [R, U, R', U, R, U2, R']
 
 antisune :: Algorithm
 antisune = reverseMoveSeq sune
 
 hOll :: Algorithm
-hOll =
-    map (uncurry Move)
-    [ (R, Normal)
-    , (U, Normal)
-    , (R, Prime)
-    , (U, Normal)
-    , (R, Normal)
-    , (U, Prime)
-    , (R, Prime)
-    , (U, Normal)
-    , (R, Normal)
-    , (U, Two)
-    , (R, Prime)
-    ]
+hOll = [R, U, R', U, R, U', R', U, R, U2, R']
 
 lOll :: Algorithm
-lOll = 
-    map (uncurry Move)
-    [ (F, Normal)
-    , (R, Prime)
-    , (F, Prime)
-    , (L, Normal)
-    , (F, Normal)
-    , (R, Normal)
-    , (F, Prime)
-    , (L, Prime)
-    ]
+lOll = [F, R', F', L, F, R, F', L']
 
 piOll :: Algorithm
-piOll =
-    map (uncurry Move)
-    [ (R, Normal)
-    , (U, Two)
-    , (R, Two)
-    , (U, Prime)
-    , (R, Two)
-    , (U, Prime)
-    , (R, Two)
-    , (U, Two)
-    , (R, Normal)
-    ]
+piOll = [R, U2, R2, U', R2, U', R2, U2, R]
 
 tOll :: Algorithm
 tOll = reverseMoveSeq lOll
 
 uOll :: Algorithm
-uOll =
-    map (uncurry Move)
-    [ (R, Two)
-    , (D, Normal)
-    , (R, Prime)
-    , (U, Two)
-    , (R, Normal)
-    , (D, Prime)
-    , (R, Prime)
-    , (U, Two)
-    , (R, Prime)
-    ]
+uOll = [R2, D, R', U2, R, D', R', U2, R']
