@@ -35,18 +35,11 @@ ollSolved cubeState = edgesOriented cubeState && cornersOriented cubeState
 edgesOriented :: CubeState -> Bool
 edgesOriented cubeState = edgeState cubeState == EdgesOriented
 
-tryEdgeFlipAlg :: [Algorithm] -> Cube Algorithm
-tryEdgeFlipAlg algs = do
-    cubeState <- get
-    case tryAlg algs cubeState edgesOriented of
-        Left errorMessage -> error $ "Failed doing edge flip in OLL: " ++ errorMessage 
-        Right alg -> applyAlgorithm alg
-
 flipEdges :: EdgeState -> Cube Algorithm
 flipEdges EdgesOriented = return []
-flipEdges Line = tryEdgeFlipAlg (prependMoves [U] [lineFlip])
-flipEdges Angle = tryEdgeFlipAlg (prependAuf [angleFlip])
-flipEdges Dot = applyAlgorithm dotFlip
+flipEdges Line = lineFlip
+flipEdges Angle = angleFlip
+flipEdges Dot = dotFlip
 
 cornersOriented :: CubeState -> Bool
 cornersOriented cubeState = totalPieceSum (pieces cubeState :: [Corner]) == 0
@@ -58,14 +51,93 @@ solveCorners = do
         Left errorMessage -> error $ "Failed solving corners of OLL: " ++ errorMessage 
         Right alg -> applyAlgorithm alg
 
-dotFlip :: Algorithm
-dotFlip = angleFlip ++ [U] ++ lineFlip
+dotFlip :: Cube Algorithm
+dotFlip = do
+    cubeState <- get
+    case tryAlg dotFlipAlgs cubeState ollSolved of
+        Left errorMessage -> error $ "Failed solving dot case of OLL: " ++ errorMessage 
+        Right alg -> applyAlgorithm alg
 
-lineFlip :: Algorithm
-lineFlip = [F] ++ sexy ++ [F']
+lineFlip :: Cube Algorithm
+lineFlip = do
+    cubeState <- get
+    case tryAlg lineFlipAlgs cubeState ollSolved of
+        Left errorMessage -> error $ "Failed solving line case of OLL: " ++ errorMessage 
+        Right alg -> applyAlgorithm alg
 
-angleFlip :: Algorithm
-angleFlip = reverseMoveSeq lineFlip
+angleFlip :: Cube Algorithm
+angleFlip = do
+    cubeState <- get
+    case tryAlg angleFlipAlgs cubeState ollSolved of
+        Left errorMessage -> error $ "Failed solving angle case of OLL: " ++ errorMessage 
+        Right alg -> applyAlgorithm alg
+
+-- Dot flip algs
+
+dotFlipAlgs :: [Algorithm]
+dotFlipAlgs = prependAuf 
+    [ [R, U2, R2, F, R, F', U2, R', F, R, F']
+    , [L, F, L', U2, R, U2, R', U2, L, F', L']
+    , [F, U, R, U', R', F', U, F, R, U, R', U', F']
+    , [F, U, R, U', R', F', U', F, R, U, R', U', F']
+    , [R, U, R', U, R', F, R, F', U2, R', F, R, F']
+    , [R, U2, R2, F, R, F', U2, R', L, F, R, F', L']
+    , [L', R, B, R, B, R', B', R2, L, F, R, F']
+    , [L, F, R', F', R2, L2, B, R, B', R', B', R', L]
+    ]
+
+-- Line flip algs
+
+lineFlipAlgs :: [Algorithm]
+lineFlipAlgs = prependAuf 
+    [ [F, U, R, U', R2, F', R, U, R, U', R']
+    , [R', F, R, U, R', F', R, F, U', F']
+    , [L', B', L, R', U', R, U, L', B, L]
+    , [L, F, L', R, U, R', U', L, F', L']
+    , sexy ++ sledgeHammer
+    , [R, U, R2, U', R', F, R, U, R, U', F']
+    , [L, F', L', U', L, U, F, U', L']
+    , [R', F, R, U, R', U', F', U, R]
+    , F : sexy ++ [F']
+    , [R', U', R', F, R, F', U, R]
+    , [F, U, R, U', R', U, R, U', R', F']
+    , [R, U, R', U, R, U', B, U', B', R']
+    , [R', F, R, U, R, U', R2, F', R2, U', R', U, R, U, R']
+    , [L, F, L', U, R, U', R', U, R, U', R', L, F', L']
+    , [R, U, R', U', R', L, F, R, F', L']
+    ]
+-- Angle flip algs
+
+angleFlipAlgs :: [Algorithm]
+angleFlipAlgs = prependAuf 
+    [ [R', F2, L, F, L', F, R]
+    , [L, F2, R', F', R, F', L']
+    , [L, F, R', F, R, F2, L']
+    , [R', F', L, F', L', F2, R]
+    , [R, U, R', U', R', F, R2, U, R', U', F']
+    , [R, U, R', U, R', F, R, F', R, U2, R']
+    , [L, F, R', F, R', D, R, D', R, F2, L']
+    , [R2, L, F', R, F', R', F2, R, F', R, L']
+    , [L, F, R', F', L', R, U, R, U', R']
+    , [R, U, R', U', R, U', R', F', U', F, R, U, R']
+    , [F, R', F, R2, U', R', U', R, U, R', F2]
+    , [R', U', F, U, R, U', R', F', R]
+    , [L, U, F', U', L', U, L, F, L']
+    , [R, U2, R2, F, R, F', R, U2, R']
+    , [L', U', L, U', L', U, L, U, L, F', L', F]
+    , [F, R', F', R, U, R, U', R']
+    , [R, U, R', U, R, U', R', U', R', F, R, F']
+    , [R, U, R', U, R, U2, R', F, R, U, R', U', F']
+    , [R', U', R, U', R', U2, R, F, R, U, R', U', F']
+    , [F', U', L', U, L, F]
+    , F : reverseSexy ++ [F']
+    , [R', U', R', F, R, F', R', F, R, F', U, R]
+    , [F, R, U, R', U', R, U, R', U', F']
+    , [L, F', L2, B, L2, F, L2, B', L]
+    , [L', B, L2, F', L2, B', L2, F, L']
+    , [R', F2, L, F, L', F', L, F, L', F, R]
+    , [L, F2, R', F', R, F, R', F', R, F', L']
+    ]
 
 -- Edges oriented algs
 
