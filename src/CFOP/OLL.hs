@@ -47,7 +47,7 @@ cornersOriented cubeState = totalPieceSum (pieces cubeState :: [Corner]) == 0
 solveCorners :: Cube Algorithm
 solveCorners = do
     cubeState <- get
-    case tryAlg (prependAuf [[], sune, antisune, hOll, lOll, piOll, tOll, uOll]) cubeState cornersOriented of
+    case tryAlg edgesOrientedAlgs cubeState cornersOriented of
         Left errorMessage -> error $ "Failed solving corners of OLL: " ++ errorMessage 
         Right alg -> applyAlgorithm alg
 
@@ -75,7 +75,7 @@ angleFlip = do
 -- Dot flip algs
 
 dotFlipAlgs :: [Algorithm]
-dotFlipAlgs = prependAuf 
+dotFlipAlgs = applyFourSidesAlg
     [ [R, U2, R2, F, R, F', U2, R', F, R, F']
     , [L, F, L', U2, R, U2, R', U2, L, F', L']
     , [F, U, R, U', R', F', U, F, R, U, R', U', F']
@@ -89,7 +89,7 @@ dotFlipAlgs = prependAuf
 -- Line flip algs
 
 lineFlipAlgs :: [Algorithm]
-lineFlipAlgs = prependAuf 
+lineFlipAlgs = applyFourSidesAlg
     [ [F, U, R, U', R2, F', R, U, R, U', R']
     , [R', F, R, U, R', F', R, F, U', F']
     , [L', B', L, R', U', R, U, L', B, L]
@@ -109,7 +109,7 @@ lineFlipAlgs = prependAuf
 -- Angle flip algs
 
 angleFlipAlgs :: [Algorithm]
-angleFlipAlgs = prependAuf 
+angleFlipAlgs = applyFourSidesAlg 
     [ [R', F2, L, F, L', F, R]
     , [L, F2, R', F', R, F', L']
     , [L, F, R', F, R, F2, L']
@@ -140,6 +140,10 @@ angleFlipAlgs = prependAuf
     ]
 
 -- Edges oriented algs
+
+edgesOrientedAlgs :: [Algorithm]
+edgesOrientedAlgs = [] : applyFourSidesAlg
+    [sune, antisune, hOll, lOll, piOll, tOll, uOll]
 
 sune :: Algorithm
 sune = [R, U, R', U, R, U2, R']

@@ -186,11 +186,32 @@ reverseMoveSeq = reverse . map reverseMove
 aufMoves :: Algorithm
 aufMoves = map (Move UFace) [Normal, Prime, Two]
 
-prependAuf :: [Algorithm] -> [Algorithm]
-prependAuf = prependMoves aufMoves
+applyFourSidesAlg :: [Algorithm] -> [Algorithm]
+applyFourSidesAlg = foldr (\x acc -> fourSidesAlg x ++ acc) []
 
-prependMoves :: [Move] -> [Algorithm] -> [Algorithm]
-prependMoves moves algorithms = algorithms ++ foldr (\x acc -> map (x:) algorithms ++ acc) [] moves
+fourSidesAlg :: Algorithm -> [Algorithm]
+fourSidesAlg alg = 
+    let onceRotated   = rotateAlg alg
+        twiceRotated  = rotateAlg onceRotated
+        thriceRotated = rotateAlg twiceRotated
+    in 
+        [ alg
+        , onceRotated
+        , twiceRotated
+        , thriceRotated
+        ]
+
+rotateAlg :: Algorithm -> Algorithm
+rotateAlg = map rotateFace
+
+rotateFace :: Move -> Move
+rotateFace (Move face dir) = Move (newFace face) dir where
+    newFace :: MoveFace -> MoveFace
+    newFace FFace = RFace
+    newFace RFace = BFace
+    newFace BFace = LFace
+    newFace LFace = FFace
+    newFace xFace = xFace
 
 tryAlg :: [Algorithm] -> CubeState -> (CubeState -> Bool) -> Either String Algorithm
 tryAlg [] cubeState _  = Left $ "Could not solve\n" ++ show cubeState

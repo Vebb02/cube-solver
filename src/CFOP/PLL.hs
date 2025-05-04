@@ -58,9 +58,9 @@ equalPllSide :: Corner -> Edge -> Corner -> Bool
 equalPllSide (Corner _ c1 _) (Edge _ c2) (Corner _ _ c3) = c1 == c2 && c1 == c3
 
 solvePllByCategory :: PLLCategory -> Cube Algorithm
-solvePllByCategory EdgesOnly = tryPllAlg (prependAuf edgesOnlyAlgs)
-solvePllByCategory AdjecentCornerSwap = tryPllAlg (prependAuf adjecentCornerSwapAlgs)
-solvePllByCategory DiagonalCornerSwap = tryPllAlg (prependAuf diagonalCornerSwapAlgs)
+solvePllByCategory EdgesOnly = tryPllAlg edgesOnlyAlgs
+solvePllByCategory AdjecentCornerSwap = tryPllAlg adjecentCornerSwapAlgs
+solvePllByCategory DiagonalCornerSwap = tryPllAlg diagonalCornerSwapAlgs
 
 tryPllAlg :: [Algorithm] -> Cube Algorithm
 tryPllAlg algs = do
@@ -72,7 +72,7 @@ tryPllAlg algs = do
 -- Edges only
 
 edgesOnlyAlgs :: [Algorithm]
-edgesOnlyAlgs = [hPerm, zPerm, uaPerm, ubPerm]
+edgesOnlyAlgs = applyFourSidesAlg [hPerm, zPerm, uaPerm, ubPerm]
 
 hPerm :: Algorithm
 hPerm = [R2, U2, R, U2, R2, U2, R2, U2, R, U2, R2]
@@ -89,7 +89,7 @@ ubPerm = reverseMoveSeq uaPerm
 -- Adjacent corner swap
 
 adjecentCornerSwapAlgs :: [Algorithm]
-adjecentCornerSwapAlgs = 
+adjecentCornerSwapAlgs = applyFourSidesAlg
     [ tPerm
     , jaPerm
     , jbPerm
@@ -144,7 +144,7 @@ gdPerm = reverseMoveSeq gcPerm
 -- Diagonal corner swap
 
 diagonalCornerSwapAlgs :: [Algorithm]
-diagonalCornerSwapAlgs = [yPerm, vPerm, naPerm, nbPerm, ePerm]
+diagonalCornerSwapAlgs = applyFourSidesAlg [yPerm, vPerm, naPerm, nbPerm, ePerm]
 
 yPerm :: Algorithm
 yPerm = [F, R, U', R', U', R, U, R', F'] ++ sexy ++ sledgeHammer
