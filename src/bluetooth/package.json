@@ -8,6 +8,6 @@
   },
   "dependencies": {
     "gan-web-bluetooth": "^3.0.2",
-    "webbluetooth": "^3.2.1"
+    "webbluetooth": "^3.3.2"
   }
 }
