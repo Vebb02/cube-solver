@@ -1,15 +1,16 @@
-{-# Language PatternSynonyms #-}
+{-# Language DeriveDataTypeable #-}
 module Cube where
 
 import CubeState
 
 import Control.Monad.State
 import Data.List (minimumBy)
+import Data.Data
 
 type Cube a = State CubeState a
 
 data MoveDirection = Normal | Prime | Two
-    deriving (Eq, Show)
+    deriving (Eq, Show, Data, Typeable)
 
 data MoveFace = 
       FFace
@@ -18,7 +19,7 @@ data MoveFace =
     | BFace
     | LFace
     | DFace
-    deriving (Eq)
+    deriving (Eq, Data, Typeable)
 
 instance Show MoveFace where
     show FFace = "F"
@@ -29,49 +30,7 @@ instance Show MoveFace where
     show DFace = "D"
 
 data Move = Move MoveFace MoveDirection
-    deriving (Eq)
-
-pattern F :: Move
-pattern F = Move FFace Normal
-pattern F' :: Move
-pattern F' = Move FFace Prime
-pattern F2 :: Move
-pattern F2 = Move FFace Two
-
-pattern R :: Move
-pattern R = Move RFace Normal
-pattern R' :: Move
-pattern R' = Move RFace Prime
-pattern R2 :: Move
-pattern R2 = Move RFace Two
-
-pattern U :: Move
-pattern U = Move UFace Normal
-pattern U' :: Move
-pattern U' = Move UFace Prime
-pattern U2 :: Move
-pattern U2 = Move UFace Two
-
-pattern B :: Move
-pattern B = Move BFace Normal
-pattern B' :: Move
-pattern B' = Move BFace Prime
-pattern B2 :: Move
-pattern B2 = Move BFace Two
-
-pattern L :: Move
-pattern L = Move LFace Normal
-pattern L' :: Move
-pattern L' = Move LFace Prime
-pattern L2 :: Move
-pattern L2 = Move LFace Two
-
-pattern D :: Move
-pattern D = Move DFace Normal
-pattern D' :: Move
-pattern D' = Move DFace Prime
-pattern D2 :: Move
-pattern D2 = Move DFace Two
+    deriving (Eq, Data, Typeable)
 
 type Algorithm = [Move]
 

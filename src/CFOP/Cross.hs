@@ -25,7 +25,7 @@ solveCross' (x:xs) solvedPieces = do
     return $ moves ++ rest
 solveCross' [] _ = do
     cubeState <- get
-    case tryAlg [[], [D], [D'], [D2]] cubeState crossSolved of
+    case tryAlg [[], [Move DFace Normal], [Move DFace Prime], [Move DFace Two]] cubeState crossSolved of
         Left errorMessage -> error $ "Failed doing last move of cross: " ++ errorMessage 
         Right alg -> applyAlgorithm alg
 
@@ -87,10 +87,10 @@ midMove cubeState x = let
     unsolvedEdge = x cubeState
     edgeSum = pieceSum unsolvedEdge in
     case solvedEdge of
-        Edge Green Red -> if edgeSum == 0 then R' else F
-        Edge Green Orange -> if edgeSum == 0 then L else F'
-        Edge Blue Red -> if edgeSum == 0 then R else B'
-        Edge Blue Orange -> if edgeSum == 0 then L' else B
+        Edge Green Red -> if edgeSum == 0 then Move RFace Prime else Move FFace Normal
+        Edge Green Orange -> if edgeSum == 0 then Move LFace Normal else Move FFace Prime
+        Edge Blue Red -> if edgeSum == 0 then Move RFace Normal else Move BFace Prime
+        Edge Blue Orange -> if edgeSum == 0 then Move LFace Prime else Move BFace Normal
         _ -> error $ show solvedEdge
 
 
