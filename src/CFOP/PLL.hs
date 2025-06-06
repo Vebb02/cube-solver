@@ -1,3 +1,4 @@
+{-# LANGUAGE QuasiQuotes #-}
 module CFOP.PLL (pll, pllSolved) where
 
 import Control.Monad.State
@@ -7,6 +8,7 @@ import Triggers
 import CFOP.Cross (crossSolved)
 import CFOP.F2L (f2lSolved)
 import CFOP.OLL (ollSolved)
+import AlgExpr
 
 data PLLCategory = EdgesOnly | AdjecentCornerSwap | DiagonalCornerSwap
     deriving (Eq, Show)
@@ -75,13 +77,13 @@ edgesOnlyAlgs :: [Algorithm]
 edgesOnlyAlgs = applyFourSidesAlg [hPerm, zPerm, uaPerm, ubPerm]
 
 hPerm :: Algorithm
-hPerm = [R2, U2, R, U2, R2, U2, R2, U2, R, U2, R2]
+hPerm = [algExpr|R2 U2 R U2 R2 U2 R2 U2 R U2 R2|]
 
 zPerm :: Algorithm
-zPerm = [R', U', R, U', R, U, R, U', R', U, R, U, R2, U', R']
+zPerm = [algExpr|R' U' R U' R U R U' R' U R U R2 U' R'|]
 
 uaPerm :: Algorithm
-uaPerm = [R, U', R, U, R, U, R, U', R', U', R2]
+uaPerm = [algExpr|R U' R U R U R U' R' U' R2|]
 
 ubPerm :: Algorithm
 ubPerm = reverseMoveSeq uaPerm
@@ -106,31 +108,31 @@ adjecentCornerSwapAlgs = applyFourSidesAlg
 
 tPerm :: Algorithm
 tPerm =
-    sexy ++ [R', F, R2, U', R', U', R, U, R', F']
+    sexy ++ [algExpr|R' F R2 U' R' U' R U R' F'|]
 
 jaPerm :: Algorithm
-jaPerm = [R, U', L', U, R', U2, L, U', L', U2, L]
+jaPerm = [algExpr|R U' L' U R' U2 L U' L' U2 L|]
 
 jbPerm :: Algorithm
-jbPerm = [R, U, R', F'] ++ sexy ++ [R', F, R2, U', R']
+jbPerm = [algExpr|R U R' F'|] ++ sexy ++ [algExpr|R' F R2 U' R'|]
 
 fPerm :: Algorithm
-fPerm = [R', U', F'] ++ init tPerm ++ [U, R]
+fPerm = [algExpr|R' U' F'|] ++ init tPerm ++ [algExpr|U R|]
 
 aaPerm :: Algorithm
-aaPerm = [R', F, R', B2, R, F', R', B2, R2]
+aaPerm = [algExpr|R' F R' B2 R F' R' B2 R2|]
 
 abPerm :: Algorithm
 abPerm = reverseMoveSeq aaPerm
 
 raPerm :: Algorithm
-raPerm = [R, U, R', F', R, U2, R', U2, R', F, R, U, R, U2, R']
+raPerm = [algExpr|R U R' F' R U2 R' U2 R' F R U R U2 R'|]
 
 rbPerm :: Algorithm
-rbPerm = [R2, F, R, U, R, U', R', F', R, U2, R', U2, R]
+rbPerm = [algExpr|R2 F R U R U' R' F' R U2 R' U2 R|]
 
 gaPerm :: Algorithm
-gaPerm = [R2, U, R', U, R', U', R, U', R2, U', D, R', U, R, D']
+gaPerm = [algExpr|R2 U R' U R' U' R U' R2 U' D R' U R D'|]
 
 gbPerm :: Algorithm
 gbPerm = reverseMoveSeq gaPerm
@@ -147,16 +149,16 @@ diagonalCornerSwapAlgs :: [Algorithm]
 diagonalCornerSwapAlgs = applyFourSidesAlg [yPerm, vPerm, naPerm, nbPerm, ePerm]
 
 yPerm :: Algorithm
-yPerm = [F, R, U', R', U', R, U, R', F'] ++ sexy ++ sledgeHammer
+yPerm = [algExpr|F R U' R' U' R U R' F'|] ++ sexy ++ sledgeHammer
 
 vPerm :: Algorithm
-vPerm = [R, U', R, U, R', D, R, D', R, U', D, R2, U, R2, D', R2]
+vPerm = [algExpr|R U' R U R' D R D' R U' D R2 U R2 D' R2|]
 
 ePerm :: Algorithm
-ePerm = [R', U', R', D', R, U', R', D, R, U, R', D', R, U, R', D, R2]
+ePerm = [algExpr|R' U' R' D' R U' R' D R U R' D' R U R' D R2|]
 
 naPerm :: Algorithm
-naPerm = [R, U, R', U] ++ jbPerm ++ [U2, R, U', R']
+naPerm = [algExpr|R U R' U|] ++ jbPerm ++ [algExpr|U2 R U' R'|]
 
 nbPerm :: Algorithm
-nbPerm = [R', U, R, U', R', F', U', F, R, U, R', F, R', F', R, U', R]
+nbPerm = [algExpr|R' U R U' R' F' U' F R U R' F R' F' R U' R|]

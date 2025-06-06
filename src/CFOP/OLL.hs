@@ -1,3 +1,4 @@
+{-# LANGUAGE QuasiQuotes #-}
 module CFOP.OLL (oll, ollSolved) where
 
 import Cube
@@ -6,6 +7,7 @@ import CubeState
 import Control.Monad.State
 import CFOP.Cross (crossSolved)
 import CFOP.F2L (f2lSolved)
+import AlgExpr
 
 oll :: Cube Algorithm
 oll = do
@@ -76,67 +78,67 @@ angleFlip = do
 
 dotFlipAlgs :: [Algorithm]
 dotFlipAlgs = applyFourSidesAlg
-    [ [R, U2, R2, F, R, F', U2, R', F, R, F']
-    , [L, F, L', U2, R, U2, R', U2, L, F', L']
-    , [F, U, R, U', R', F', U, F, R, U, R', U', F']
-    , [F, U, R, U', R', F', U', F, R, U, R', U', F']
-    , [R, U, R', U, R', F, R, F', U2, R', F, R, F']
-    , [R, U2, R2, F, R, F', U2, R', L, F, R, F', L']
-    , [L', R, B, R, B, R', B', R2, L, F, R, F']
-    , [L, F, R', F', R2, L2, B, R, B', R', B', R', L]
+    [ [algExpr|R U2 R2 F R F' U2 R' F R F'|]
+    , [algExpr|L F L' U2 R U2 R' U2 L F' L'|]
+    , [algExpr|F U R U' R' F' U F R U R' U' F'|]
+    , [algExpr|F U R U' R' F' U' F R U R' U' F'|]
+    , [algExpr|R U R' U R' F R F' U2 R' F R F'|]
+    , [algExpr|R U2 R2 F R F' U2 R' L F R F' L'|]
+    , [algExpr|L' R B R B R' B' R2 L F R F'|]
+    , [algExpr|L F R' F' R2 L2 B R B' R' B' R' L|]
     ]
 
 -- Line flip algs
 
 lineFlipAlgs :: [Algorithm]
 lineFlipAlgs = applyFourSidesAlg
-    [ [F, U, R, U', R2, F', R, U, R, U', R']
-    , [R', F, R, U, R', F', R, F, U', F']
-    , [L', B', L, R', U', R, U, L', B, L]
-    , [L, F, L', R, U, R', U', L, F', L']
+    [ [algExpr|F U R U' R2 F' R U R U' R'|]
+    , [algExpr|R' F R U R' F' R F U' F'|]
+    , [algExpr|L' B' L R' U' R U L' B L|]
+    , [algExpr|L F L' R U R' U' L F' L'|]
     , sexy ++ sledgeHammer
-    , [R, U, R2, U', R', F, R, U, R, U', F']
-    , [L, F', L', U', L, U, F, U', L']
-    , [R', F, R, U, R', U', F', U, R]
-    , F : sexy ++ [F']
-    , [R', U', R', F, R, F', U, R]
-    , [F, U, R, U', R', U, R, U', R', F']
-    , [R, U, R', U, R, U', B, U', B', R']
-    , [R', F, R, U, R, U', R2, F', R2, U', R', U, R, U, R']
-    , [L, F, L', U, R, U', R', U, R, U', R', L, F', L']
-    , [R, U, R', U', R', L, F, R, F', L']
+    , [algExpr|R U R2 U' R' F R U R U' F'|]
+    , [algExpr|L F' L' U' L U F U' L'|]
+    , [algExpr|R' F R U R' U' F' U R|]
+    , [algExpr|F|] ++ sexy ++ [algExpr|F'|]
+    , [algExpr|R' U' R' F R F' U R|]
+    , [algExpr|F U R U' R' U R U' R' F'|]
+    , [algExpr|R U R' U R U' B U' B' R'|]
+    , [algExpr|R' F R U R U' R2 F' R2 U' R' U R U R'|]
+    , [algExpr|L F L' U R U' R' U R U' R' L F' L'|]
+    , [algExpr|R U R' U' R' L F R F' L'|]
     ]
 -- Angle flip algs
 
 angleFlipAlgs :: [Algorithm]
 angleFlipAlgs = applyFourSidesAlg 
-    [ [R', F2, L, F, L', F, R]
-    , [L, F2, R', F', R, F', L']
-    , [L, F, R', F, R, F2, L']
-    , [R', F', L, F', L', F2, R]
-    , [R, U, R', U', R', F, R2, U, R', U', F']
-    , [R, U, R', U, R', F, R, F', R, U2, R']
-    , [L, F, R', F, R', D, R, D', R, F2, L']
-    , [R2, L, F', R, F', R', F2, R, F', R, L']
-    , [L, F, R', F', L', R, U, R, U', R']
-    , [R, U, R', U', R, U', R', F', U', F, R, U, R']
-    , [F, R', F, R2, U', R', U', R, U, R', F2]
-    , [R', U', F, U, R, U', R', F', R]
-    , [L, U, F', U', L', U, L, F, L']
-    , [R, U2, R2, F, R, F', R, U2, R']
-    , [L', U', L, U', L', U, L, U, L, F', L', F]
-    , [F, R', F', R, U, R, U', R']
-    , [R, U, R', U, R, U', R', U', R', F, R, F']
-    , [R, U, R', U, R, U2, R', F, R, U, R', U', F']
-    , [R', U', R, U', R', U2, R, F, R, U, R', U', F']
-    , [F', U', L', U, L, F]
-    , F : reverseSexy ++ [F']
-    , [R', U', R', F, R, F', R', F, R, F', U, R]
-    , [F, R, U, R', U', R, U, R', U', F']
-    , [L, F', L2, B, L2, F, L2, B', L]
-    , [L', B, L2, F', L2, B', L2, F, L']
-    , [R', F2, L, F, L', F', L, F, L', F, R]
-    , [L, F2, R', F', R, F, R', F', R, F', L']
+    [ [algExpr|R' F2 L F L' F R|]
+    , [algExpr|L F2 R' F' R F' L'|]
+    , [algExpr|L F R' F R F2 L'|]
+    , [algExpr|R' F' L F' L' F2 R|]
+    , [algExpr|R U R' U' R' F R2 U R' U' F'|]
+    , [algExpr|R U R' U R' F R F' R U2 R'|]
+    , [algExpr|L F R' F R' D R D' R F2 L'|]
+    , [algExpr|R2 L F' R F' R' F2 R F' R L'|]
+    , [algExpr|L F R' F' L' R U R U' R'|]
+    , [algExpr|R U R' U' R U' R' F' U' F R U R'|]
+    , [algExpr|F R' F R2 U' R' U' R U R' F2|]
+    , [algExpr|R' U' F U R U' R' F' R|]
+    , [algExpr|L U F' U' L' U L F L'|]
+    , [algExpr|R U2 R2 F R F' R U2 R'|]
+    , [algExpr|L' U' L U' L' U L U L F' L' F|]
+    , [algExpr|F R' F' R U R U' R'|]
+    , [algExpr|R U R' U R U' R' U' R' F R F'|]
+    , [algExpr|R U R' U R U2 R' F R U R' U' F'|]
+    , [algExpr|R' U' R U' R' U2 R F R U R' U' F'|]
+    , [algExpr|F' U' L' U L F|]
+    , [algExpr|F|] ++ reverseSexy ++ [algExpr|F'|]
+    , [algExpr|R' U' R' F R F' R' F R F' U R|]
+    , [algExpr|F R U R' U' R U R' U' F'|]
+    , [algExpr|L F' L2 B L2 F L2 B' L|]
+    , [algExpr|L' B L2 F' L2 B' L2 F L'|]
+    , [algExpr|R' F2 L F L' F' L F L' F R|]
+    , [algExpr|L F2 R' F' R F R' F' R F' L'|]
     ]
 
 -- Edges oriented algs
@@ -146,22 +148,22 @@ edgesOrientedAlgs = [] : applyFourSidesAlg
     [sune, antisune, hOll, lOll, piOll, tOll, uOll]
 
 sune :: Algorithm
-sune = [R, U, R', U, R, U2, R']
+sune = [algExpr|R U R' U R U2 R'|]
 
 antisune :: Algorithm
 antisune = reverseMoveSeq sune
 
 hOll :: Algorithm
-hOll = [R, U, R', U, R, U', R', U, R, U2, R']
+hOll = [algExpr|R U R' U R U' R' U R U2 R'|]
 
 lOll :: Algorithm
-lOll = [F, R', F', L, F, R, F', L']
+lOll = [algExpr|F R' F' L F R F' L'|]
 
 piOll :: Algorithm
-piOll = [R, U2, R2, U', R2, U', R2, U2, R]
+piOll = [algExpr|R U2 R2 U' R2 U' R2 U2 R|]
 
 tOll :: Algorithm
 tOll = reverseMoveSeq lOll
 
 uOll :: Algorithm
-uOll = [R2, D, R', U2, R, D', R', U2, R']
+uOll = [algExpr|R2 D R' U2 R D' R' U2 R'|]
