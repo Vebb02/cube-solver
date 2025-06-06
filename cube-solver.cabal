@@ -35,7 +35,7 @@ library
                       CFOP.F2L,
                       CFOP.Cross,
                       Triggers,
-                      MoveExpr
+                      AlgExpr
 
     build-depends:    base ^>=4.17.2.1,
                       mtl,

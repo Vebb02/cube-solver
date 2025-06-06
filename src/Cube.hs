@@ -1,15 +1,16 @@
-{-# Language PatternSynonyms #-}
+{-# Language PatternSynonyms, DeriveDataTypeable #-}
 module Cube where
 
 import CubeState
 
 import Control.Monad.State
 import Data.List (minimumBy)
+import Data.Data
 
 type Cube a = State CubeState a
 
 data MoveDirection = Normal | Prime | Two
-    deriving (Eq, Show)
+    deriving (Eq, Show, Data, Typeable)
 
 data MoveFace = 
       FFace
@@ -18,7 +19,7 @@ data MoveFace =
     | BFace
     | LFace
     | DFace
-    deriving (Eq)
+    deriving (Eq, Data, Typeable)
 
 instance Show MoveFace where
     show FFace = "F"
@@ -29,7 +30,7 @@ instance Show MoveFace where
     show DFace = "D"
 
 data Move = Move MoveFace MoveDirection
-    deriving (Eq)
+    deriving (Eq, Data, Typeable)
 
 pattern F :: Move
 pattern F = Move FFace Normal
