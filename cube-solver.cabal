@@ -34,7 +34,8 @@ library
                       CFOP.OLL,
                       CFOP.F2L,
                       CFOP.Cross,
-                      Triggers
+                      Triggers,
+                      MoveExpr
 
     build-depends:    base ^>=4.17.2.1,
                       mtl,
@@ -47,7 +48,8 @@ library
                       servant-server,
                       wai,
                       warp,
-                      bytestring
+                      bytestring,
+                      template-haskell
 
     hs-source-dirs:   src
 
