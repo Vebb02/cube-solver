@@ -34,6 +34,21 @@ data Move = Move MoveFace MoveDirection
 
 type Algorithm = [Move]
 
+data RotationDirection = X | Y | Z
+    deriving (Eq, Show)
+
+data Rotation = Rotation RotationDirection MoveDirection
+    deriving (Eq, Show)
+
+data Slice = M | E | S
+    deriving (Eq, Show)
+
+data SliceMove = SliceMove Slice MoveDirection
+    deriving (Eq, Show)
+
+data WideMove = WideMove MoveFace MoveDirection
+    deriving (Eq, Show)
+
 showAlg :: Algorithm -> String
 showAlg [] = ""
 showAlg [x] = show x
@@ -213,3 +228,44 @@ bestPossibleSolution :: CubeState -> ([a] -> Cube Algorithm) -> [[a]] -> Algorit
 bestPossibleSolution cubeState method orderings = 
     minimumBy (\x y -> if length x < length y then LT else GT) 
         $ map (\x -> evalState (method x) cubeState) orderings
+
+applyRotations :: Move -> [Rotation] -> Move
+applyRotations = foldr applyRotation
+
+applyRotation :: Rotation -> Move -> Move
+applyRotation (Rotation X Normal) (Move FFace dir) = Move DFace dir
+applyRotation (Rotation X Normal) (Move RFace dir) = Move RFace dir
+applyRotation (Rotation X Normal) (Move UFace dir) = Move FFace dir
+applyRotation (Rotation X Normal) (Move BFace dir) = Move UFace dir
+applyRotation (Rotation X Normal) (Move LFace dir) = Move LFace dir
+applyRotation (Rotation X Normal) (Move DFace dir) = Move BFace dir
+applyRotation (Rotation Y Normal) (Move FFace dir) = Move RFace dir
+applyRotation (Rotation Y Normal) (Move RFace dir) = Move BFace dir
+applyRotation (Rotation Y Normal) (Move UFace dir) = Move UFace dir
+applyRotation (Rotation Y Normal) (Move BFace dir) = Move LFace dir
+applyRotation (Rotation Y Normal) (Move LFace dir) = Move FFace dir
+applyRotation (Rotation Y Normal) (Move DFace dir) = Move DFace dir
+applyRotation (Rotation Z Normal) (Move FFace dir) = Move FFace dir
+applyRotation (Rotation Z Normal) (Move RFace dir) = Move UFace dir
+applyRotation (Rotation Z Normal) (Move UFace dir) = Move LFace dir
+applyRotation (Rotation Z Normal) (Move BFace dir) = Move BFace dir
+applyRotation (Rotation Z Normal) (Move LFace dir) = Move DFace dir
+applyRotation (Rotation Z Normal) (Move DFace dir) = Move RFace dir
+applyRotation (Rotation rotationDir Prime) m = applyRotation (Rotation rotationDir Normal) $ applyRotation (Rotation rotationDir Normal) $ applyRotation (Rotation rotationDir Normal) m
+applyRotation (Rotation rotationDir Two) m = applyRotation (Rotation rotationDir Normal) $ applyRotation (Rotation rotationDir Normal) m
+
+rotationAndAlgFromSliceMove :: SliceMove -> (Rotation, Algorithm)
+rotationAndAlgFromSliceMove (SliceMove M dir) =
+    (Rotation X (reverseMoveDirection dir), [Move RFace dir, Move LFace (reverseMoveDirection dir)])
+rotationAndAlgFromSliceMove (SliceMove E dir) =
+    (Rotation Y (reverseMoveDirection dir), [Move UFace dir, Move DFace (reverseMoveDirection dir)])
+rotationAndAlgFromSliceMove (SliceMove S dir) =
+    (Rotation Z (reverseMoveDirection dir), [Move FFace dir, Move BFace (reverseMoveDirection dir)])
+
+rotationAndMoveFromWideMove :: WideMove -> (Rotation, Move)
+rotationAndMoveFromWideMove (WideMove FFace dir) = (Rotation Z dir, Move BFace dir)
+rotationAndMoveFromWideMove (WideMove RFace dir) = (Rotation X dir, Move LFace dir)
+rotationAndMoveFromWideMove (WideMove UFace dir) = (Rotation Y dir, Move DFace dir)
+rotationAndMoveFromWideMove (WideMove BFace dir) = (Rotation Z (reverseMoveDirection dir), Move FFace dir)
+rotationAndMoveFromWideMove (WideMove LFace dir) = (Rotation X (reverseMoveDirection dir), Move RFace dir)
+rotationAndMoveFromWideMove (WideMove DFace dir) = (Rotation Y (reverseMoveDirection dir), Move UFace dir)

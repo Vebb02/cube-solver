@@ -16,5 +16,5 @@ algExpr = QuasiQuoter { quoteExp  = parseAlgExprExp
 
 parseAlgExprExp :: String -> TH.Q TH.Exp
 parseAlgExprExp input = case runParser parseScramble "" (T.pack input) of
-    Left _ -> error "failed"
+    Left errorMessage -> error $ show errorMessage
     Right alg -> liftData alg
