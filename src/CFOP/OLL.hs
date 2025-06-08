@@ -105,8 +105,8 @@ lineFlipAlgs = applyFourSidesAlg
     , [algExpr|F U R U' R' U R U' R' F'|]
     , [algExpr|R U R' U R U' B U' B' R'|]
     , [algExpr|R' F R U R U' R2 F' R2 U' R' U R U R'|]
-    , [algExpr|L F L' U R U' R' U R U' R' L F' L'|]
-    , [algExpr|R U R' U' R' L F R F' L'|]
+    , [algExpr|r U r' U R U' R' U R U' R' r U' r'|]
+    , [algExpr|R U R' U' M' U R U' r'|]
     ]
 -- Angle flip algs
 
@@ -138,7 +138,7 @@ angleFlipAlgs = applyFourSidesAlg
     , [algExpr|L F' L2 B L2 F L2 B' L|]
     , [algExpr|L' B L2 F' L2 B' L2 F L'|]
     , [algExpr|R' F2 L F L' F' L F L' F R|]
-    , [algExpr|L F2 R' F' R F R' F' R F' L'|]
+    , [algExpr|r U2 R' U' R U R' U' R U' r'|]
     ]
 
 -- Edges oriented algs
@@ -157,13 +157,13 @@ hOll :: Algorithm
 hOll = [algExpr|R U R' U R U' R' U R U2 R'|]
 
 lOll :: Algorithm
-lOll = [algExpr|F R' F' L F R F' L'|]
+lOll = [algExpr|F R' F' r U R U' r'|]
 
 piOll :: Algorithm
 piOll = [algExpr|R U2 R2 U' R2 U' R2 U2 R|]
 
 tOll :: Algorithm
-tOll = reverseMoveSeq lOll
+tOll = [algExpr|r U R' U' r' F R F'|]
 
 uOll :: Algorithm
 uOll = [algExpr|R2 D R' U2 R D' R' U2 R'|]

@@ -120,7 +120,7 @@ fPerm :: Algorithm
 fPerm = [algExpr|R' U' F'|] ++ init tPerm ++ [algExpr|U R|]
 
 aaPerm :: Algorithm
-aaPerm = [algExpr|R' F R' B2 R F' R' B2 R2|]
+aaPerm = [algExpr|x R' U R' D2 R U' R' D2 R2|]
 
 abPerm :: Algorithm
 abPerm = reverseMoveSeq aaPerm
@@ -155,7 +155,7 @@ vPerm :: Algorithm
 vPerm = [algExpr|R U' R U R' D R D' R U' D R2 U R2 D' R2|]
 
 ePerm :: Algorithm
-ePerm = [algExpr|R' U' R' D' R U' R' D R U R' D' R U R' D R2|]
+ePerm = [algExpr|x' R U' R' D R U R' D' R U R' D R U' R' D'|]
 
 naPerm :: Algorithm
 naPerm = [algExpr|R U R' U|] ++ jbPerm ++ [algExpr|U2 R U' R'|]

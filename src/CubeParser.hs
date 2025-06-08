@@ -39,7 +39,7 @@ parseCubeState = do
     space
     eof
 
-    let cubeState = CubeState { 
+    let cubeState = CubeState {
           f = Center f5
         , r = Center r5
         , u = Center u5
@@ -73,21 +73,93 @@ parseCubeState = do
 
 parseScramble :: Parser Algorithm
 parseScramble = do
-    moves <- endBy parseMove space
+    moves <-parseScrambleHelper [] <|> return []
     eof
     return moves
+
+parseScrambleHelper :: [Rotation] -> Parser Algorithm
+parseScrambleHelper rotations = do
+    (maybeRotation, alg) <- parseNextMoveWithRotation
+    space
+    let rotatedAlg = map (`applyRotations` rotations) alg
+    let prependedRotations = prependIfExist maybeRotation rotations
+    rest <- parseScrambleHelper prependedRotations <|> return []
+    return $ rotatedAlg ++ rest
+
+prependIfExist :: Maybe a -> [a] -> [a]
+prependIfExist (Just a) list = a : list
+prependIfExist Nothing list = list
+
+parseNextMoveWithRotation :: Parser (Maybe Rotation, Algorithm)
+parseNextMoveWithRotation =
+        parseMoveWithRotation
+    <|> parseRotationWithAlg
+    <|> parseWideMoveWithRotation
+    <|> parseSliceMoveWithRotation
+
+parseMoveWithRotation :: Parser (Maybe Rotation, Algorithm)
+parseMoveWithRotation = do
+    m <- parseMove
+    return (Nothing, [m])
+
+parseWideMoveWithRotation :: Parser (Maybe Rotation, Algorithm)
+parseWideMoveWithRotation = do
+    wideMove <- parseWideMove
+    let (rotation, m) = rotationAndMoveFromWideMove wideMove
+    return (Just rotation, [m])
+
+parseWideMove :: Parser WideMove
+parseWideMove = WideMove <$> parseWideTurningFace <*> parseDirection
+
+parseWideTurningFace :: Parser MoveFace
+parseWideTurningFace =
+        FFace <$ char 'f'
+    <|> RFace <$ char 'r'
+    <|> UFace <$ char 'u'
+    <|> BFace <$ char 'b'
+    <|> LFace <$ char 'l'
+    <|> DFace <$ char 'd'
+
+parseSliceMoveWithRotation :: Parser (Maybe Rotation, Algorithm)
+parseSliceMoveWithRotation = do
+    sliceMove <- parseSliceMove
+    let (rotation, alg) = rotationAndAlgFromSliceMove sliceMove
+    return (Just rotation, alg)
+
+parseSliceMove :: Parser SliceMove
+parseSliceMove = SliceMove <$> parseSlice <*> parseDirection
+
+parseSlice :: Parser Slice
+parseSlice =
+        M <$ char 'M'
+    <|> E <$ char 'E'
+    <|> S <$ char 'S'
+
+parseRotationWithAlg :: Parser (Maybe Rotation, Algorithm)
+parseRotationWithAlg = do
+    rotation <- parseRotation
+    return (Just rotation, [])
+
+parseRotation :: Parser Rotation
+parseRotation = Rotation <$> parseRotationDirection <*> parseDirection
+
+parseRotationDirection :: Parser RotationDirection
+parseRotationDirection =
+        X <$ char 'x'
+    <|> Y <$ char 'y'
+    <|> Z <$ char 'z'
 
 parseMove :: Parser Move
 parseMove = Move <$> parseTurningFace <*> parseDirection
 
 parseTurningFace :: Parser MoveFace
 parseTurningFace =
-        FFace <$ char' 'F'
-    <|> RFace <$ char' 'R'
-    <|> UFace <$ char' 'U'
-    <|> BFace <$ char' 'B'
-    <|> LFace <$ char' 'L'
-    <|> DFace <$ char' 'D'
+        FFace <$ char 'F'
+    <|> RFace <$ char 'R'
+    <|> UFace <$ char 'U'
+    <|> BFace <$ char 'B'
+    <|> LFace <$ char 'L'
+    <|> DFace <$ char 'D'
 
 parseDirection :: Parser MoveDirection
 parseDirection =
